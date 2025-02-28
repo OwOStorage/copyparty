@@ -1409,7 +1409,7 @@ function up2k_init(subtle) {
                 name = good_files[a][1],
                 fdir = evpath,
                 now = Date.now(),
-                lmod = uc.u2ts ? (fobj.lastModified || now) : 0,
+                lmod = (uc.u2ts && fobj.lastModified) || 0,
                 ofs = name.lastIndexOf('/') + 1;
 
             if (ofs) {

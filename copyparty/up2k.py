@@ -2954,9 +2954,14 @@ class Up2k(object):
                     self.salt, cj["size"], cj["lmod"], cj["prel"], cj["name"]
                 )
 
-            if vfs.flags.get("up_ts", "") == "fu" or not cj["lmod"]:
+            zi = cj["lmod"]
+            bad_mt = zi <= 0 or zi > 0xAAAAAAAA
+            if bad_mt or vfs.flags.get("up_ts", "") == "fu":
                 # force upload time rather than last-modified
                 cj["lmod"] = int(time.time())
+                if zi and bad_mt:
+                    t = "ignoring impossible last-modified time from client: %s"
+                    self.log(t % (zi,), 6)
 
             alts: list[tuple[int, int, dict[str, Any], "sqlite3.Cursor", str, str]] = []
             for ptop, cur in vols:
