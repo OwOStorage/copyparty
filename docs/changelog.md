@@ -1,4 +1,68 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0225-0017  `v1.16.15`  fix low-severity vuln
+
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+## ⚠️ this fixes a minor vulnerability; CVE-score `3.6`/`10`
+
+[GHSA-m2jw-cj8v-937r](https://github.com/9001/copyparty/security/advisories/GHSA-m2jw-cj8v-937r) aka [CVE-2025-27145](https://www.cve.org/CVERecord?id=CVE-2025-27145) could let an attacker run arbitrary javascript by tricking an authenticated user into uploading files with malicious filenames
+
+* ...but it required some clever social engineering, and is **not likely** to be a cause for concern... ah, better safe than sorry
+
+there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates, such as [vulnerabilities](https://github.com/9001/copyparty/security) (most recently 2025-02-25)
+
+## recent important news
+
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## 🧪 new features
+
+* nothing this time
+
+## 🩹 bugfixes
+
+* fix [GHSA-m2jw-cj8v-937r](https://github.com/9001/copyparty/security/advisories/GHSA-m2jw-cj8v-937r) / [CVE-2025-27145](https://www.cve.org/CVERecord?id=CVE-2025-27145) in 438ea6cc
+  * when trying to upload an empty files by dragging it into the browser, the filename would be rendered as HTML, allowing javascript injection if the filename was malicious
+  * issue discovered and reported by @JayPatel48 (thx!)
+* related issues in errorhandling of uploads 499ae1c7 36866f1d
+  * these all had the same consequences as the GHSA above, but a network outage was necessary to trigger them
+    * which would probably have the lucky side-effect of blocking the javascript download, nice
+* paranoid fixing of probably-not-even-issues 3adbb2ff
+* fix some markdown / texteditor bugs 407531bc
+  * only indicate file-versions for markdown files in listings, since it's tricky to edit non-textfiles otherwise
+  * CTRL-C followed by CTRL-V and CTRL-Z in a single-line file would make a character fall off
+  * ensure safety of extensions
+
+## 🔧 other changes
+
+* readme:
+  * mention support for running the server on risc-v 6d102fc8
+  * mention that the [sony psp](https://github.com/user-attachments/assets/9d21f020-1110-4652-abeb-6fc09c533d4f) can browse and upload 598a29a7
+
+----
+
+# 💾 what to download?
+| download link | is it good? | description |
+| -- | -- | -- |
+| **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/download/copyparty-sfx.py)** | ✅ the best 👍 | runs anywhere! only needs python |
+| [a docker image](https://github.com/9001/copyparty/blob/hovudstraum/scripts/docker/README.md) | it's ok | good if you prefer docker 🐋 |
+| [copyparty.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty.exe) |  ⚠️ [acceptable](https://github.com/9001/copyparty#copypartyexe) | for [win8](https://user-images.githubusercontent.com/241032/221445946-1e328e56-8c5b-44a9-8b9f-dee84d942535.png) or later; built-in thumbnailer |
+| [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.16.14/u2c.exe) | ⚠️ acceptable | [CLI uploader](https://github.com/9001/copyparty/blob/hovudstraum/bin/u2c.py) as a win7+ exe ([video](https://a.ocv.me/pub/demo/pics-vids/u2cli.webm)) |
+| [copyparty.pyz](https://github.com/9001/copyparty/releases/latest/download/copyparty.pyz) | ⚠️ acceptable | similar to the regular sfx, [mostly worse](https://github.com/9001/copyparty#zipapp) |
+| [copyparty32.exe](https://github.com/9001/copyparty/releases/latest/download/copyparty32.exe) | ⛔️ [dangerous](https://github.com/9001/copyparty#copypartyexe) | for [win7](https://user-images.githubusercontent.com/241032/221445944-ae85d1f4-d351-4837-b130-82cab57d6cca.png) -- never expose to the internet! |
+| [cpp-winpe64.exe](https://github.com/9001/copyparty/releases/download/v1.16.5/copyparty-winpe64.exe) | ⛔️ dangerous | runs on [64bit WinPE](https://user-images.githubusercontent.com/241032/205454984-e6b550df-3c49-486d-9267-1614078dd0dd.png), otherwise useless |
+
+* except for [u2c.exe](https://github.com/9001/copyparty/releases/download/v1.16.14/u2c.exe), all of the options above are mostly equivalent
+* the zip and tar.gz files below are just source code
+* python packages are available at [PyPI](https://pypi.org/project/copyparty/#files)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0219-2309  `v1.16.14`  overwrite by upload
 
 ## 🧪 new features
