@@ -1584,12 +1584,8 @@ class AuthSrv(object):
         for vol in vfs.all_vols.values():
             unknown_flags = set()
             for k, v in vol.flags.items():
-                stripped = k.lstrip("-")
-                if k != stripped and stripped not in vol.flags:
-                    t = "WARNING: the config for volume [/%s] tried to remove volflag [%s] by specifying [%s] but that volflag was not already set"
-                    self.log(t % (vol.vpath, stripped, k), 3)
-                k = stripped
-                if k not in flagdescs and k not in k_ign:
+                ks = k.lstrip("-")
+                if ks not in flagdescs and ks not in k_ign:
                     unknown_flags.add(k)
             if unknown_flags:
                 t = "WARNING: the config for volume [/%s] has unrecognized volflags; will ignore: '%s'"
@@ -2181,8 +2177,13 @@ class AuthSrv(object):
         for vol in vfs.all_nodes.values():
             for k in list(vol.flags.keys()):
                 if re.match("^-[^-]+$", k):
-                    vol.flags.pop(k[1:], None)
                     vol.flags.pop(k)
+                    zs = k[1:]
+                    if zs in vol.flags:
+                        vol.flags.pop(k[1:])
+                    else:
+                        t = "WARNING: the config for volume [/%s] tried to remove volflag [%s] by specifying [%s] but that volflag was not already set"
+                        self.log(t % (vol.vpath, zs, k), 3)
 
             if vol.flags.get("dots"):
                 for name in vol.axs.uread:
