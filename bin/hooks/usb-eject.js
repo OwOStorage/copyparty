@@ -1,7 +1,9 @@
 // see usb-eject.py for usage
 
 function usbclick() {
-    QS('#treeul a[href="/usb/"]').click();
+    var o = QS('#treeul a[href="/usb/"]') || QS('#treepar a[href="/usb/"]');
+    if (o)
+        o.click();
 }
 
 function eject_cb() {
@@ -19,11 +21,14 @@ function add_eject_2(a) {
         return;
 
     var v = aw[2],
-        k = 'umount_' + v,
-        o = ebi(k);
+        k = 'umount_' + v;
 
-    if (o)
+    for (var b = 0; b < 9; b++) {
+        var o = ebi(k);
+        if (!o)
+            break;
         o.parentNode.removeChild(o);
+    }
 
     a.appendChild(mknod('span', k, '⏏'), a);
     o = ebi(k);
@@ -40,7 +45,7 @@ function add_eject_2(a) {
 };
 
 function add_eject() {
-    var o = QSA('#treeul a[href^="/usb/"]');
+    var o = QSA('#treeul a[href^="/usb/"]') || QSA('#treepar a[href^="/usb/"]');
     for (var a = o.length - 1; a > 0; a--)
         add_eject_2(o[a]);
 };
