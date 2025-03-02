@@ -1,13 +1,13 @@
 // see usb-eject.py for usage
 
 function usbclick() {
-    var o = QS('#treeul a[href="/usb/"]') || QS('#treepar a[href="/usb/"]');
+    var o = QS('#treeul a[dst="/usb/"]') || QS('#treepar a[dst="/usb/"]');
     if (o)
         o.click();
 }
 
 function eject_cb() {
-    var t = this.responseText;
+    var t = ('' + this.responseText).trim();
     if (t.indexOf('can be safely unplugged') < 0 && t.indexOf('Device can be removed') < 0)
         return toast.err(30, 'usb eject failed:\n\n' + t);
 
