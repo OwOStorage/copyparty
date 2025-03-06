@@ -20,6 +20,7 @@ import time
 import uuid
 from datetime import datetime
 from operator import itemgetter
+from ipaddress import IPv6Network
 
 import jinja2  # typechk
 
@@ -387,11 +388,12 @@ class HttpCli(object):
                         t += '  Note: if you are behind cloudflare, then this default header is not a good choice; please first make sure your local reverse-proxy (if any) does not allow non-cloudflare IPs from providing cf-* headers, and then add this additional global setting: "--xff-hdr=cf-connecting-ip"'
                     else:
                         t += '  Note: depending on your reverse-proxy, and/or WAF, and/or other intermediates, you may want to read the true client IP from another header by also specifying "--xff-hdr=SomeOtherHeader"'
-                    zs = (
-                        ".".join(pip.split(".")[:2]) + "."
-                        if "." in pip
-                        else ":".join(pip.split(":")[:4]) + ":"
-                    ) + "0.0/16"
+
+                    if "." in pip:
+                        zs = ".".join(pip.split(".")[:2]) + ".0.0/16"
+                    else:
+                        zs = IPv6Network(pip + "/64", False).compressed
+
                     zs2 = ' or "--xff-src=lan"' if self.conn.xff_lan.map(pip) else ""
                     self.log(t % (self.args.xff_hdr, pip, cli_ip, zso, zs, zs2), 3)
                     self.bad_xff = True
