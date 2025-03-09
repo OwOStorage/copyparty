@@ -359,6 +359,7 @@ class VFS(object):
         self.lim: Optional[Lim] = None  # upload limits; only set for dbv
         self.shr_src: Optional[tuple[VFS, str]] = None  # source vfs+rem of a share
         self.shr_files: set[str] = set()  # filenames to include from shr_src
+        self.shr_owner: str = ""  # uname
         self.aread: dict[str, list[str]] = {}
         self.awrite: dict[str, list[str]] = {}
         self.amove: dict[str, list[str]] = {}
@@ -376,7 +377,7 @@ class VFS(object):
             vp = vpath + ("/" if vpath else "")
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
             self.all_vols = {vpath: self}  # flattened recursive
-            self.all_nodes = {vpath: self}  # also jumpvols
+            self.all_nodes = {vpath: self}  # also jumpvols/shares
             self.all_aps = [(rp, self)]
             self.all_vps = [(vp, self)]
         else:
@@ -2327,11 +2328,6 @@ class AuthSrv(object):
                 for x, y in vfs.all_vols.items()
                 if x != shr and not x.startswith(shrs)
             }
-            vfs.all_nodes = {
-                x: y
-                for x, y in vfs.all_nodes.items()
-                if x != shr and not x.startswith(shrs)
-            }
 
             assert db and cur and cur2 and shv  # type: ignore
             for row in cur.execute("select * from sh"):
@@ -2361,6 +2357,7 @@ class AuthSrv(object):
                 else:
                     shn.ls = shn._ls
 
+                shn.shr_owner = s_un
                 shn.shr_src = (s_vfs, s_rem)
                 shn.realpath = s_vfs.canonical(s_rem)
 
@@ -2386,7 +2383,9 @@ class AuthSrv(object):
 
         self.js_ls = {}
         self.js_htm = {}
-        for vn in self.vfs.all_nodes.values():
+        for vp, vn in self.vfs.all_nodes.items():
+            if enshare and vp.startswith(shrs):
+                continue  # propagates later in this func
             vf = vn.flags
             vn.js_ls = {
                 "idx": "e2d" in vf,
@@ -2444,8 +2443,12 @@ class AuthSrv(object):
         vols = list(vfs.all_nodes.values())
         if enshare:
             assert shv  # type: ignore  # !rm
-            vols.append(shv)
-            vols.extend(list(shv.nodes.values()))
+            for vol in shv.nodes.values():
+                if vol.vpath not in vfs.all_nodes:
+                    self.log("BUG: /%s not in all_nodes" % (vol.vpath,), 1)
+                    vols.append(vol)
+            if shr in vfs.all_nodes:
+                self.log("BUG: %s found in all_nodes" % (shr,), 1)
 
         for vol in vols:
             dbv = vol.get_dbv("")[0]

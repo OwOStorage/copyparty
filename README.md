@@ -100,6 +100,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
         * [GDPR compliance](#GDPR-compliance) - imagine using copyparty professionally...
         * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
+        * [feature beefybits](#feature-beefybits) - force-enable incompatible features
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [fedora package](#fedora-package) - does not exist yet
@@ -2135,6 +2136,15 @@ buggy feature? rip it out  by setting any of the following environment variables
 | `PRTY_NO_TPOKE`      | disable systemd-tmpfilesd avoider |
 
 example: `PRTY_NO_IFADDR=1 python3 copyparty-sfx.py`
+
+
+### feature beefybits
+
+force-enable features with known issues on your OS/env  by setting any of the following environment variables, also affectionately knnown as `fuckitbits` or `hail-mary-bits`
+
+| env-var                  | what it does |
+| ------------------------ | ------------ |
+| `PRTY_FORCE_MP`          | force-enable multiprocessing (real multithreading) on MacOS and other broken platforms |
 
 
 # packages

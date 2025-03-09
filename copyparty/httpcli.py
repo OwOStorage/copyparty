@@ -5012,6 +5012,8 @@ class HttpCli(object):
     def get_dls(self) -> list[list[Any]]:
         ret = []
         dls = self.conn.hsrv.tdls
+        enshare = self.args.shr
+        shrs = enshare[1:]
         for dl_id, (t0, sz, vn, vp, uname) in self.conn.hsrv.tdli.items():
             t1, sent = dls[dl_id]
             if sent > 0x100000:  # 1m; buffers 2~4
@@ -5019,6 +5021,15 @@ class HttpCli(object):
             if self.uname not in vn.axs.uread:
                 vp = ""
             elif self.uname not in vn.axs.udot and (vp.startswith(".") or "/." in vp):
+                vp = ""
+            elif (
+                enshare
+                and vp.startswith(shrs)
+                and self.uname != vn.shr_owner
+                and self.uname not in vn.axs.uadmin
+                and self.uname not in self.args.shr_adm
+                and not dl_id.startswith(self.ip + ":")
+            ):
                 vp = ""
             if self.uname not in vn.axs.uadmin:
                 dl_id = uname = ""

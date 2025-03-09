@@ -1260,7 +1260,7 @@ class SvcHub(object):
                 raise
 
     def check_mp_support(self) -> str:
-        if MACOS:
+        if MACOS and not os.environ.get("PRTY_FORCE_MP"):
             return "multiprocessing is wonky on mac osx;"
         elif sys.version_info < (3, 3):
             return "need python 3.3 or newer for multiprocessing;"
@@ -1280,7 +1280,7 @@ class SvcHub(object):
             return False
 
         try:
-            if mp.cpu_count() <= 1:
+            if mp.cpu_count() <= 1 and not os.environ.get("PRTY_FORCE_MP"):
                 raise Exception()
         except:
             self.log("svchub", "only one CPU detected; multiprocessing disabled")
