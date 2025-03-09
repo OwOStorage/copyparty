@@ -2140,7 +2140,7 @@ example: `PRTY_NO_IFADDR=1 python3 copyparty-sfx.py`
 
 ### feature beefybits
 
-force-enable features with known issues on your OS/env  by setting any of the following environment variables, also affectionately knnown as `fuckitbits` or `hail-mary-bits`
+force-enable features with known issues on your OS/env  by setting any of the following environment variables, also affectionately known as `fuckitbits` or `hail-mary-bits`
 
 | env-var                  | what it does |
 | ------------------------ | ------------ |
