@@ -33,6 +33,7 @@ from .util import (
     get_df,
     humansize,
     odfusion,
+    read_utf8,
     relchk,
     statdir,
     ub64enc,
@@ -2547,8 +2548,8 @@ class AuthSrv(object):
             if not bos.path.exists(ap):
                 pwdb = {}
             else:
-                with open(ap, "r", encoding="utf-8") as f:
-                    pwdb = json.load(f)
+                jtxt = read_utf8(self.log, ap, True)
+                pwdb = json.loads(jtxt)
 
             pwdb = [x for x in pwdb if x[0] != uname]
             pwdb.append((uname, self.defpw[uname], hpw))
@@ -2571,8 +2572,8 @@ class AuthSrv(object):
         if not self.args.chpw or not bos.path.exists(ap):
             return
 
-        with open(ap, "r", encoding="utf-8") as f:
-            pwdb = json.load(f)
+        jtxt = read_utf8(self.log, ap, True)
+        pwdb = json.loads(jtxt)
 
         useen = set()
         urst = set()
@@ -3068,8 +3069,9 @@ def expand_config_file(
     ipath += " -> " + fp
     ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
 
-    with open(fp, "rb") as f:
-        for oln in [x.decode("utf-8").rstrip() for x in f]:
+    cfg_lines = read_utf8(log, fp, True).split("\n")
+    if True:  # diff-golf
+        for oln in [x.rstrip() for x in cfg_lines]:
             ln = oln.split("  #")[0].strip()
             if ln.startswith("% "):
                 pad = " " * len(oln.split("%")[0])

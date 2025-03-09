@@ -87,6 +87,7 @@ from .util import (
     quotep,
     rand_name,
     read_header,
+    read_utf8,
     read_socket,
     read_socket_chunked,
     read_socket_unbounded,
@@ -870,8 +871,7 @@ class HttpCli(object):
             html = html.replace("%", "", 1)
 
         if html.startswith("@"):
-            with open(html[1:], "rb") as f:
-                html = f.read().decode("utf-8")
+            html = read_utf8(self.log, html[1:], True)
 
         if html.startswith("%"):
             html = html[1:]
@@ -3740,8 +3740,7 @@ class HttpCli(object):
                     continue
                 fn = "%s/%s" % (abspath, fn)
                 if bos.path.isfile(fn):
-                    with open(fsenc(fn), "rb") as f:
-                        logues[n] = f.read().decode("utf-8")
+                    logues[n] = read_utf8(self.log, fsenc(fn), False)
                     if "exp" in vn.flags:
                         logues[n] = self._expand(
                             logues[n], vn.flags.get("exp_lg") or []
@@ -3762,9 +3761,8 @@ class HttpCli(object):
             for fn in fns:
                 fn = "%s/%s" % (abspath, fn)
                 if bos.path.isfile(fn):
-                    with open(fsenc(fn), "rb") as f:
-                        txt = f.read().decode("utf-8")
-                        break
+                    txt = read_utf8(self.log, fsenc(fn), False)
+                    break
 
             if txt and "exp" in vn.flags:
                 txt = self._expand(txt, vn.flags.get("exp_md") or [])
@@ -6254,9 +6252,7 @@ class HttpCli(object):
                 docpath = os.path.join(abspath, doc)
                 sz = bos.path.getsize(docpath)
                 if sz < 1024 * self.args.txt_max:
-                    with open(fsenc(docpath), "rb") as f:
-                        doctxt = f.read().decode("utf-8", "replace")
-
+                    doctxt = read_utf8(self.log, fsenc(docpath), False)
                     if doc.lower().endswith(".md") and "exp" in vn.flags:
                         doctxt = self._expand(doctxt, vn.flags.get("exp_md") or [])
                 else:

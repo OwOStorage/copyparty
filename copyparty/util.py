@@ -594,6 +594,38 @@ except Exception as ex:
         print("using fallback base64 codec due to %r" % (ex,))
 
 
+class NotUTF8(Exception):
+    pass
+
+
+def read_utf8(log: Optional["NamedLogger"], ap: Union[str, bytes], strict: bool) -> str:
+    with open(ap, "rb") as f:
+        buf = f.read()
+
+    try:
+        return buf.decode("utf-8", "strict")
+    except UnicodeDecodeError as ex:
+        eo = ex.start
+        eb = buf[eo : eo + 1]
+
+    if not strict:
+        t = "WARNING: The file [%s] is not using the UTF-8 character encoding; some characters in the file will be skipped/ignored. The first unreadable character was byte %r at offset %d. Please convert this file to UTF-8 by opening the file in your text-editor and saving it as UTF-8."
+        t = t % (ap, eb, eo)
+        if log:
+            log(t, 3)
+        else:
+            print(t)
+        return buf.decode("utf-8", "replace")
+
+    t = "ERROR: The file [%s] is not using the UTF-8 character encoding, and cannot be loaded. The first unreadable character was byte %r at offset %d. Please convert this file to UTF-8 by opening the file in your text-editor and saving it as UTF-8."
+    t = t % (ap, eb, eo)
+    if log:
+        log(t, 3)
+    else:
+        print(t)
+    raise NotUTF8(t)
+
+
 class Daemon(threading.Thread):
     def __init__(
         self,

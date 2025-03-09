@@ -65,6 +65,7 @@ from .util import (
     load_resource,
     min_ex,
     pybin,
+    read_utf8,
     termsize,
     wrap,
 )
@@ -255,8 +256,7 @@ def get_srvname(verbose) -> str:
     if verbose:
         lprint("using hostname from {}\n".format(fp))
     try:
-        with open(fp, "rb") as f:
-            ret = f.read().decode("utf-8", "replace").strip()
+        return read_utf8(None, fp, True).strip()
     except:
         ret = ""
         namelen = 5
@@ -265,47 +265,18 @@ def get_srvname(verbose) -> str:
             ret = re.sub("[234567=]", "", ret)[:namelen]
         with open(fp, "wb") as f:
             f.write(ret.encode("utf-8") + b"\n")
+        return ret
 
-    return ret
 
-
-def get_fk_salt() -> str:
-    fp = os.path.join(E.cfg, "fk-salt.txt")
+def get_salt(name: str, nbytes: int) -> str:
+    fp = os.path.join(E.cfg, "%s-salt.txt" % (name,))
     try:
-        with open(fp, "rb") as f:
-            ret = f.read().strip()
+        return read_utf8(None, fp, True).strip()
     except:
-        ret = b64enc(os.urandom(18))
+        ret = b64enc(os.urandom(nbytes))
         with open(fp, "wb") as f:
             f.write(ret + b"\n")
-
-    return ret.decode("utf-8")
-
-
-def get_dk_salt() -> str:
-    fp = os.path.join(E.cfg, "dk-salt.txt")
-    try:
-        with open(fp, "rb") as f:
-            ret = f.read().strip()
-    except:
-        ret = b64enc(os.urandom(30))
-        with open(fp, "wb") as f:
-            f.write(ret + b"\n")
-
-    return ret.decode("utf-8")
-
-
-def get_ah_salt() -> str:
-    fp = os.path.join(E.cfg, "ah-salt.txt")
-    try:
-        with open(fp, "rb") as f:
-            ret = f.read().strip()
-    except:
-        ret = b64enc(os.urandom(18))
-        with open(fp, "wb") as f:
-            f.write(ret + b"\n")
-
-    return ret.decode("utf-8")
+        return ret.decode("utf-8")
 
 
 def ensure_locale() -> None:
@@ -1552,9 +1523,9 @@ def run_argparse(
 
     cert_path = os.path.join(E.cfg, "cert.pem")
 
-    fk_salt = get_fk_salt()
-    dk_salt = get_dk_salt()
-    ah_salt = get_ah_salt()
+    fk_salt = get_salt("fk", 18)
+    dk_salt = get_salt("dk", 30)
+    ah_salt = get_salt("ah", 18)
 
     # alpine peaks at 5 threads for some reason,
     # all others scale past that (but try to avoid SMT),
