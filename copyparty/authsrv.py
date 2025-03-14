@@ -47,7 +47,7 @@ from .util import (
 if True:  # pylint: disable=using-constant-test
     from collections.abc import Iterable
 
-    from typing import Any, Generator, Optional, Union
+    from typing import Any, Generator, Optional, Sequence, Union
 
     from .util import NamedLogger, RootLogger
 
@@ -1803,6 +1803,29 @@ class AuthSrv(object):
             vfs.histtab[zv.realpath] = histp
 
         for vol in vfs.all_vols.values():
+            use = False
+            for k, si in [["zipmaxn", ""], ["zipmaxs", "m"]]:
+                try:
+                    zs = vol.flags[k]
+                except:
+                    zs = getattr(self.args, k)
+                if zs in ("", "0"):
+                    vol.flags[k] = 0
+                    continue
+
+                try:
+                    _ = float(zs)
+                    zs = "%s%s" % (zs, si)
+                except:
+                    pass
+                zf = unhumanize(zs)
+                vol.flags[k] = zf
+                if zf:
+                    use = True
+            if use:
+                vol.flags["zipmax"] = True
+
+        for vol in vfs.all_vols.values():
             lim = Lim(self.log_func)
             use = False
 
@@ -2730,7 +2753,7 @@ class AuthSrv(object):
     def dbg_ls(self) -> None:
         users = self.args.ls
         vol = "*"
-        flags: list[str] = []
+        flags: Sequence[str] = []
 
         try:
             users, vol = users.split(",", 1)

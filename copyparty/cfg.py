@@ -55,6 +55,7 @@ def vf_bmap() -> dict[str, str]:
         "xdev",
         "xlink",
         "xvol",
+        "zipmaxu",
     ):
         ret[k] = k
     return ret
@@ -101,6 +102,7 @@ def vf_vmap() -> dict[str, str]:
         "u2ts",
         "ups_who",
         "zip_who",
+        "zipmaxt",
     ):
         ret[k] = k
     return ret
@@ -299,6 +301,10 @@ flagcats = {
         "rss": "allow '?rss' URL suffix (experimental)",
         "ups_who=2": "restrict viewing the list of recent uploads",
         "zip_who=2": "restrict access to download-as-zip/tar",
+        "zipmaxn=9k": "reject download-as-zip if more than 9000 files",
+        "zipmaxs=2g": "reject download-as-zip if size over 2 GiB",
+        "zipmaxt=no": "reply with 'no' if download-as-zip exceeds max",
+        "zipmaxu": "zip-size-limit does not apply to authenticated users",
         "nopipe": "disable race-the-beam (download unfinished uploads)",
         "mv_retry": "ms-windows: timeout for renaming busy files",
         "rm_retry": "ms-windows: timeout for deleting busy files",

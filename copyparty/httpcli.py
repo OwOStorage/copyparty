@@ -20,9 +20,9 @@ import time
 import uuid
 from datetime import datetime
 from operator import itemgetter
-from ipaddress import IPv6Network
 
 import jinja2  # typechk
+from ipaddress import IPv6Network
 
 try:
     if os.environ.get("PRTY_NO_LZMA"):
@@ -87,10 +87,10 @@ from .util import (
     quotep,
     rand_name,
     read_header,
-    read_utf8,
     read_socket,
     read_socket_chunked,
     read_socket_unbounded,
+    read_utf8,
     relchk,
     ren_open,
     runhook,
@@ -4365,6 +4365,33 @@ class HttpCli(object):
             fn = fn.rstrip("/").split("/")[-1]
         else:
             fn = self.host.split(":")[0]
+
+        if vn.flags.get("zipmax") and (not self.uname or not "zipmaxu" in vn.flags):
+            maxs = vn.flags.get("zipmaxs") or 0
+            maxn = vn.flags.get("zipmaxn") or 0
+            nf = 0
+            nb = 0
+            fgen = vn.zipgen(
+                vpath, rem, set(items), self.uname, False, not self.args.no_scandir
+            )
+            t = "total size exceeds a limit specified in server config"
+            t = vn.flags.get("zipmaxt") or t
+            if maxs and maxn:
+                for zd in fgen:
+                    nf += 1
+                    nb += zd["st"].st_size
+                    if maxs < nb or maxn < nf:
+                        raise Pebkac(400, t)
+            elif maxs:
+                for zd in fgen:
+                    nb += zd["st"].st_size
+                    if maxs < nb:
+                        raise Pebkac(400, t)
+            elif maxn:
+                for zd in fgen:
+                    nf += 1
+                    if maxn < nf:
+                        raise Pebkac(400, t)
 
         safe = (string.ascii_letters + string.digits).replace("%", "")
         afn = "".join([x if x in safe.replace('"', "") else "_" for x in fn])
