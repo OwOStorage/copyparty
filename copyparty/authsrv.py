@@ -343,12 +343,14 @@ class VFS(object):
         log: Optional["RootLogger"],
         realpath: str,
         vpath: str,
+        vpath0: str,
         axs: AXS,
         flags: dict[str, Any],
     ) -> None:
         self.log = log
         self.realpath = realpath  # absolute path on host filesystem
         self.vpath = vpath  # absolute path in the virtual filesystem
+        self.vpath0 = vpath0  # original vpath (before idp expansion)
         self.axs = axs
         self.flags = flags  # config options
         self.root = self
@@ -417,7 +419,7 @@ class VFS(object):
         for v in self.nodes.values():
             v.get_all_vols(vols, nodes, aps, vps)
 
-    def add(self, src: str, dst: str) -> "VFS":
+    def add(self, src: str, dst: str, dst0: str) -> "VFS":
         """get existing, or add new path to the vfs"""
         assert src == "/" or not src.endswith("/")  # nosec
         assert not dst.endswith("/")  # nosec
@@ -425,20 +427,22 @@ class VFS(object):
         if "/" in dst:
             # requires breadth-first population (permissions trickle down)
             name, dst = dst.split("/", 1)
+            name0, dst0 = dst0.split("/", 1)
             if name in self.nodes:
                 # exists; do not manipulate permissions
-                return self.nodes[name].add(src, dst)
+                return self.nodes[name].add(src, dst, dst0)
 
             vn = VFS(
                 self.log,
                 os.path.join(self.realpath, name) if self.realpath else "",
                 "{}/{}".format(self.vpath, name).lstrip("/"),
+                "{}/{}".format(self.vpath0, name0).lstrip("/"),
                 self.axs,
                 self._copy_flags(name),
             )
             vn.dbv = self.dbv or self
             self.nodes[name] = vn
-            return vn.add(src, dst)
+            return vn.add(src, dst, dst0)
 
         if dst in self.nodes:
             # leaf exists; return as-is
@@ -446,7 +450,8 @@ class VFS(object):
 
         # leaf does not exist; create and keep permissions blank
         vp = "{}/{}".format(self.vpath, dst).lstrip("/")
-        vn = VFS(self.log, src, vp, AXS(), {})
+        vp0 = "{}/{}".format(self.vpath0, dst0).lstrip("/")
+        vn = VFS(self.log, src, vp, vp0, AXS(), {})
         vn.dbv = self.dbv or self
         self.nodes[dst] = vn
         return vn
@@ -863,7 +868,7 @@ class AuthSrv(object):
         self.indent = ""
 
         # fwd-decl
-        self.vfs = VFS(log_func, "", "", AXS(), {})
+        self.vfs = VFS(log_func, "", "", "", AXS(), {})
         self.acct: dict[str, str] = {}  # uname->pw
         self.iacct: dict[str, str] = {}  # pw->uname
         self.ases: dict[str, str] = {}  # uname->session
@@ -931,7 +936,7 @@ class AuthSrv(object):
         self,
         src: str,
         dst: str,
-        mount: dict[str, str],
+        mount: dict[str, tuple[str, str]],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
         un_gns: dict[str, list[str]],
@@ -969,7 +974,7 @@ class AuthSrv(object):
                 continue
             visited.add(label)
 
-            src, dst = self._map_volume(src, dst, mount, daxs, mflags)
+            src, dst = self._map_volume(src, dst, dst0, mount, daxs, mflags)
             if src:
                 ret.append((src, dst, un, gn))
                 if un or gn:
@@ -981,7 +986,8 @@ class AuthSrv(object):
         self,
         src: str,
         dst: str,
-        mount: dict[str, str],
+        dst0: str,
+        mount: dict[str, tuple[str, str]],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
     ) -> tuple[str, str]:
@@ -991,13 +997,13 @@ class AuthSrv(object):
 
         if dst in mount:
             t = "multiple filesystem-paths mounted at [/{}]:\n  [{}]\n  [{}]"
-            self.log(t.format(dst, mount[dst], src), c=1)
+            self.log(t.format(dst, mount[dst][0], src), c=1)
             raise Exception(BAD_CFG)
 
         if src in mount.values():
             t = "filesystem-path [{}] mounted in multiple locations:"
             t = t.format(src)
-            for v in [k for k, v in mount.items() if v == src] + [dst]:
+            for v in [k for k, v in mount.items() if v[0] == src] + [dst]:
                 t += "\n  /{}".format(v)
 
             self.log(t, c=3)
@@ -1006,7 +1012,7 @@ class AuthSrv(object):
         if not bos.path.isdir(src):
             self.log("warning: filesystem-path does not exist: {}".format(src), 3)
 
-        mount[dst] = src
+        mount[dst] = (src, dst0)
         daxs[dst] = AXS()
         mflags[dst] = {}
         return (src, dst)
@@ -1067,7 +1073,7 @@ class AuthSrv(object):
         grps: dict[str, list[str]],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
-        mount: dict[str, str],
+        mount: dict[str, tuple[str, str]],
     ) -> None:
         self.line_ctr = 0
 
@@ -1092,7 +1098,7 @@ class AuthSrv(object):
         grps: dict[str, list[str]],
         daxs: dict[str, AXS],
         mflags: dict[str, dict[str, Any]],
-        mount: dict[str, str],
+        mount: dict[str, tuple[str, str]],
         npass: int,
     ) -> None:
         self.line_ctr = 0
@@ -1451,8 +1457,8 @@ class AuthSrv(object):
         acct: dict[str, str] = {}  # username:password
         grps: dict[str, list[str]] = {}  # groupname:usernames
         daxs: dict[str, AXS] = {}
-        mflags: dict[str, dict[str, Any]] = {}  # moutpoint:flags
-        mount: dict[str, str] = {}  # dst:src (mountpoint:realpath)
+        mflags: dict[str, dict[str, Any]] = {}  # vpath:flags
+        mount: dict[str, tuple[str, str]] = {}  # dst:src (vp:(ap,vp0))
 
         self.idp_vols = {}  # yolo
 
@@ -1531,8 +1537,8 @@ class AuthSrv(object):
         # case-insensitive; normalize
         if WINDOWS:
             cased = {}
-            for k, v in mount.items():
-                cased[k] = absreal(v)
+            for vp, (ap, vp0) in mount.items():
+                cased[vp] = (absreal(ap), vp0)
 
             mount = cased
 
@@ -1547,25 +1553,26 @@ class AuthSrv(object):
                 t = "Read-access has been disabled due to failsafe: No volumes were defined by the config-file. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to the working-directory by adding the following arguments:  -v .::rw"
                 self.log(t, 1)
                 axs = AXS()
-            vfs = VFS(self.log_func, absreal("."), "", axs, {})
+            vfs = VFS(self.log_func, absreal("."), "", "", axs, {})
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             zsd = {"d2d": True, "tcolor": self.args.tcolor}
-            vfs = VFS(self.log_func, "", "", AXS(), zsd)
+            vfs = VFS(self.log_func, "", "", "", AXS(), zsd)
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
             depth = dst.count("/")
             assert maxdepth <= depth  # nosec
             maxdepth = depth
+            src, dst0 = mount[dst]
 
             if dst == "":
                 # rootfs was mapped; fully replaces the default CWD vfs
-                vfs = VFS(self.log_func, mount[dst], dst, daxs[dst], mflags[dst])
+                vfs = VFS(self.log_func, src, dst, dst0, daxs[dst], mflags[dst])
                 continue
 
             assert vfs  # type: ignore
-            zv = vfs.add(mount[dst], dst)
+            zv = vfs.add(src, dst, dst0)
             zv.axs = daxs[dst]
             zv.flags = mflags[dst]
             zv.dbv = None
@@ -1599,7 +1606,7 @@ class AuthSrv(object):
         if enshare:
             import sqlite3
 
-            shv = VFS(self.log_func, "", shr, AXS(), {})
+            shv = VFS(self.log_func, "", shr, shr, AXS(), {})
 
             db_path = self.args.shr_db
             db = sqlite3.connect(db_path)
@@ -1633,9 +1640,8 @@ class AuthSrv(object):
 
                 # don't know the abspath yet + wanna ensure the user
                 # still has the privs they granted, so nullmap it
-                shv.nodes[s_k] = VFS(
-                    self.log_func, "", "%s/%s" % (shr, s_k), s_axs, shv.flags.copy()
-                )
+                vp = "%s/%s" % (shr, s_k)
+                shv.nodes[s_k] = VFS(self.log_func, "", vp, vp, s_axs, shv.flags.copy())
 
             vfs.nodes[shr] = vfs.all_vols[shr] = shv
             for vol in shv.nodes.values():
@@ -2278,22 +2284,56 @@ class AuthSrv(object):
         except Pebkac:
             self.warn_anonwrite = True
 
-        idp_err = "WARNING! The following IdP volumes are mounted directly below another volume where anonymous users can read and/or write files. This is a SECURITY HAZARD!! When copyparty is restarted, it will not know about these IdP volumes yet. These volumes will then be accessible by anonymous users UNTIL one of the users associated with their volume sends a request to the server. RECOMMENDATION: You should create a restricted volume where nobody can read/write files, and make sure that all IdP volumes are configured to appear somewhere below that volume."
+        self.idp_warn = []
+        self.idp_err = []
         for idp_vp in self.idp_vols:
-            parent_vp = vsplit(idp_vp)[0]
-            vn, _ = vfs.get(parent_vp, "*", False, False)
-            zs = (
-                "READABLE"
-                if "*" in vn.axs.uread
-                else "WRITABLE"
-                if "*" in vn.axs.uwrite
-                else ""
-            )
-            if zs:
-                t = '\nWARNING: Volume "/%s" appears below "/%s" and would be WORLD-%s'
-                idp_err += t % (idp_vp, vn.vpath, zs)
-        if "\n" in idp_err:
-            self.log(idp_err, 1)
+            idp_vn, _ = vfs.get(idp_vp, "*", False, False)
+            idp_vp0 = idp_vn.vpath0
+
+            sigils = set(re.findall(r"(\${[ug]})", idp_vp0))
+            if len(sigils) > 1:
+                t = '\nWARNING: IdP-volume "/%s" created by "/%s" has multiple IdP placeholders: %s'
+                self.idp_warn.append(t % (idp_vp, idp_vp0, list(sigils)))
+                continue
+
+            sigil = sigils.pop()
+            par_vp = idp_vp
+            while par_vp:
+                par_vp = vsplit(par_vp)[0]
+                par_vn, _ = vfs.get(par_vp, "*", False, False)
+                if sigil in par_vn.vpath0:
+                    continue  # parent was spawned for and by same user
+
+                oth_read = []
+                oth_write = []
+                for usr in par_vn.axs.uread:
+                    if usr not in idp_vn.axs.uread:
+                        oth_read.append(usr)
+                for usr in par_vn.axs.uwrite:
+                    if usr not in idp_vn.axs.uwrite:
+                        oth_write.append(usr)
+
+                if "*" in oth_read:
+                    taxs = "WORLD-READABLE"
+                elif "*" in oth_write:
+                    taxs = "WORLD-WRITABLE"
+                elif oth_read:
+                    taxs = "READABLE BY %r" % (oth_read,)
+                elif oth_write:
+                    taxs = "WRITABLE BY %r" % (oth_write,)
+                else:
+                    continue
+
+                t = '\nWARNING: IdP-volume "/%s" created by "/%s" has parent/grandparent "/%s" and would be %s'
+                self.idp_err.append(t % (idp_vp, idp_vp0, par_vn.vpath, taxs))
+
+        if self.idp_warn:
+            t = "WARNING! Some IdP volumes include multiple IdP placeholders; this is too complex to automatically determine if safe or not. To ensure that no users gain unintended access, please use only a single placeholder for each IdP volume."
+            self.log(t + "".join(self.idp_warn), 1)
+
+        if self.idp_err:
+            t = "WARNING! The following IdP volumes are mounted below another volume where other users can read and/or write files. This is a SECURITY HAZARD!! When copyparty is restarted, it will not know about these IdP volumes yet. These volumes will then be accessible by an unexpected set of permissions UNTIL one of the users associated with their volume sends a request to the server. RECOMMENDATION: You should create a restricted volume where nobody can read/write files, and make sure that all IdP volumes are configured to appear somewhere below that volume."
+            self.log(t + "".join(self.idp_err), 1)
 
         self.vfs = vfs
         self.acct = acct
@@ -2375,7 +2415,7 @@ class AuthSrv(object):
                     continue  # also fine
                 for zs in svn.nodes.keys():
                     # hide subvolume
-                    vn.nodes[zs] = VFS(self.log_func, "", "", AXS(), {})
+                    vn.nodes[zs] = VFS(self.log_func, "", "", "", AXS(), {})
 
             cur2.close()
             cur.close()

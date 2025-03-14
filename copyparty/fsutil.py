@@ -78,7 +78,7 @@ class Fstab(object):
             return vid
 
     def build_fallback(self) -> None:
-        self.tab = VFS(self.log_func, "idk", "/", AXS(), {})
+        self.tab = VFS(self.log_func, "idk", "/", "/", AXS(), {})
         self.trusted = False
 
     def build_tab(self) -> None:
@@ -111,9 +111,10 @@ class Fstab(object):
 
         tab1.sort(key=lambda x: (len(x[0]), x[0]))
         path1, fs1 = tab1[0]
-        tab = VFS(self.log_func, fs1, path1, AXS(), {})
+        tab = VFS(self.log_func, fs1, path1, path1, AXS(), {})
         for path, fs in tab1[1:]:
-            tab.add(fs, path.lstrip("/"))
+            zs = path.lstrip("/")
+            tab.add(fs, zs, zs)
 
         self.tab = tab
         self.srctab = srctab
