@@ -1606,7 +1606,8 @@ class AuthSrv(object):
         if enshare:
             import sqlite3
 
-            shv = VFS(self.log_func, "", shr, shr, AXS(), {})
+            zsd = {"d2d": True, "tcolor": self.args.tcolor}
+            shv = VFS(self.log_func, "", shr, shr, AXS(), zsd)
 
             db_path = self.args.shr_db
             db = sqlite3.connect(db_path)

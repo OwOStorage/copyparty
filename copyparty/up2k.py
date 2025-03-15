@@ -3426,6 +3426,7 @@ class Up2k(object):
         rm: bool = False,
         lmod: float = 0,
         fsrc: Optional[str] = None,
+        is_mv: bool = False,
     ) -> None:
         if src == dst or (fsrc and fsrc == dst):
             t = "symlinking a file to itself?? orig(%s) fsrc(%s) link(%s)"
@@ -3442,7 +3443,7 @@ class Up2k(object):
 
         linked = False
         try:
-            if not flags.get("dedup"):
+            if not is_mv and not flags.get("dedup"):
                 raise Exception("dedup is disabled in config")
 
             lsrc = src
@@ -4601,7 +4602,7 @@ class Up2k(object):
                 dlink = bos.readlink(sabs)
                 dlink = os.path.join(os.path.dirname(sabs), dlink)
                 dlink = bos.path.abspath(dlink)
-                self._symlink(dlink, dabs, dvn.flags, lmod=ftime)
+                self._symlink(dlink, dabs, dvn.flags, lmod=ftime, is_mv=True)
                 wunlink(self.log, sabs, svn.flags)
             else:
                 atomic_move(self.log, sabs, dabs, svn.flags)
@@ -4820,7 +4821,7 @@ class Up2k(object):
             flags = self.flags.get(ptop) or {}
             atomic_move(self.log, sabs, slabs, flags)
             bos.utime(slabs, (int(time.time()), int(mt)), False)
-            self._symlink(slabs, sabs, flags, False)
+            self._symlink(slabs, sabs, flags, False, is_mv=True)
             full[slabs] = (ptop, rem)
             sabs = slabs
 
@@ -4879,7 +4880,9 @@ class Up2k(object):
             # (for example a volume with symlinked dupes but no --dedup);
             # fsrc=sabs is then a source that currently resolves to copy
 
-            self._symlink(dabs, alink, flags, False, lmod=lmod or 0, fsrc=sabs)
+            self._symlink(
+                dabs, alink, flags, False, lmod=lmod or 0, fsrc=sabs, is_mv=True
+            )
 
         return len(full) + len(links)
 
