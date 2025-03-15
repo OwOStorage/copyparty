@@ -542,6 +542,7 @@ var Ls = {
 		"u_enoow": "overwrite will not work here; need Delete-permission",
 		"u_badf": 'These {0} files (of {1} total) were skipped, possibly due to filesystem permissions:\n\n',
 		"u_blankf": 'These {0} files (of {1} total) are blank / empty; upload them anyways?\n\n',
+		"u_applef": 'These {0} files (of {1} total) are probably undesirable;\nPress <code>OK/Enter</code> to SKIP the following files,\nPress <code>Cancel/ESC</code> to NOT exclude, and UPLOAD those as well:\n\n',
 		"u_just1": '\nMaybe it works better if you select just one file',
 		"u_ff_many": "if you're using <b>Linux / MacOS / Android,</b> then this amount of files <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>may</em> crash Firefox!</a>\nif that happens, please try again (or use Chrome).",
 		"u_up_life": "This upload will be deleted from the server\n{0} after it completes",
@@ -1144,6 +1145,7 @@ var Ls = {
 		"u_enoow": "kan ikke overskrive filer her (Delete-rettigheten er nødvendig)",
 		"u_badf": 'Disse {0} filene (av totalt {1}) kan ikke leses, kanskje pga rettighetsproblemer i filsystemet på datamaskinen din:\n\n',
 		"u_blankf": 'Disse {0} filene (av totalt {1}) er blanke / uten innhold; ønsker du å laste dem opp uansett?\n\n',
+		"u_applef": 'Disse {0} filene (av totalt {1}) er antagelig uønskede;\nTrykk <code>OK/Enter</code> for å HOPPE OVER disse filene,\nTrykk <code>Avbryt/ESC</code> for å LASTE OPP disse filene også:\n\n',
 		"u_just1": '\nFunker kanskje bedre hvis du bare tar én fil om gangen',
 		"u_ff_many": 'Hvis du bruker <b>Linux / MacOS / Android,</b> så kan dette antallet filer<br /><a href="https://bugzilla.mozilla.org/show_bug.cgi?id=1790500" target="_blank"><em>kanskje</em> krasje Firefox!</a> Hvis det skjer, så prøv igjen (eller bruk Chrome).',
 		"u_up_life": "Filene slettes fra serveren {0}\netter at opplastningen er fullført",
@@ -1746,6 +1748,7 @@ var Ls = {
 		"u_enoow": "无法覆盖此处的文件；需要删除权限", //m
 		"u_badf": '这些 {0} 个文件（共 {1} 个）被跳过，可能是由于文件系统权限：\n\n',
 		"u_blankf": '这些 {0} 个文件（共 {1} 个）是空白的；是否仍然上传？\n\n',
+		"u_applef": "这些 {0} 个文件（共 {1} 个）可能是不需要的；\n按 <code>确定/Enter</code> 跳过以下文件，\n按 <code>取消/ESC</code> 取消排除，并上传这些文件：\n\n", //m
 		"u_just1": '\n也许如果你只选择一个文件会更好',
 		"u_ff_many": "如果你使用的是 <b>Linux / MacOS / Android，</b> 那么这个文件数量 <a href=\"https://bugzilla.mozilla.org/show_bug.cgi?id=1790500\" target=\"_blank\"><em>可能</em> 崩溃 Firefox!</a>\n如果发生这种情况，请再试一次（或使用 Chrome）。",
 		"u_up_life": "此上传将在 {0} 后从服务器删除",

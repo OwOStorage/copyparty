@@ -1343,10 +1343,68 @@ function up2k_init(subtle) {
             });
         }
 
+        var fps = new Set(), pdp = '';
+        for (var a = 0; a < good_files.length; a++) {
+            var fp = good_files[a][1],
+                dp = vsplit(fp)[0];
+            fps.add(fp);
+            if (pdp != dp) {
+                pdp = dp;
+                dp = dp.slice(0, -1);
+                while (dp) {
+                    fps.add(dp);
+                    dp = vsplit(dp)[0].slice(0, -1);
+                }
+            }
+        }
+
+        var junk = [], rmi = [];
+        for (var a = 0; a < good_files.length; a++) {
+            var fn = good_files[a][1];
+            if (fn.indexOf("/.") < 0 && fn.indexOf("/__MACOS") < 0)
+                continue;
+
+            if (/\/__MACOS|\/\.(DS_Store|AppleDouble|LSOverride|DocumentRevisions-|fseventsd|Spotlight-V[0-9]|TemporaryItems|Trashes|VolumeIcon\.icns|com\.apple\.timemachine\.donotpresent|AppleDB|AppleDesktop|apdisk)/.exec(fn)) {
+                junk.push(good_files[a]);
+                rmi.push(a);
+                continue;
+            }
+
+            if (fn.indexOf("/._") + 1 &&
+                fps.has(fn.replace("/._", "/")) &&
+                fn.split("/").pop().startsWith("._") &&
+                !has(rmi, a)
+            ) {
+                junk.push(good_files[a]);
+                rmi.push(a);
+            }
+        }
+
+        if (!junk.length)
+            return gotallfiles2(good_files);
+
+        junk.sort();
+        rmi.sort(function (a, b) { return a - b; });
+
+        var msg = L.u_applef.format(junk.length, good_files.length);
+        for (var a = 0, aa = Math.min(1000, junk.length); a < aa; a++)
+            msg += '-- ' + esc(junk[a][1]) + '\n';
+
+        return modal.confirm(msg, function () {
+            for (var a = rmi.length - 1; a >= 0; a--)
+                good_files.splice(rmi[a], 1);
+
+            start_actx();
+            gotallfiles2(good_files);
+        }, function () {
+            start_actx();
+            gotallfiles2(good_files);
+        });
+    }
+
+    function gotallfiles2(good_files) {
         good_files.sort(function (a, b) {
-            a = a[1];
-            b = b[1];
-            return a < b ? -1 : a > b ? 1 : 0;
+            return a[1] < b[1] ? -1 : 1;
         });
 
         var msg = [];
@@ -1399,9 +1457,7 @@ function up2k_init(subtle) {
 
         if (!uc.az)
             good_files.sort(function (a, b) {
-                a = a[0].size;
-                b = b[0].size;
-                return a < b ? -1 : a > b ? 1 : 0;
+                return a[0].size - b[0].size;
             });
 
         for (var a = 0; a < good_files.length; a++) {
