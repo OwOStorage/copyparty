@@ -5774,7 +5774,7 @@ var showfile = (function () {
 
 			td.innerHTML = '<a href="#" id="t' +
 				link.id + '" class="doc bri" hl="' +
-				link.id + '">-txt-</a>';
+				link.id + '" rel="nofollow">-txt-</a>';
 
 			td.getElementsByTagName('a')[0].setAttribute('href', '?doc=' + fn);
 		}
@@ -7936,7 +7936,7 @@ var treectl = (function () {
 
 			if (tn.lead == '-')
 				tn.lead = '<a href="?doc=' + bhref + '" id="t' + id +
-					'" class="doc' + (lang ? ' bri' : '') +
+					'" rel="nofollow" class="doc' + (lang ? ' bri' : '') +
 					'" hl="' + id + '" name="' + hname + '">-txt-</a>';
 
 			var cl = /\.PARTIAL$/.exec(fname) ? ' class="fade"' : '',

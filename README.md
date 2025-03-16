@@ -1837,7 +1837,7 @@ tell search engines you don't wanna be indexed,  either using the good old [robo
 * volflag `[...]:c,norobots` does the same thing for that single volume
 * volflag `[...]:c,robots` ALLOWS search-engine crawling for that volume, even if `--no-robots` is set globally
 
-also, `--force-js` disables the plain HTML folder listing, making things harder to parse for search engines
+also, `--force-js` disables the plain HTML folder listing, making things harder to parse for *some* search engines -- note that crawlers which understand javascript (such as google) will not be affected
 
 
 ## themes

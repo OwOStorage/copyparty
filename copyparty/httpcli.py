@@ -6078,7 +6078,7 @@ class HttpCli(object):
                         quotep(href),
                     )
             elif fn in hist:
-                margin = '<a href="%s.hist/%s">#%s</a>' % (
+                margin = '<a href="%s.hist/%s" rel="nofollow">#%s</a>' % (
                     base,
                     html_escape(hist[fn][2], quot=True, crlf=True),
                     hist[fn][0],
