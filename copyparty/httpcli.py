@@ -3795,6 +3795,16 @@ class HttpCli(object):
 
         return txt
 
+    def _can_zip(self, volflags: dict[str, Any]) -> str:
+        lvl = volflags["zip_who"]
+        if self.args.no_zip or not lvl:
+            return "download-as-zip/tar is disabled in server config"
+        elif lvl <= 1 and not self.can_admin:
+            return "download-as-zip/tar is admin-only on this server"
+        elif lvl <= 2 and self.uname in ("", "*"):
+            return "you must be authenticated to download-as-zip/tar on this server"
+        return ""
+
     def tx_res(self, req_path: str) -> bool:
         status = 200
         logmsg = "{:4} {} ".format("", self.req)
@@ -4327,13 +4337,8 @@ class HttpCli(object):
         rem: str,
         items: list[str],
     ) -> bool:
-        lvl = vn.flags["zip_who"]
-        if self.args.no_zip or not lvl:
-            raise Pebkac(400, "download-as-zip/tar is disabled in server config")
-        elif lvl <= 1 and not self.can_admin:
-            raise Pebkac(400, "download-as-zip/tar is admin-only on this server")
-        elif lvl <= 2 and self.uname in ("", "*"):
-            t = "you must be authenticated to download-as-zip/tar on this server"
+        t = self._can_zip(vn.flags)
+        if t:
             raise Pebkac(400, t)
 
         logmsg = "{:4} {} ".format("", self.req)
@@ -6040,6 +6045,8 @@ class HttpCli(object):
                 zs = self.gen_fk(2, self.args.dk_salt, abspath, 0, 0)[:add_dk]
                 ls_ret["dk"] = cgv["dk"] = zs
 
+        no_zip = bool(self._can_zip(vf))
+
         dirs = []
         files = []
         ptn_hr = RE_HR
@@ -6065,7 +6072,7 @@ class HttpCli(object):
             is_dir = stat.S_ISDIR(inf.st_mode)
             if is_dir:
                 href += "/"
-                if self.args.no_zip:
+                if no_zip:
                     margin = "DIR"
                 elif add_dk:
                     zs = absreal(fspath)
