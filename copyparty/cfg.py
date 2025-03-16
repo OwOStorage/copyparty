@@ -102,6 +102,8 @@ def vf_vmap() -> dict[str, str]:
         "u2ts",
         "ups_who",
         "zip_who",
+        "zipmaxn",
+        "zipmaxs",
         "zipmaxt",
     ):
         ret[k] = k

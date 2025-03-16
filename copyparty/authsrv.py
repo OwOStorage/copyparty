@@ -1805,7 +1805,7 @@ class AuthSrv(object):
 
         for vol in vfs.all_vols.values():
             use = False
-            for k, si in [["zipmaxn", ""], ["zipmaxs", "m"]]:
+            for k in ["zipmaxn", "zipmaxs"]:
                 try:
                     zs = vol.flags[k]
                 except:
@@ -1814,13 +1814,8 @@ class AuthSrv(object):
                     vol.flags[k] = 0
                     continue
 
-                try:
-                    _ = float(zs)
-                    zs = "%s%s" % (zs, si)
-                except:
-                    pass
                 zf = unhumanize(zs)
-                vol.flags[k] = zf
+                vol.flags[k + "_v"] = zf
                 if zf:
                     use = True
             if use:
