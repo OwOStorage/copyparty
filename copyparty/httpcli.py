@@ -1238,14 +1238,7 @@ class HttpCli(object):
                     return self.tx_404(True)
             else:
                 vfs = self.asrv.vfs
-                if (
-                    not vfs.nodes
-                    and not vfs.axs.uread
-                    and not vfs.axs.uwrite
-                    and not vfs.axs.uget
-                    and not vfs.axs.uhtml
-                    and not vfs.axs.uadmin
-                ):
+                if vfs.badcfg1:
                     t = "<h2>access denied due to failsafe; check server log</h2>"
                     html = self.j2s("splash", this=self, msg=t)
                     self.reply(html.encode("utf-8", "replace"), 500)

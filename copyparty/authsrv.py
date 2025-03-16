@@ -355,6 +355,7 @@ class VFS(object):
         self.flags = flags  # config options
         self.root = self
         self.dev = 0  # st_dev
+        self.badcfg1 = False
         self.nodes: dict[str, VFS] = {}  # child nodes
         self.histtab: dict[str, str] = {}  # all realpath->histpath
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
@@ -1554,6 +1555,8 @@ class AuthSrv(object):
                 self.log(t, 1)
                 axs = AXS()
             vfs = VFS(self.log_func, absreal("."), "", "", axs, {})
+            if not axs.uread:
+                vfs.badcfg1 = True
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             zsd = {"d2d": True, "tcolor": self.args.tcolor}

@@ -131,9 +131,10 @@ class Fstab(object):
         if not self.trusted:
             # no mtab access; have to build as we go
             if "/" in rem:
-                self.tab.add("idk", os.path.join(vn.vpath, rem.split("/")[0]))
+                zs = os.path.join(vn.vpath, rem.split("/")[0])
+                self.tab.add("idk", zs, zs)
             if rem:
-                self.tab.add(nval, path)
+                self.tab.add(nval, path, path)
             else:
                 vn.realpath = nval
 
