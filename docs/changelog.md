@@ -1,4 +1,39 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0228-1846  `v1.16.16`  lemon melon cookie
+
+<img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>
+
+webdev is [like a lemon](https://youtu.be/HPURbfKb7to) sometimes
+
+* read-only demo server at https://a.ocv.me/pub/demo/
+* [docker image](https://github.com/9001/copyparty/tree/hovudstraum/scripts/docker) ╱ [similar software](https://github.com/9001/copyparty/blob/hovudstraum/docs/versus.md) ╱ [client testbed](https://cd.ocv.me/b/)
+
+there is a [discord server](https://discord.gg/25J8CdTT6G) with an `@everyone` in case of future important updates, such as [vulnerabilities](https://github.com/9001/copyparty/security) (most recently 2025-02-25)
+
+## recent important news
+
+* [v1.16.15 (2025-02-25)](https://github.com/9001/copyparty/releases/tag/v1.16.15) fixed low-severity xss when uploading maliciously-named files
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## 🧪 new features
+
+* #142 workaround android-chrome timestamp bug 5e12abbb
+  * all files were uploaded with last-modified year 1601 in specific recent versions of chrome
+  * https://issues.chromium.org/issues/393149335 has the actual fix; will be out soon
+
+## 🩹 bugfixes
+
+* add helptext for volflags `dk`, `dks`, `dky` 65a7706f
+* fix false-positive warning when disabling a global option per-volume by unsetting the volflag
+
+## 🔧 other changes
+
+* #140 nixos: @daimond113 fixed a warning in the nixpkg (thx!) e0fe2b97
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0225-0017  `v1.16.15`  fix low-severity vuln
 
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>

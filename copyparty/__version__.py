@@ -1,8 +1,8 @@
 # coding: utf-8
 
-VERSION = (1, 16, 16)
+VERSION = (1, 16, 17)
 CODENAME = "COPYparty"
-BUILD_DT = (2025, 2, 28)
+BUILD_DT = (2025, 3, 16)
 
 S_VERSION = ".".join(map(str, VERSION))
 S_BUILD_DT = "{0:04d}-{1:02d}-{2:02d}".format(*BUILD_DT)
