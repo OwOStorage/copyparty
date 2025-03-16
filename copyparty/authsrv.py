@@ -72,6 +72,8 @@ SSEELOG = " ({})".format(SEE_LOG)
 BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)
 
+PTN_U_GRP = re.compile(r"\$\{u%([+-])([^}]+)\}")
+
 
 class CfgEx(Exception):
     pass
@@ -953,12 +955,24 @@ class AuthSrv(object):
             un_gn = [("", "")]
 
         for un, gn in un_gn:
+            m = PTN_U_GRP.search(dst0)
+            if m:
+                req, gnc = m.groups()
+                hit = gnc in (un_gns.get(un) or [])
+                if req == "+":
+                    if not hit:
+                        continue
+                elif hit:
+                    continue
+
             # if ap/vp has a user/group placeholder, make sure to keep
             # track so the same user/group is mapped when setting perms;
             # otherwise clear un/gn to indicate it's a regular volume
 
             src1 = src0.replace("${u}", un or "\n")
             dst1 = dst0.replace("${u}", un or "\n")
+            src1 = PTN_U_GRP.sub(un or "\n", src1)
+            dst1 = PTN_U_GRP.sub(un or "\n", dst1)
             if src0 == src1 and dst0 == dst1:
                 un = ""
 
@@ -2312,7 +2326,7 @@ class AuthSrv(object):
             idp_vn, _ = vfs.get(idp_vp, "*", False, False)
             idp_vp0 = idp_vn.vpath0
 
-            sigils = set(re.findall(r"(\${[ug]})", idp_vp0))
+            sigils = set(re.findall(r"(\${[ug][}%])", idp_vp0))
             if len(sigils) > 1:
                 t = '\nWARNING: IdP-volume "/%s" created by "/%s" has multiple IdP placeholders: %s'
                 self.idp_warn.append(t % (idp_vp, idp_vp0, list(sigils)))
@@ -2344,7 +2358,7 @@ class AuthSrv(object):
                 elif oth_write:
                     taxs = "WRITABLE BY %r" % (oth_write,)
                 else:
-                    continue
+                    break  # no sigil; not idp; safe to stop
 
                 t = '\nWARNING: IdP-volume "/%s" created by "/%s" has parent/grandparent "/%s" and would be %s'
                 self.idp_err.append(t % (idp_vp, idp_vp0, par_vn.vpath, taxs))
