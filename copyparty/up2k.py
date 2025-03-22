@@ -2918,7 +2918,6 @@ class Up2k(object):
             if ptop not in self.registry:
                 raise Pebkac(410, "location unavailable")
 
-        cj["name"] = sanitize_fn(cj["name"], "")
         cj["poke"] = now = self.db_act = self.vol_act[ptop] = time.time()
         wark = dwark = self._get_wark(cj)
         job = None
@@ -3236,6 +3235,7 @@ class Up2k(object):
                                     job["ptop"] = vfs.realpath
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
+                                    job["name"] = sanitize_fn(job["name"], "")
                                     if zvfs.vpath != vfs.vpath:
                                         # print(json.dumps(job, sort_keys=True, indent=4))
                                         job["hash"] = cj["hash"]
@@ -4996,6 +4996,7 @@ class Up2k(object):
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
+                    job["name"] = sanitize_fn(job["name"], "")
                     if zvfs.vpath != vfs.vpath:
                         self.log("xbu reloc2:%d..." % (depth,), 6)
                         return self._handle_json(job, depth + 1)

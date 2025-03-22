@@ -1222,6 +1222,7 @@ def add_yolo(ap):
     ap2 = ap.add_argument_group('yolo options')
     ap2.add_argument("--allow-csrf", action="store_true", help="disable csrf protections; let other domains/sites impersonate you through cross-site requests")
     ap2.add_argument("--getmod", action="store_true", help="permit ?move=[...] and ?delete as GET")
+    ap2.add_argument("--wo-up-readme", action="store_true", help="allow users with write-only access to upload logues and readmes without adding the _wo_ filename prefix (volflag=wo_up_readme)")
 
 
 def add_optouts(ap):
