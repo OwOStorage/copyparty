@@ -2,7 +2,7 @@
 set -ex
 
 # use zlib-ng if available
-f=/z/base/zlib_ng-0.5.1-cp312-cp312-linux_$(uname -m).whl
+f=/z/base/zlib_ng-0.5.1-cp312-cp312-linux_$(cat /etc/apk/arch).whl
 [ "$1" != min ] && [ -e $f ] && {
   apk add -t .bd !pyc py3-pip
   rm -f /usr/lib/python3*/EXTERNALLY-MANAGED
@@ -65,7 +65,11 @@ for n in $(seq 1 200); do sleep 0.2
 done
 [ -z "$v" ] && echo SNAAAAAKE && exit 1
 
-wget -O- http://${v/ /:}/?tar=gz:1 | tar -xzO top/innvikler.sh | cmp innvikler.sh
+for n in $(seq 1 200); do sleep 0.2
+  wget -O- http://${v/ /:}/?tar=gz:1 >tf && break
+done
+tar -xzO top/innvikler.sh <tf | cmp innvikler.sh
+rm tf
 
 kill $pid; wait $pid
 
