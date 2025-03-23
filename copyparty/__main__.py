@@ -1029,6 +1029,8 @@ def add_network(ap):
         ap2.add_argument("--reuseaddr", action="store_true", help="set reuseaddr on listening sockets on windows; allows rapid restart of copyparty at the expense of being able to accidentally start multiple instances")
     else:
         ap2.add_argument("--freebind", action="store_true", help="allow listening on IPs which do not yet exist, for example if the network interfaces haven't finished going up. Only makes sense for IPs other than '0.0.0.0', '127.0.0.1', '::', and '::1'. May require running as root (unless net.ipv6.ip_nonlocal_bind)")
+    ap2.add_argument("--wr-h-eps", metavar="PATH", type=u, default="", help="write list of listening-on ip:port to textfile at \033[33mPATH\033[0m when http-servers have started")
+    ap2.add_argument("--wr-h-aon", metavar="PATH", type=u, default="", help="write list of accessible-on ip:port to textfile at \033[33mPATH\033[0m when http-servers have started")
     ap2.add_argument("--s-thead", metavar="SEC", type=int, default=120, help="socket timeout (read request header)")
     ap2.add_argument("--s-tbody", metavar="SEC", type=float, default=128.0, help="socket timeout (read/write request/response bodies). Use 60 on fast servers (default is extremely safe). Disable with 0 if reverse-proxied for a 2%% speed boost")
     ap2.add_argument("--s-rd-sz", metavar="B", type=int, default=256*1024, help="socket read size in bytes (indirectly affects filesystem writes; recommendation: keep equal-to or lower-than \033[33m--iobuf\033[0m)")

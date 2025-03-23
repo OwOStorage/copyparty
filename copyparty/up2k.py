@@ -2,7 +2,6 @@
 from __future__ import print_function, unicode_literals
 
 import errno
-import gzip
 import hashlib
 import json
 import math
@@ -42,6 +41,7 @@ from .util import (
     fsenc,
     gen_filekey,
     gen_filekey_dbg,
+    gzip,
     hidedir,
     humansize,
     min_ex,

@@ -12,7 +12,8 @@ RUN     apk --no-cache add !pyc \
             py3-jinja2 py3-argon2-cffi py3-pillow py3-mutagen
 
 COPY    i/dist/copyparty-sfx.py innvikler.sh ./
-RUN     ash innvikler.sh && rm innvikler.sh
+ADD     base ./base
+RUN     ash innvikler.sh im
 
 WORKDIR /w
 EXPOSE  3923

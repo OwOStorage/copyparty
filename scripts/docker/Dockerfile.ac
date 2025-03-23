@@ -13,7 +13,8 @@ RUN     apk --no-cache add !pyc \
             ffmpeg
 
 COPY    i/dist/copyparty-sfx.py innvikler.sh ./
-RUN     ash innvikler.sh && rm innvikler.sh
+ADD     base ./base
+RUN     ash innvikler.sh ac
 
 WORKDIR /w
 EXPOSE  3923

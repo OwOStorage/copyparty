@@ -3,7 +3,6 @@ from __future__ import print_function, unicode_literals
 
 import argparse
 import errno
-import gzip
 import logging
 import os
 import re
@@ -63,6 +62,7 @@ from .util import (
     ansi_re,
     build_netmap,
     expat_ver,
+    gzip,
     load_ipu,
     min_ex,
     mp,

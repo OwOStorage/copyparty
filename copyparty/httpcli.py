@@ -4,7 +4,6 @@ from __future__ import print_function, unicode_literals
 import argparse  # typechk
 import copy
 import errno
-import gzip
 import hashlib
 import itertools
 import json
@@ -70,6 +69,7 @@ from .util import (
     get_df,
     get_spd,
     guess_mime,
+    gzip,
     gzip_file_orig_sz,
     gzip_orig_sz,
     has_resource,

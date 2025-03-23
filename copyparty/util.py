@@ -31,6 +31,17 @@ from collections import Counter
 from ipaddress import IPv4Address, IPv4Network, IPv6Address, IPv6Network
 from queue import Queue
 
+try:
+    from zlib_ng import gzip_ng as gzip
+    from zlib_ng import zlib_ng as zlib
+
+    sys.modules["gzip"] = gzip
+    # sys.modules["zlib"] = zlib
+    # `- somehow makes tarfile 3% slower with default malloc, and barely faster with mimalloc
+except:
+    import gzip
+    import zlib
+
 from .__init__ import (
     ANYWIN,
     EXE,
@@ -1453,8 +1464,6 @@ def stackmon(fp: str, ival: float, suffix: str) -> None:
         buf = st.encode("utf-8", "replace")
 
         if fp.endswith(".gz"):
-            import gzip
-
             # 2459b 2304b 2241b 2202b 2194b 2191b lv3..8
             # 0.06s 0.08s 0.11s 0.13s 0.16s 0.19s
             buf = gzip.compress(buf, compresslevel=6)
@@ -4055,9 +4064,22 @@ class WrongPostKey(Pebkac):
         self.datagen = datagen
 
 
-_: Any = (mp, BytesIO, quote, unquote, SQLITE_VER, JINJA_VER, PYFTPD_VER, PARTFTPY_VER)
+_: Any = (
+    gzip,
+    mp,
+    zlib,
+    BytesIO,
+    quote,
+    unquote,
+    SQLITE_VER,
+    JINJA_VER,
+    PYFTPD_VER,
+    PARTFTPY_VER,
+)
 __all__ = [
+    "gzip",
     "mp",
+    "zlib",
     "BytesIO",
     "quote",
     "unquote",
