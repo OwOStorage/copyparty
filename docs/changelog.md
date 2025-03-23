@@ -1,4 +1,44 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0316-2002  `v1.16.17`  boot2party
+
+## NEW: make it a bootable usb flashdrive
+
+get the party going anywhere, anytime, no OS required! [download flashdrive image](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) or watch the [low-effort demo video](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/hub-demo-hq.webm) which eventually gets to the copyparty part after showing off a bunch of other stuff on there
+
+* there is [source code](https://github.com/9001/asm/tree/hovudstraum/p/hub) and [build instructions](https://github.com/9001/asm/tree/hovudstraum/p/hub/sm/how2build) too
+* please don't take this too seriously
+
+## 🧪 new features
+
+* option to specify max-size for download-as-zip/tar 494179bd 0a33336d
+  * either the total download size (`--zipmaxs 500M`), and/or max number of files (`--zipmaxn 9k`)
+  * applies to all uesrs by default; can also ignore limits for authorized users (`--zipmaxu`)
+  * errormessage can be customized with `--zipmaxt "winter is coming... but this download isn't"`
+* [appledoubles](https://a.ocv.me/pub/stuff/?doc=appledoubles-and-friends.txt) are detected and skipped when uploading with the browser-UI 78208405
+* IdP-volumes can be filtered by group 9c2c4237
+  * `[/users/${u}]` in a config-file creates the volume for all users like before
+  * `[/users/${u%+canwrite}]` only if the user is in the `canwrite` group
+  * `[/users/${u%-admins}]` only if the user is NOT in the `admins` group
+
+## 🩹 bugfixes
+
+* when moving a folder with symlinks, don't expand them into full files 5ab09769
+  * absolute symlinks are moved as-is; relative symlinks are rewritten so they still point to the same file when possible (if both source and destination are indexed in the db)
+  * the previous behavior was good for un-deduplicating files after changing the server-settings, but was too inconvenient for all other usecases
+* #146 fix downloading from shares when `-j0` enabled 8417098c
+* only show the download-as-zip link when the user is actually allowed to 14bb2999
+* the suggestions in the serverlog regarding how to fix incorrect X-Forwarded-For settings would be incorrect if the reverse-proxy used IPv6 to communicate with copyparty 16462ee5
+* set nofollow on `?doc` links so crawlers don't download binary files as text 6a2644fe
+
+## 🔧 other changes
+
+* #147 IdP: fix the warning about dangerous misconfigurations to be more accurate 29a17ae2
+* #143 print a warning on incorrect character-encoding in textfiles (config-files, logues, readmes etc.) 25974d66
+* copyparty.exe: update to jinja 3.1.6 (copyparty was *not affected* by the jinja-3.1.5 vuln)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0228-1846  `v1.16.16`  lemon melon cookie
 
 <img src="https://github.com/9001/copyparty/raw/hovudstraum/docs/logo.svg" width="250" align="right"/>

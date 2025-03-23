@@ -100,7 +100,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [custom mimetypes](#custom-mimetypes) - change the association of a file extension
         * [GDPR compliance](#GDPR-compliance) - imagine using copyparty professionally...
         * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
-        * [feature beefybits](#feature-beefybits) - force-enable incompatible features
+        * [feature beefybits](#feature-beefybits) - force-enable features with known issues on your OS/env
 * [packages](#packages) - the party might be closer than you think
     * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
     * [fedora package](#fedora-package) - does not exist yet
