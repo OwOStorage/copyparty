@@ -3709,8 +3709,9 @@ class Up2k(object):
         if self.idx_wark(vflags, *z2):
             del self.registry[ptop][wark]
         else:
-            for k in "host tnam busy sprs poke t0c".split():
+            for k in "host tnam busy sprs poke".split():
                 del job[k]
+            job.pop("t0c", None)
             job["t0"] = int(job["t0"])
             job["hash"] = []
             job["done"] = 1
