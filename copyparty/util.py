@@ -245,6 +245,9 @@ SYMTIME = PY36 and os.utime in os.supports_follow_symlinks
 
 META_NOBOTS = '<meta name="robots" content="noindex, nofollow">\n'
 
+# smart enough to understand javascript while also ignoring rel="nofollow"
+BAD_BOTS = r"Barkrowler|bingbot|BLEXBot|Googlebot|GPTBot|PetalBot|SeekportBot|SemrushBot|YandexBot"
+
 FFMPEG_URL = "https://www.gyan.dev/ffmpeg/builds/ffmpeg-git-full.7z"
 
 URL_PRJ = "https://github.com/9001/copyparty"

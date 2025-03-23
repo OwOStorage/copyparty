@@ -3807,6 +3807,9 @@ class HttpCli(object):
             return "download-as-zip/tar is admin-only on this server"
         elif lvl <= 2 and self.uname in ("", "*"):
             return "you must be authenticated to download-as-zip/tar on this server"
+        elif self.args.ua_nozip and self.args.ua_nozip.search(self.ua):
+            t = "this URL contains no valuable information for bots/crawlers"
+            raise Pebkac(403, t)
         return ""
 
     def tx_res(self, req_path: str) -> bool:
@@ -6291,6 +6294,10 @@ class HttpCli(object):
 
         doc = self.uparam.get("doc") if self.can_read else None
         if doc:
+            zp = self.args.ua_nodoc
+            if zp and zp.search(self.ua):
+                t = "this URL contains no valuable information for bots/crawlers"
+                raise Pebkac(403, t)
             j2a["docname"] = doc
             doctxt = None
             dfn = lnames.get(doc.lower())

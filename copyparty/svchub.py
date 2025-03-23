@@ -769,7 +769,8 @@ class SvcHub(object):
                 vs = os.path.expandvars(os.path.expanduser(vs))
                 setattr(al, k, vs)
 
-        for k in "dav_ua1 sus_urls nonsus_urls".split(" "):
+        zs = "dav_ua1 sus_urls nonsus_urls ua_nodoc ua_nozip"
+        for k in zs.split(" "):
             vs = getattr(al, k)
             if not vs or vs == "no":
                 setattr(al, k, None)

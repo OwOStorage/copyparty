@@ -40,6 +40,7 @@ from .cfg import flagcats, onedash
 from .svchub import SvcHub
 from .util import (
     APPLESAN_TXT,
+    BAD_BOTS,
     DEF_EXP,
     DEF_MTE,
     DEF_MTH,
@@ -1244,6 +1245,7 @@ def add_optouts(ap):
     ap2.add_argument("--zipmaxt", metavar="TXT", type=u, default="", help="custom errormessage when download size exceeds max (volflag=zipmaxt)")
     ap2.add_argument("--zipmaxu", action="store_true", help="authenticated users bypass the zip size limit (volflag=zipmaxu)")
     ap2.add_argument("--zip-who", metavar="LVL", type=int, default=3, help="who can download as zip/tar? [\033[32m0\033[0m]=nobody, [\033[32m1\033[0m]=admins, [\033[32m2\033[0m]=authenticated-with-read-access, [\033[32m3\033[0m]=everyone-with-read-access (volflag=zip_who)\n\033[1;31mWARNING:\033[0m if a nested volume has a more restrictive value than a parent volume, then this will be \033[33mignored\033[0m if the download is initiated from the parent, more lenient volume")
+    ap2.add_argument("--ua-nozip", metavar="PTN", type=u, default=BAD_BOTS, help="regex of user-agents to reject from download-as-zip/tar; disable with [\033[32mno\033[0m] or blank")
     ap2.add_argument("--no-zip", action="store_true", help="disable download as zip/tar; same as \033[33m--zip-who=0\033[0m")
     ap2.add_argument("--no-tarcmp", action="store_true", help="disable download as compressed tar (?tar=gz, ?tar=bz2, ?tar=xz, ?tar=gz:9, ...)")
     ap2.add_argument("--no-lifetime", action="store_true", help="do not allow clients (or server config) to schedule an upload to be deleted after a given time")
@@ -1434,6 +1436,7 @@ def add_txt(ap):
     ap2.add_argument("--exp", action="store_true", help="enable textfile expansion -- replace {{self.ip}} and such; see \033[33m--help-exp\033[0m (volflag=exp)")
     ap2.add_argument("--exp-md", metavar="V,V,V", type=u, default=DEF_EXP, help="comma/space-separated list of placeholders to expand in markdown files; add/remove stuff on the default list with +hdr_foo or /vf.scan (volflag=exp_md)")
     ap2.add_argument("--exp-lg", metavar="V,V,V", type=u, default=DEF_EXP, help="comma/space-separated list of placeholders to expand in prologue/epilogue files (volflag=exp_lg)")
+    ap2.add_argument("--ua-nodoc", metavar="PTN", type=u, default=BAD_BOTS, help="regex of user-agents to reject from viewing documents through ?doc=[...]; disable with [\033[32mno\033[0m] or blank")
 
 
 def add_og(ap):
