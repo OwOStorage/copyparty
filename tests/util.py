@@ -174,6 +174,7 @@ class Cfg(Namespace):
             lang="eng",
             log_badpwd=1,
             logout=573,
+            md_hist="s",
             mte={"a": True},
             mth={},
             mtp=[],

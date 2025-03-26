@@ -57,6 +57,7 @@ from .util import (
     UnrecvEOF,
     WrongPostKey,
     absreal,
+    afsenc,
     alltrace,
     atomic_move,
     b64dec,
@@ -3501,6 +3502,7 @@ class HttpCli(object):
 
         fp = os.path.join(fp, fn)
         rem = "{}/{}".format(rp, fn).strip("/")
+        dbv, vrem = vfs.get_dbv(rem)
 
         if not rem.endswith(".md") and not self.can_delete:
             raise Pebkac(400, "only markdown pls")
@@ -3555,13 +3557,27 @@ class HttpCli(object):
             mdir, mfile = os.path.split(fp)
             fname, fext = mfile.rsplit(".", 1) if "." in mfile else (mfile, "md")
             mfile2 = "{}.{:.3f}.{}".format(fname, srv_lastmod, fext)
-            try:
+
+            dp = ""
+            hist_cfg = dbv.flags["md_hist"]
+            if hist_cfg == "v":
+                vrd = vsplit(vrem)[0]
+                zb = hashlib.sha512(afsenc(vrd)).digest()
+                zs = ub64enc(zb).decode("ascii")[:24].lower()
+                dp = "%s/md/%s/%s/%s" % (dbv.histpath, zs[:2], zs[2:4], zs)
+                self.log("moving old version to %s/%s" % (dp, mfile2))
+                if bos.makedirs(dp):
+                    with open(os.path.join(dp, "dir.txt"), "wb") as f:
+                        f.write(afsenc(vrd))
+            elif hist_cfg == "s":
                 dp = os.path.join(mdir, ".hist")
-                bos.mkdir(dp)
-                hidedir(dp)
-            except:
-                pass
-            wrename(self.log, fp, os.path.join(mdir, ".hist", mfile2), vfs.flags)
+                try:
+                    bos.mkdir(dp)
+                    hidedir(dp)
+                except:
+                    pass
+            if dp:
+                wrename(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
 
         assert self.parser.gen  # !rm
         p_field, _, p_data = next(self.parser.gen)
@@ -3634,13 +3650,12 @@ class HttpCli(object):
             wunlink(self.log, fp, vfs.flags)
             raise Pebkac(403, t)
 
-        vfs, rem = vfs.get_dbv(rem)
         self.conn.hsrv.broker.say(
             "up2k.hash_file",
-            vfs.realpath,
-            vfs.vpath,
-            vfs.flags,
-            vsplit(rem)[0],
+            dbv.realpath,
+            dbv.vpath,
+            dbv.flags,
+            vsplit(vrem)[0],
             fn,
             self.ip,
             new_lastmod,
@@ -6020,9 +6035,11 @@ class HttpCli(object):
         # check for old versions of files,
         # [num-backups, most-recent, hist-path]
         hist: dict[str, tuple[int, float, str]] = {}
-        histdir = os.path.join(fsroot, ".hist")
-        ptn = RE_MDV
         try:
+            if vf["md_hist"] != "s":
+                raise Exception()
+            histdir = os.path.join(fsroot, ".hist")
+            ptn = RE_MDV
             for hfn in bos.listdir(histdir):
                 m = ptn.match(hfn)
                 if not m:

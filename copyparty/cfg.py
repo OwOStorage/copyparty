@@ -83,6 +83,7 @@ def vf_vmap() -> dict[str, str]:
         "md_sbf",
         "lg_sba",
         "md_sba",
+        "md_hist",
         "nrand",
         "u2ow",
         "og_desc",
@@ -291,6 +292,7 @@ flagcats = {
         "og_ua": "if defined: only send OG html if useragent matches this regex",
     },
     "textfiles": {
+        "md_hist": "where to put markdown backups; s=subfolder, v=volHist, n=nope",
         "exp": "enable textfile expansion; see --help-exp",
         "exp_md": "placeholders to expand in markdown files; see --help",
         "exp_lg": "placeholders to expand in prologue/epilogue; see --help",
