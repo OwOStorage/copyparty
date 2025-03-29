@@ -281,6 +281,8 @@ small collection of user feedback
 
 `good enough`, `surprisingly correct`, `certified good software`, `just works`, `why`, `wow this is better than nextcloud`
 
+* UI просто ужасно. Если буду описывать детально не смогу удержаться в рамках приличий
+
 
 # motivations
 
