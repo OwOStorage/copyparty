@@ -679,8 +679,8 @@ class SvcHub(object):
                 t += ", "
             t += "\033[0mNG: \033[35m" + sng
 
-        t += "\033[0m, see --deps"
-        self.log("dependencies", t, 6)
+        t += "\033[0m, see --deps (this is fine btw)"
+        self.log("optional-dependencies", t, 6)
 
     def _check_env(self) -> None:
         try:
