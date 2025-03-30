@@ -2447,6 +2447,8 @@ below are some tweaks roughly ordered by usefulness:
 * `--no-hash .` when indexing a network-disk if you don't care about the actual filehashes and only want the names/tags searchable
 * if your volumes are on a network-disk such as NFS / SMB / s3, specifying larger values for `--iobuf` and/or `--s-rd-sz` and/or `--s-wr-sz` may help; try setting all of them to `524288` or `1048576` or `4194304`
 * `--no-htp --hash-mt=0 --mtag-mt=1 --th-mt=1` minimizes the number of threads; can help in some eccentric environments (like the vscode debugger)
+* when running on AlpineLinux or other musl-based distro, try mimalloc for higher performance (and twice as much RAM usage); `apk add mimalloc2` and run copyparty with env-var `LD_PRELOAD=/usr/lib/libmimalloc-secure.so.2`
+  * note that mimalloc requires special care when combined with prisonparty and/or bubbleparty/bubblewrap; you must give it access to `/proc` and `/sys` otherwise you'll encounter issues with FFmpeg (audio transcoding, thumbnails)
 * `-j0` enables multiprocessing (actual multithreading), can reduce latency to `20+80/numCores` percent and generally improve performance in cpu-intensive workloads, for example:
   * lots of connections (many users or heavy clients)
   * simultaneous downloads and uploads saturating a 20gbps connection
