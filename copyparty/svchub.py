@@ -763,7 +763,7 @@ class SvcHub(object):
             vl = [os.path.expandvars(os.path.expanduser(x)) for x in vl]
             setattr(al, k, vl)
 
-        for k in "lo hist ssl_log".split(" "):
+        for k in "lo hist dbpath ssl_log".split(" "):
             vs = getattr(al, k)
             if vs:
                 vs = os.path.expandvars(os.path.expanduser(vs))

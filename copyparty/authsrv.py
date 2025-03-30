@@ -360,6 +360,7 @@ class VFS(object):
         self.badcfg1 = False
         self.nodes: dict[str, VFS] = {}  # child nodes
         self.histtab: dict[str, str] = {}  # all realpath->histpath
+        self.dbpaths: dict[str, str] = {}  # all realpath->dbpath
         self.dbv: Optional[VFS] = None  # closest full/non-jump parent
         self.lim: Optional[Lim] = None  # upload limits; only set for dbv
         self.shr_src: Optional[tuple[VFS, str]] = None  # source vfs+rem of a share
@@ -381,12 +382,13 @@ class VFS(object):
             rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
             vp = vpath + ("/" if vpath else "")
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
+            self.dbpath = self.histpath
             self.all_vols = {vpath: self}  # flattened recursive
             self.all_nodes = {vpath: self}  # also jumpvols/shares
             self.all_aps = [(rp, self)]
             self.all_vps = [(vp, self)]
         else:
-            self.histpath = ""
+            self.histpath = self.dbpath = ""
             self.all_vols = {}
             self.all_nodes = {}
             self.all_aps = []
@@ -461,17 +463,23 @@ class VFS(object):
 
     def _copy_flags(self, name: str) -> dict[str, Any]:
         flags = {k: v for k, v in self.flags.items()}
+
         hist = flags.get("hist")
         if hist and hist != "-":
             zs = "{}/{}".format(hist.rstrip("/"), name)
             flags["hist"] = os.path.expandvars(os.path.expanduser(zs))
+
+        dbp = flags.get("dbpath")
+        if dbp and dbp != "-":
+            zs = "{}/{}".format(dbp.rstrip("/"), name)
+            flags["dbpath"] = os.path.expandvars(os.path.expanduser(zs))
 
         return flags
 
     def bubble_flags(self) -> None:
         if self.dbv:
             for k, v in self.dbv.flags.items():
-                if k not in ["hist"]:
+                if k not in ("hist", "dbpath"):
                     self.flags[k] = v
 
         for n in self.nodes.values():
@@ -1759,7 +1767,7 @@ class AuthSrv(object):
                 pass
             elif vflag:
                 vflag = os.path.expandvars(os.path.expanduser(vflag))
-                vol.histpath = uncyg(vflag) if WINDOWS else vflag
+                vol.histpath = vol.dbpath = uncyg(vflag) if WINDOWS else vflag
             elif self.args.hist:
                 for nch in range(len(hid)):
                     hpath = os.path.join(self.args.hist, hid[: nch + 1])
@@ -1780,12 +1788,45 @@ class AuthSrv(object):
                         with open(powner, "wb") as f:
                             f.write(me)
 
-                    vol.histpath = hpath
+                    vol.histpath = vol.dbpath = hpath
                     break
 
             vol.histpath = absreal(vol.histpath)
+
+        for vol in vfs.all_vols.values():
+            hid = self.hid_cache[vol.realpath]
+            vflag = vol.flags.get("dbpath")
+            if vflag == "-":
+                pass
+            elif vflag:
+                vflag = os.path.expandvars(os.path.expanduser(vflag))
+                vol.dbpath = uncyg(vflag) if WINDOWS else vflag
+            elif self.args.dbpath:
+                for nch in range(len(hid)):
+                    hpath = os.path.join(self.args.dbpath, hid[: nch + 1])
+                    bos.makedirs(hpath)
+
+                    powner = os.path.join(hpath, "owner.txt")
+                    try:
+                        with open(powner, "rb") as f:
+                            owner = f.read().rstrip()
+                    except:
+                        owner = None
+
+                    me = afsenc(vol.realpath).rstrip()
+                    if owner not in [None, me]:
+                        continue
+
+                    if owner is None:
+                        with open(powner, "wb") as f:
+                            f.write(me)
+
+                    vol.dbpath = hpath
+                    break
+
+            vol.dbpath = absreal(vol.dbpath)
             if vol.dbv:
-                if bos.path.exists(os.path.join(vol.histpath, "up2k.db")):
+                if bos.path.exists(os.path.join(vol.dbpath, "up2k.db")):
                     promote.append(vol)
                     vol.dbv = None
                 else:
@@ -1800,9 +1841,7 @@ class AuthSrv(object):
                 "\n  the following jump-volumes were generated to assist the vfs.\n  As they contain a database (probably from v0.11.11 or older),\n  they are promoted to full volumes:"
             ]
             for vol in promote:
-                ta.append(
-                    "  /{}  ({})  ({})".format(vol.vpath, vol.realpath, vol.histpath)
-                )
+                ta.append("  /%s  (%s)  (%s)" % (vol.vpath, vol.realpath, vol.dbpath))
 
             self.log("\n\n".join(ta) + "\n", c=3)
 
@@ -1813,12 +1852,26 @@ class AuthSrv(object):
             is_shr = shr and zv.vpath.split("/")[0] == shr
             if histp and not is_shr and histp in rhisttab:
                 zv2 = rhisttab[histp]
-                t = "invalid config; multiple volumes share the same histpath (database location):\n  histpath: %s\n  volume 1: /%s  [%s]\n  volume 2: %s  [%s]"
+                t = "invalid config; multiple volumes share the same histpath (database+thumbnails location):\n  histpath: %s\n  volume 1: /%s  [%s]\n  volume 2: %s  [%s]"
                 t = t % (histp, zv2.vpath, zv2.realpath, zv.vpath, zv.realpath)
                 self.log(t, 1)
                 raise Exception(t)
             rhisttab[histp] = zv
             vfs.histtab[zv.realpath] = histp
+
+        rdbpaths = {}
+        vfs.dbpaths = {}
+        for zv in vfs.all_vols.values():
+            dbp = zv.dbpath
+            is_shr = shr and zv.vpath.split("/")[0] == shr
+            if dbp and not is_shr and dbp in rdbpaths:
+                zv2 = rdbpaths[dbp]
+                t = "invalid config; multiple volumes share the same dbpath (database location):\n  dbpath: %s\n  volume 1: /%s  [%s]\n  volume 2: %s  [%s]"
+                t = t % (dbp, zv2.vpath, zv2.realpath, zv.vpath, zv.realpath)
+                self.log(t, 1)
+                raise Exception(t)
+            rdbpaths[dbp] = zv
+            vfs.dbpaths[zv.realpath] = dbp
 
         for vol in vfs.all_vols.values():
             use = False

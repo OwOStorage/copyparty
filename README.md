@@ -331,7 +331,8 @@ roughly sorted by chance of encounter
   * `--th-ff-jpg` may fix video thumbnails on some FFmpeg versions (macos, some linux)
   * `--th-ff-swr` may fix audio thumbnails on some FFmpeg versions
   * if the `up2k.db` (filesystem index) is on a samba-share or network disk, you'll get unpredictable behavior if the share is disconnected for a bit
-    * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db on a local disk instead
+    * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db and thumbnails on a local disk instead
+    * or, if you only want to move the db (and not the thumbnails), then use `--dbpath` or the `dbpath` volflag
   * all volumes must exist / be available on startup; up2k (mtp especially) gets funky otherwise
   * probably more, pls let me know
 
@@ -384,7 +385,8 @@ same order here too
   * this is an msys2 bug, the regular windows edition of python is fine
 
 * VirtualBox: sqlite throws `Disk I/O Error` when running in a VM and the up2k database is in a vboxsf
-  * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db inside the vm instead
+  * use `--hist` or the `hist` volflag (`-v [...]:c,hist=/tmp/foo`) to place the db and thumbnails inside the vm instead
+    * or, if you only want to move the db (and not the thumbnails), then use `--dbpath` or the `dbpath` volflag
   * also happens on mergerfs, so put the db elsewhere
 
 * Ubuntu: dragging files from certain folders into firefox or chrome is impossible
@@ -1593,6 +1595,8 @@ copyparty creates a subfolder named `.hist` inside each volume where it stores t
 
 this can instead be kept in a single place using the `--hist` argument, or the `hist=` volflag, or a mix of both:
 * `--hist ~/.cache/copyparty -v ~/music::r:c,hist=-` sets `~/.cache/copyparty` as the default place to put volume info, but `~/music` gets the regular `.hist` subfolder (`-` restores default behavior)
+
+by default, the per-volume `up2k.db` sqlite3-database for `-e2d` and `-e2t` is stored next to the thumbnails according to the `--hist` option, but the global-option `--dbpath` and/or volflag `dbpath` can be used to put the database somewhere else
 
 note:
 * putting the hist-folders on an SSD is strongly recommended for performance

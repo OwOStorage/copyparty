@@ -1546,6 +1546,12 @@ def vol_san(vols: list["VFS"], txt: bytes) -> bytes:
         txt = txt.replace(bap.replace(b"\\", b"\\\\"), bvp)
         txt = txt.replace(bhp.replace(b"\\", b"\\\\"), bvph)
 
+        if vol.histpath != vol.dbpath:
+            bdp = vol.dbpath.encode("utf-8")
+            bdph = b"$db(/" + bvp + b")"
+            txt = txt.replace(bdp, bdph)
+            txt = txt.replace(bdp.replace(b"\\", b"\\\\"), bdph)
+
     if txt != txt0:
         txt += b"\r\nNOTE: filepaths sanitized; see serverlog for correct values"
 

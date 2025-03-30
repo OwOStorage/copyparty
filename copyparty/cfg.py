@@ -205,6 +205,7 @@ flagcats = {
         "d2v": "disables file verification, overrides -e2v*",
         "d2d": "disables all database stuff, overrides -e2*",
         "hist=/tmp/cdb": "puts thumbnails and indexes at that location",
+        "dbpath=/tmp/cdb": "puts indexes at that location",
         "scan=60": "scan for new files every 60sec, same as --re-maxage",
         "nohash=\\.iso$": "skips hashing file contents if path matches *.iso",
         "noidx=\\.iso$": "fully ignores the contents at paths matching *.iso",

@@ -94,7 +94,7 @@ VF_AFFECTS_INDEXING = set(zsg.split(" "))
 
 SBUSY = "cannot receive uploads right now;\nserver busy with %s.\nPlease wait; the client will retry..."
 
-HINT_HISTPATH = "you could try moving the database to another location (preferably an SSD or NVME drive) using either the --hist argument (global option for all volumes), or the hist volflag (just for this volume)"
+HINT_HISTPATH = "you could try moving the database to another location (preferably an SSD or NVME drive) using either the --hist argument (global option for all volumes), or the hist volflag (just for this volume), or, if you want to keep the thumbnails in the current location and only move the database itself, then use --dbpath or volflag dbpath"
 
 
 NULLSTAT = os.stat_result((0, -1, -1, 0, 0, 0, 0, 0, 0, 0))
@@ -1096,9 +1096,9 @@ class Up2k(object):
         self, ptop: str, flags: dict[str, Any]
     ) -> Optional[tuple["sqlite3.Cursor", str]]:
         """mutex(main,reg) me"""
-        histpath = self.vfs.histtab.get(ptop)
+        histpath = self.vfs.dbpaths.get(ptop)
         if not histpath:
-            self.log("no histpath for %r" % (ptop,))
+            self.log("no dbpath for %r" % (ptop,))
             return None
 
         db_path = os.path.join(histpath, "up2k.db")
@@ -1344,11 +1344,14 @@ class Up2k(object):
             ]
             excl += [absreal(x) for x in excl]
             excl += list(self.vfs.histtab.values())
+            excl += list(self.vfs.dbpaths.values())
             if WINDOWS:
                 excl = [x.replace("/", "\\") for x in excl]
             else:
                 # ~/.wine/dosdevices/z:/ and such
                 excl.extend(("/dev", "/proc", "/run", "/sys"))
+
+            excl = list({k: 1 for k in excl})
 
             if self.args.re_dirsz:
                 db.c.execute("delete from ds")
@@ -5102,7 +5105,7 @@ class Up2k(object):
 
     def _snap_reg(self, ptop: str, reg: dict[str, dict[str, Any]]) -> None:
         now = time.time()
-        histpath = self.vfs.histtab.get(ptop)
+        histpath = self.vfs.dbpaths.get(ptop)
         if not histpath:
             return
 
