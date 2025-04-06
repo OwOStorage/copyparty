@@ -2999,9 +2999,6 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
         rem = sanitize_vpath(rem, "/")
         fn = vfs.canonical(rem)
-        if not fn.startswith(vfs.realpath):
-            self.log("invalid mkdir %r %r" % (self.gctx, vpath), 1)
-            raise Pebkac(422)
 
         if not nullwrite:
             fdir = os.path.dirname(fn)
