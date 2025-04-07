@@ -3941,7 +3941,7 @@ def hidedir(dp) -> None:
 
 
 try:
-    if sys.version_info < (3, 10):
+    if sys.version_info < (3, 10) or os.environ.get("PRTY_NO_IMPRESO"):
         # py3.8 doesn't have .files
         # py3.9 has broken .is_file
         raise ImportError()

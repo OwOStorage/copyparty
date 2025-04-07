@@ -32,6 +32,9 @@ rm -rf \
   /tmp/pe-* /z/copyparty-sfx.py \
   ensurepip pydoc_data turtle.py turtledemo lib2to3
 
+# speedhack
+sed -ri 's/os.environ.get\("PRTY_NO_IMPRESO"\)/"1"/' /usr/lib/python3.*/site-packages/copyparty/util.py
+
 # drop bytecode
 find / -xdev -name __pycache__ -print0 | xargs -0 rm -rf
 
