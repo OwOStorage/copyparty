@@ -808,6 +808,8 @@ if you are resuming a massive upload and want to skip hashing the files which al
 
 if the server is behind a proxy which imposes a request-size limit, you can configure up2k to sneak below the limit with server-option `--u2sz` (the default is 96 MiB to support Cloudflare)
 
+if you want to replace existing files on the server with new uploads by default, run with `--u2ow 2` (only works if users have the delete-permission, and can still be disabled with `🛡️` in the UI)
+
 
 ### file-search
 
