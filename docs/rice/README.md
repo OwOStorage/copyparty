@@ -33,12 +33,6 @@ if you are introducing a new ttf/woff font, don't forget to declare the font its
 }
 ```
 
-and because textboxes don't inherit fonts by default, you can force it like this:
-
-```css
-input[type=text], input[type=submit], input[type=button] { font-family: var(--font-main) }
-```
-
 and if you want to have a monospace font in the fancy markdown editor, do this:
 
 ```css

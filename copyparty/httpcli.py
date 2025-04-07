@@ -4882,7 +4882,7 @@ class HttpCli(object):
             self.reply(pt.encode("utf-8"), status=rc)
             return True
 
-        if "th" in self.ouparam:
+        if "th" in self.ouparam and str(self.ouparam["th"])[:1] in "jw":
             return self.tx_svg("e" + pt[:3])
 
         # most webdav clients will not send credentials until they
@@ -5810,7 +5810,13 @@ class HttpCli(object):
 
                 thp = None
                 if self.thumbcli and not nothumb:
-                    thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
+                    try:
+                        thp = self.thumbcli.get(dbv, vrem, int(st.st_mtime), th_fmt)
+                    except Pebkac as ex:
+                        if ex.code == 500 and th_fmt[:1] in "jw":
+                            self.log("failed to convert [%s]:\n%s" % (abspath, ex), 3)
+                            return self.tx_svg("--error--\ncheck\nserver\nlog")
+                        raise
 
                 if thp:
                     return self.tx_file(thp)

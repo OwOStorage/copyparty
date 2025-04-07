@@ -385,8 +385,12 @@ class ThumbSrv(object):
                     self.log(msg, c)
                     if getattr(ex, "returncode", 0) != 321:
                         if fun == funs[-1]:
-                            with open(ttpath, "wb") as _:
-                                pass
+                            try:
+                                with open(ttpath, "wb") as _:
+                                    pass
+                            except Exception as ex:
+                                t = "failed to create the file [%s]: %r"
+                                self.log(t % (ttpath, ex), 3)
                     else:
                         # ffmpeg may spawn empty files on windows
                         try:
@@ -399,7 +403,10 @@ class ThumbSrv(object):
 
             try:
                 wrename(self.log, ttpath, tpath, vn.flags)
-            except:
+            except Exception as ex:
+                if not os.path.exists(tpath):
+                    t = "failed to move  [%s]  to  [%s]:  %r"
+                    self.log(t % (ttpath, tpath, ex), 3)
                 pass
 
             with self.mutex:

@@ -316,6 +316,7 @@ var Ls = {
 		"mm_eunk": "Unknown Errol",
 		"mm_e404": "Could not play audio; error 404: File not found.",
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
+		"mm_e500": "Could not play audio; error 500: Check server logs.",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
 		"mm_prescan": "Looking for music to play next...",
@@ -919,6 +920,7 @@ var Ls = {
 		"mm_eunk": "Ukjent feil",
 		"mm_e404": "Avspilling feilet: Fil ikke funnet.",
 		"mm_e403": "Avspilling feilet: Tilgang nektet.\n\nKanskje du ble logget ut?\nPrøv å trykk F5 for å laste siden på nytt.",
+		"mm_e500": "Avspilling feilet: Rusk i maskineriet, sjekk serverloggen.",
 		"mm_e5xx": "Avspilling feilet: ",
 		"mm_nof": "finner ikke flere sanger i nærheten",
 		"mm_prescan": "Leter etter neste sang...",
@@ -1522,6 +1524,7 @@ var Ls = {
 		"mm_eunk": "未知错误",
 		"mm_e404": "无法播放音频；错误 404：文件未找到。",
 		"mm_e403": "无法播放音频；错误 403：访问被拒绝。\n\n尝试按 F5 重新加载，也许你已被注销",
+		"mm_e500": "无法播放音频；错误 500：检查服务器日志。", //m
 		"mm_e5xx": "无法播放音频；服务器错误",
 		"mm_nof": "附近找不到更多音频文件",
 		"mm_prescan": "正在寻找下一首音乐...",
@@ -4202,6 +4205,7 @@ function evau_error(e) {
 	}
 	var em = '' + eplaya.error.message,
 		mfile = '\n\nFile: «' + uricom_dec(eplaya.src.split('/').pop()) + '»',
+		e500 = L.mm_e500,
 		e404 = L.mm_e404,
 		e403 = L.mm_e403;
 
@@ -4214,6 +4218,9 @@ function evau_error(e) {
 	if (em.startsWith('404: '))
 		err = e404;
 
+	if (em.startsWith('500: '))
+		err = e500;
+
 	toast.warn(15, esc(basenames(err + mfile)));
 	console.log(basenames(err + mfile));
 
@@ -4225,7 +4232,9 @@ function evau_error(e) {
 			if (this.status < 400)
 				return;
 
-			err = this.status == 403 ? e403 : this.status == 404 ? e404 :
+			err = this.status == 403 ? e403 :
+				this.status == 404 ? e404 :
+				this.status == 500 ? e500 :
 				L.mm_e5xx + this.status;
 
 			toast.warn(15, esc(basenames(err + mfile)));
