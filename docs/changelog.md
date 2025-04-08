@@ -1,4 +1,31 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0323-2216  `v1.16.18`  zlib-ng
+
+## 🧪 new features
+
+* prefer zlib-ng when available 57a56073
+  * download-as-tar-gz becomes 2.5x faster
+  * default-enabled in docker-images
+  * not enabled in copyparty.exe yet; coming in a future python version
+* docker: add mimalloc (optional, default-disabled) de2c9788
+  * gives twice the speed, and twice the ram usage
+
+## 🩹 bugfixes
+
+* small up2k glitch 3c90cec0
+
+## 🔧 other changes
+
+* rename logues/readmes when uploaded with write-only access 2525d594
+  * since they are used as helptext when viewing the page
+* try to block google and other bad bots from `?doc` and `?zip` 99f63adf
+  * apparently `rel="nofollow"` means nothing these days
+
+### the docker images for this release were built from e1dea7ef
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0316-2002  `v1.16.17`  boot2party
 
 ## NEW: make it a bootable usb flashdrive

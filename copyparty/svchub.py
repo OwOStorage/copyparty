@@ -194,8 +194,14 @@ class SvcHub(object):
 
         if not args.use_fpool and args.j != 1:
             args.no_fpool = True
-            t = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems"
-            self.log("root", t.format(args.j))
+            t = "multithreading enabled with -j {}, so disabling fpool -- this can reduce upload performance on some filesystems, and make some antivirus-softwares "
+            c = 0
+            if ANYWIN:
+                t += "(especially Microsoft Defender) stress your CPU and HDD severely during big uploads"
+                c = 3
+            else:
+                t += "consume more resources (CPU/HDD) than normal"
+            self.log("root", t.format(args.j), c)
 
         if not args.no_fpool and args.j != 1:
             t = "WARNING: ignoring --use-fpool because multithreading (-j{}) is enabled"

@@ -232,6 +232,8 @@ def init_E(EE: EnvParams) -> None:
         p = os.environ.get("XDG_CONFIG_HOME")
         if not p:
             raise Exception()
+        if p.startswith("~"):
+            p = os.path.expanduser(p)
         p = os.path.abspath(os.path.realpath(p))
         p = os.path.join(p, "copyparty")
         if not os.path.isdir(p):
