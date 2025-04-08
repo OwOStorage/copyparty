@@ -2135,7 +2135,9 @@ buggy feature? rip it out  by setting any of the following environment variables
 
 | env-var              | what it does |
 | -------------------- | ------------ |
+| `PRTY_NO_DB_LOCK`    | do not lock session/shares-databases for exclusive access |
 | `PRTY_NO_IFADDR`     | disable ip/nic discovery by poking into your OS with ctypes |
+| `PRTY_NO_IMPRESO`    | do not try to load js/css files using `importlib.resources` |
 | `PRTY_NO_IPV6`       | disable some ipv6 support (should not be necessary since windows 2000) |
 | `PRTY_NO_LZMA`       | disable streaming xz compression of incoming uploads |
 | `PRTY_NO_MP`         | disable all use of the python `multiprocessing` module (actual multithreading, cpu-count for parsers/thumbnailers) |
@@ -2676,7 +2678,6 @@ set any of the following environment variables to disable its associated optiona
 | `PRTY_NO_CFSSL`      | never attempt to generate self-signed certificates using [cfssl](https://github.com/cloudflare/cfssl) |
 | `PRTY_NO_FFMPEG`     | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips |
 | `PRTY_NO_FFPROBE`    | **audio transcoding** goes byebye, **thumbnailing** must be handled by Pillow/libvips, **metadata-scanning** must be handled by mutagen |
-| `PRTY_NO_IMPRESO`    | do not try to load js/css files using `importlib.resources` |
 | `PRTY_NO_MUTAGEN`    | do not use [mutagen](https://pypi.org/project/mutagen/) for reading metadata from media files; will fallback to ffprobe |
 | `PRTY_NO_PIL`        | disable all [Pillow](https://pypi.org/project/pillow/)-based thumbnail support; will fallback to libvips or ffmpeg |
 | `PRTY_NO_PILF`       | disable Pillow `ImageFont` text rendering, used for folder thumbnails |

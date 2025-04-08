@@ -114,8 +114,14 @@ IP6ALL = "0:0:0:0:0:0:0:0"
 
 
 try:
-    import ctypes
     import fcntl
+
+    HAVE_FCNTL = True
+except:
+    HAVE_FCNTL = False
+
+try:
+    import ctypes
     import termios
 except:
     pass
@@ -3938,6 +3944,73 @@ def hidedir(dp) -> None:
                 k32.SetFileAttributesW(dp, attrs | 2)
         except:
             pass
+
+
+_flocks = {}
+
+
+def _lock_file_noop(ap: str) -> bool:
+    return True
+
+
+def _lock_file_ioctl(ap: str) -> bool:
+    assert fcntl  # type: ignore  # !rm
+    try:
+        fd = _flocks.pop(ap)
+        os.close(fd)
+    except:
+        pass
+
+    fd = os.open(ap, os.O_RDWR | os.O_CREAT, 438)
+    # NOTE: the fcntl.lockf identifier is (pid,node);
+    #  the lock will be dropped if os.close(os.open(ap))
+    #  is performed anywhere else in this thread
+
+    try:
+        fcntl.lockf(fd, fcntl.LOCK_EX | fcntl.LOCK_NB)
+        _flocks[ap] = fd
+        return True
+    except Exception as ex:
+        eno = getattr(ex, "errno", -1)
+        try:
+            os.close(fd)
+        except:
+            pass
+        if eno in (errno.EAGAIN, errno.EACCES):
+            return False
+        print("WARNING: unexpected errno %d from fcntl.lockf; %r" % (eno, ex))
+        return True
+
+
+def _lock_file_windows(ap: str) -> bool:
+    try:
+        import msvcrt
+
+        try:
+            fd = _flocks.pop(ap)
+            os.close(fd)
+        except:
+            pass
+
+        fd = os.open(ap, os.O_RDWR | os.O_CREAT, 438)
+        msvcrt.locking(fd, msvcrt.LK_NBLCK, 1)
+        return True
+    except Exception as ex:
+        eno = getattr(ex, "errno", -1)
+        if eno == errno.EACCES:
+            return False
+        print("WARNING: unexpected errno %d from msvcrt.locking; %r" % (eno, ex))
+        return True
+
+
+if os.environ.get("PRTY_NO_DB_LOCK"):
+    lock_file = _lock_file_noop
+elif ANYWIN:
+    lock_file = _lock_file_windows
+elif HAVE_FCNTL:
+    lock_file = _lock_file_ioctl
+else:
+    lock_file = _lock_file_noop
 
 
 try:

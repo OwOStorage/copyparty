@@ -64,6 +64,7 @@ from .util import (
     expat_ver,
     gzip,
     load_ipu,
+    lock_file,
     min_ex,
     mp,
     odfusion,
@@ -419,6 +420,7 @@ class SvcHub(object):
         # the sessions-db is whatever, if something looks broken then just nuke it
 
         db_path = self.args.ses_db
+        db_lock = db_path + ".lock"
         try:
             create = not os.path.getsize(db_path)
         except:
@@ -444,7 +446,11 @@ class SvcHub(object):
                         raise
                     sver = 1
                     self._create_session_db(cur)
-                self._verify_session_db(cur, sver)
+                err = self._verify_session_db(cur, sver, db_path)
+                if err:
+                    tries = 99
+                    self.args.no_ses = True
+                    self.log("root", err, 3)
                 break
 
             except Exception as ex:
@@ -458,6 +464,10 @@ class SvcHub(object):
                     pass
                 try:
                     db.close()  # type: ignore
+                except:
+                    pass
+                try:
+                    os.unlink(db_lock)
                 except:
                     pass
                 os.unlink(db_path)
@@ -476,7 +486,7 @@ class SvcHub(object):
             cur.execute(cmd)
         self.log("root", "created new sessions-db")
 
-    def _verify_session_db(self, cur: "sqlite3.Cursor", sver: int) -> None:
+    def _verify_session_db(self, cur: "sqlite3.Cursor", sver: int, db_path: str) -> str:
         # ensure writable (maybe owned by other user)
         db = cur.connection
 
@@ -487,6 +497,10 @@ class SvcHub(object):
             owner = zil[0][0]
         except:
             owner = 0
+
+        if not lock_file(db_path + ".lock"):
+            t = "the sessions-db [%s] is already in use by another copyparty instance (pid:%d). This is not supported; please provide another database with --ses-db or give this copyparty-instance its entirely separate config-folder by setting another path in the XDG_CONFIG_HOME env-var. You can also disable this safeguard by setting env-var PRTY_NO_DB_LOCK=1. Will now disable sessions and instead use plaintext passwords in cookies."
+            return t % (db_path, owner)
 
         vars = (("pid", os.getpid()), ("ts", int(time.time() * 1000)))
         if owner:
@@ -505,6 +519,7 @@ class SvcHub(object):
         db.commit()
         cur.close()
         db.close()
+        return ""
 
     def setup_share_db(self) -> None:
         al = self.args
@@ -513,7 +528,7 @@ class SvcHub(object):
             al.shr = ""
             return
 
-        import sqlite3
+        assert sqlite3  # type: ignore  # !rm
 
         al.shr = al.shr.strip("/")
         if "/" in al.shr or not al.shr:
@@ -528,6 +543,7 @@ class SvcHub(object):
         # the shares-db is important, so panic if something is wrong
 
         db_path = self.args.shr_db
+        db_lock = db_path + ".lock"
         try:
             create = not os.path.getsize(db_path)
         except:
@@ -559,6 +575,12 @@ class SvcHub(object):
             owner = zil[0][0]
         except:
             owner = 0
+
+        if not lock_file(db_lock):
+            t = "the shares-db [%s] is already in use by another copyparty instance (pid:%d). This is not supported; please provide another database with --shr-db or give this copyparty-instance its entirely separate config-folder by setting another path in the XDG_CONFIG_HOME env-var. You can also disable this safeguard by setting env-var PRTY_NO_DB_LOCK=1. Will now panic."
+            t = t % (db_path, owner)
+            self.log("root", t, 1)
+            raise Exception(t)
 
         sch1 = [
             r"create table kv (k text, v int)",
