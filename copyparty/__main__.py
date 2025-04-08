@@ -228,7 +228,21 @@ def init_E(EE: EnvParams) -> None:
     if E.mod.endswith("__init__"):
         E.mod = os.path.dirname(E.mod)
 
-    if sys.platform == "win32":
+    try:
+        p = os.environ.get("XDG_CONFIG_HOME")
+        if not p:
+            raise Exception()
+        p = os.path.abspath(os.path.realpath(p))
+        p = os.path.join(p, "copyparty")
+        if not os.path.isdir(p):
+            os.mkdir(p)
+        os.listdir(p)
+    except:
+        p = ""
+
+    if p:
+        E.cfg = p
+    elif sys.platform == "win32":
         bdir = os.environ.get("APPDATA") or os.environ.get("TEMP") or "."
         E.cfg = os.path.normpath(bdir + "/copyparty")
     elif sys.platform == "darwin":
