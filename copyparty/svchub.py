@@ -73,6 +73,9 @@ from .util import (
     ub64enc,
 )
 
+if HAVE_SQLITE3:
+    import sqlite3
+
 if TYPE_CHECKING:
     try:
         from .mdns import MDNS
@@ -82,6 +85,10 @@ if TYPE_CHECKING:
 
 if PY2:
     range = xrange  # type: ignore
+
+
+VER_SESSION_DB = 1
+VER_SHARES_DB = 2
 
 
 class SvcHub(object):
@@ -406,25 +413,44 @@ class SvcHub(object):
             self.log("root", t, 3)
             return
 
-        import sqlite3
+        assert sqlite3  # type: ignore  # !rm
 
-        create = True
+        # policy:
+        # the sessions-db is whatever, if something looks broken then just nuke it
+
         db_path = self.args.ses_db
-        self.log("root", "opening sessions-db %s" % (db_path,))
-        for n in range(2):
+        try:
+            create = not os.path.getsize(db_path)
+        except:
+            create = True
+        zs = "creating new" if create else "opening"
+        self.log("root", "%s sessions-db %s" % (zs, db_path))
+
+        for tries in range(2):
+            sver = 0
             try:
                 db = sqlite3.connect(db_path)
                 cur = db.cursor()
                 try:
+                    zs = "select v from kv where k='sver'"
+                    sver = cur.execute(zs).fetchall()[0][0]
+                    if sver > VER_SESSION_DB:
+                        zs = "this version of copyparty only understands session-db v%d and older; the db is v%d"
+                        raise Exception(zs % (VER_SESSION_DB, sver))
+
                     cur.execute("select count(*) from us").fetchone()
-                    create = False
-                    break
                 except:
-                    pass
+                    if sver:
+                        raise
+                    sver = 1
+                    self._create_session_db(cur)
+                self._verify_session_db(cur, sver)
+                break
+
             except Exception as ex:
-                if n:
+                if tries or sver > VER_SESSION_DB:
                     raise
-                t = "sessions-db corrupt; deleting and recreating: %r"
+                t = "sessions-db is unusable; deleting and recreating: %r"
                 self.log("root", t % (ex,), 3)
                 try:
                     cur.close()  # type: ignore
@@ -436,6 +462,7 @@ class SvcHub(object):
                     pass
                 os.unlink(db_path)
 
+    def _create_session_db(self, cur: "sqlite3.Cursor") -> None:
         sch = [
             r"create table kv (k text, v int)",
             r"create table us (un text, si text, t0 int)",
@@ -445,15 +472,37 @@ class SvcHub(object):
             r"create index us_t0 on us(t0)",
             r"insert into kv values ('sver', 1)",
         ]
+        for cmd in sch:
+            cur.execute(cmd)
+        self.log("root", "created new sessions-db")
 
-        assert db  # type: ignore  # !rm
-        assert cur  # type: ignore  # !rm
-        if create:
-            for cmd in sch:
-                cur.execute(cmd)
-            self.log("root", "created new sessions-db")
-            db.commit()
+    def _verify_session_db(self, cur: "sqlite3.Cursor", sver: int) -> None:
+        # ensure writable (maybe owned by other user)
+        db = cur.connection
 
+        try:
+            zil = cur.execute("select v from kv where k='pid'").fetchall()
+            if len(zil) > 1:
+                raise Exception()
+            owner = zil[0][0]
+        except:
+            owner = 0
+
+        vars = (("pid", os.getpid()), ("ts", int(time.time() * 1000)))
+        if owner:
+            # wear-estimate: 2 cells; offsets 0x10, 0x50, 0x19720
+            for k, v in vars:
+                cur.execute("update kv set v=? where k=?", (v, k))
+        else:
+            # wear-estimate: 3~4 cells; offsets 0x10, 0x50, 0x19180, 0x19710, 0x36000, 0x360b0, 0x36b90
+            for k, v in vars:
+                cur.execute("insert into kv values(?, ?)", (k, v))
+
+        if sver < VER_SESSION_DB:
+            cur.execute("delete from kv where k='sver'")
+            cur.execute("insert into kv values('sver',?)", (VER_SESSION_DB,))
+
+        db.commit()
         cur.close()
         db.close()
 
@@ -475,34 +524,41 @@ class SvcHub(object):
         al.shr = "/%s/" % (al.shr,)
         al.shr1 = al.shr[1:]
 
-        create = True
-        modified = False
+        # policy:
+        # the shares-db is important, so panic if something is wrong
+
         db_path = self.args.shr_db
-        self.log("root", "opening shares-db %s" % (db_path,))
-        for n in range(2):
-            try:
-                db = sqlite3.connect(db_path)
-                cur = db.cursor()
-                try:
-                    cur.execute("select count(*) from sh").fetchone()
-                    create = False
-                    break
-                except:
-                    pass
-            except Exception as ex:
-                if n:
-                    raise
-                t = "shares-db corrupt; deleting and recreating: %r"
-                self.log("root", t % (ex,), 3)
-                try:
-                    cur.close()  # type: ignore
-                except:
-                    pass
-                try:
-                    db.close()  # type: ignore
-                except:
-                    pass
-                os.unlink(db_path)
+        try:
+            create = not os.path.getsize(db_path)
+        except:
+            create = True
+        zs = "creating new" if create else "opening"
+        self.log("root", "%s shares-db %s" % (zs, db_path))
+
+        sver = 0
+        try:
+            db = sqlite3.connect(db_path)
+            cur = db.cursor()
+            if not create:
+                zs = "select v from kv where k='sver'"
+                sver = cur.execute(zs).fetchall()[0][0]
+                if sver > VER_SHARES_DB:
+                    zs = "this version of copyparty only understands shares-db v%d and older; the db is v%d"
+                    raise Exception(zs % (VER_SHARES_DB, sver))
+
+                cur.execute("select count(*) from sh").fetchone()
+        except Exception as ex:
+            t = "could not open shares-db; will now panic...\nthe following database must be repaired or deleted before you can launch copyparty:\n%s\n\nERROR: %s\n\nadditional details:\n%s\n"
+            self.log("root", t % (db_path, ex, min_ex()), 1)
+            raise
+
+        try:
+            zil = cur.execute("select v from kv where k='pid'").fetchall()
+            if len(zil) > 1:
+                raise Exception()
+            owner = zil[0][0]
+        except:
+            owner = 0
 
         sch1 = [
             r"create table kv (k text, v int)",
@@ -514,34 +570,37 @@ class SvcHub(object):
             r"create index sf_k on sf(k)",
             r"create index sh_k on sh(k)",
             r"create index sh_t1 on sh(t1)",
+            r"insert into kv values ('sver', 2)",
         ]
 
         assert db  # type: ignore  # !rm
         assert cur  # type: ignore  # !rm
-        if create:
-            dver = 2
-            modified = True
+        if not sver:
+            sver = VER_SHARES_DB
             for cmd in sch1 + sch2:
                 cur.execute(cmd)
             self.log("root", "created new shares-db")
-        else:
-            (dver,) = cur.execute("select v from kv where k = 'sver'").fetchall()[0]
 
-        if dver == 1:
-            modified = True
+        if sver == 1:
             for cmd in sch2:
                 cur.execute(cmd)
             cur.execute("update sh set st = 0")
             self.log("root", "shares-db schema upgrade ok")
 
-        if modified:
-            for cmd in [
-                r"delete from kv where k = 'sver'",
-                r"insert into kv values ('sver', %d)" % (2,),
-            ]:
-                cur.execute(cmd)
-            db.commit()
+        if sver < VER_SHARES_DB:
+            cur.execute("delete from kv where k='sver'")
+            cur.execute("insert into kv values('sver',?)", (VER_SHARES_DB,))
 
+        vars = (("pid", os.getpid()), ("ts", int(time.time() * 1000)))
+        if owner:
+            # wear-estimate: same as sessions-db
+            for k, v in vars:
+                cur.execute("update kv set v=? where k=?", (v, k))
+        else:
+            for k, v in vars:
+                cur.execute("insert into kv values(?, ?)", (k, v))
+
+        db.commit()
         cur.close()
         db.close()
 
