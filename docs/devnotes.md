@@ -281,8 +281,11 @@ on writing your own [hooks](../README.md#event-hooks)
 hooks can cause intentional side-effects,  such as redirecting an upload into another location, or creating+indexing additional files, or deleting existing files, by returning json on stdout
 
 * `reloc` can redirect uploads before/after uploading has finished, based on filename, extension, file contents, uploader ip/name etc.
+  * example: [reloc-by-ext](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reloc-by-ext.py)
 * `idx` informs copyparty about a new file to index as a consequence of this upload
+  * example: [podcast-normalizer.py](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/podcast-normalizer.py)
 * `del` tells copyparty to delete an unrelated file by vpath
+  * example: (　´・ω・) nyoro~n
 
 for these to take effect, the hook must be defined with the `c1` flag; see example [reloc-by-ext](https://github.com/9001/copyparty/blob/hovudstraum/bin/hooks/reloc-by-ext.py)
 

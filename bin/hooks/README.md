@@ -14,6 +14,8 @@ run copyparty with `--help-hooks` for usage details / hook type explanations (xm
 * [discord-announce.py](discord-announce.py) announces new uploads on discord using webhooks ([example](https://user-images.githubusercontent.com/241032/215304439-1c1cb3c8-ec6f-4c17-9f27-81f969b1811a.png))
 * [reject-mimetype.py](reject-mimetype.py) rejects uploads unless the mimetype is acceptable
 * [into-the-cache-it-goes.py](into-the-cache-it-goes.py) avoids bugs in caching proxies by immediately downloading each file that is uploaded
+* [podcast-normalizer.py](podcast-normalizer.py) creates a second file with dynamic-range-compression whenever an audio file is uploaded
+  * good example of the `idx` [hook effect](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#hook-effects) to tell copyparty about additional files to scan/index
 
 
 # upload batches
@@ -25,6 +27,7 @@ these are `--xiu` hooks; unlike `xbu` and `xau` (which get executed on every sin
 # before upload
 * [reject-extension.py](reject-extension.py) rejects uploads if they match a list of file extensions
 * [reloc-by-ext.py](reloc-by-ext.py) redirects an upload to another destination based on the file extension
+  * good example of the `reloc` [hook effect](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#hook-effects)
 
 
 # on message
