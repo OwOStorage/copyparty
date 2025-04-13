@@ -857,11 +857,6 @@ function get_evpath() {
 }
 
 
-function get_vpath() {
-    return uricom_dec(get_evpath());
-}
-
-
 function noq_href(el) {
     return el.getAttribute('href').split('?')[0];
 }

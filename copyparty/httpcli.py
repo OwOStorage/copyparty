@@ -1206,11 +1206,6 @@ class HttpCli(object):
                 else:
                     return self.tx_res(res_path)
 
-            if res_path != undot(res_path):
-                t = "malicious user; attempted path traversal; req(%r) vp(%r) => %r"
-                self.log(t % (self.req, "/" + self.vpath, res_path), 1)
-                self.cbonk(self.conn.hsrv.gmal, self.req, "trav", "path traversal")
-
             self.tx_404()
             return False
 

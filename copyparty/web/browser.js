@@ -2555,7 +2555,7 @@ var mpl = (function () {
 		ebi('np_artist').textContent = np.artist || (fns.length > 1 ? fns[0] : '');
 		ebi('np_title').textContent = np.title || '';
 		ebi('np_dur').textContent = np['.dur'] || '';
-		ebi('np_url').textContent = get_vpath() + np.file.split('?')[0];
+		ebi('np_url').textContent = uricom_dec(get_evpath()) + np.file.split('?')[0];
 		if (!MOBILE && cover)
 			ebi('np_img').setAttribute('src', cover);
 		else
@@ -5972,7 +5972,8 @@ var showfile = (function () {
 	};
 
 	r.mktree = function () {
-		var html = ['<li class="bn">' + L.tv_lst + '<br />' + linksplit(get_vpath()).join('<span>/</span>') + '</li>'];
+		var crumbs = linksplit(get_evpath()).join('<span>/</span>'),
+			html = ['<li class="bn">' + L.tv_lst + '<br />' + crumbs + '</li>'];
 		for (var a = 0; a < r.files.length; a++) {
 			var file = r.files[a];
 			html.push('<li><a href="?doc=' +
@@ -7595,8 +7596,8 @@ var treectl = (function () {
 	};
 
 	function reload_tree() {
-		var cdir = r.nextdir || get_vpath(),
-			cevp = get_evpath(),
+		var cevp = get_evpath(),
+			cdir = r.nextdir || uricom_dec(cevp),
 			links = QSA('#treeul a+a'),
 			nowrap = QS('#tree.nowrap') && QS('#hovertree.on'),
 			act = null;
@@ -9781,7 +9782,7 @@ function wintitle(txt, noname) {
 	if (s_name && !noname)
 		txt = s_name + ' ' + txt;
 
-	txt += get_vpath().slice(1, -1).split('/').pop();
+	txt += uricom_dec(get_evpath()).slice(1, -1).split('/').pop();
 
 	document.title = txt;
 }
