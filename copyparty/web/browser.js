@@ -6548,8 +6548,8 @@ function tree_scrolltoo(q) {
 	var ctr = ebi('tree'),
 		em = parseFloat(getComputedStyle(act).fontSize),
 		top = act.offsetTop + ul.offsetTop,
-		min = top - 11 * em,
-		max = top - (ctr.offsetHeight - 10 * em);
+		min = top - 20 * em,
+		max = top - (ctr.offsetHeight - 16 * em);
 
 	if (ctr.scrollTop > min)
 		ctr.scrollTop = Math.floor(min);
