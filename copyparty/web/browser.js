@@ -6720,7 +6720,8 @@ var ahotkeys = function (e) {
 			return ebi('griden').click();
 	}
 
-	if ((aet == 'tr' || aet == 'td') && ae.closest('#files')) {
+	var in_ftab = (aet == 'tr' || aet == 'td') && ae.closest('#files');
+	if (in_ftab) {
 		var d = '', rem = 0;
 		if (aet == 'td') ae = ae.closest('tr'); //ie11
 		if (k == 'ArrowUp' || k == 'Up') d = 'previous';
@@ -6737,6 +6738,8 @@ var ahotkeys = function (e) {
 			msel.selui();
 			return ev(e);
 		}
+	}
+	if (in_ftab || !aet || (ae && ae.closest('#ggrid'))) {
 		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
 			var sel = msel.getsel(),
 				all = msel.getall();
