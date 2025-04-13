@@ -4433,7 +4433,8 @@ function eval_hash() {
 
 function read_dsort(txt) {
 	dnsort = dnsort ? 1 : 0;
-	clmod(ebi('nsort'), 'on', (sread('nsort') || dnsort) == 1);
+	ENATSORT = NATSORT && (sread('nsort') || dnsort) == 1;
+	clmod(ebi('nsort'), 'on', ENATSORT);
 	try {
 		var zt = (('' + txt).trim() || 'href').split(/,+/g);
 		dsort = [];
@@ -4478,9 +4479,6 @@ function sortfiles(nodes) {
 		dir1st = sread('dir1st') !== '0';
 
 	sopts = sopts && sopts.length ? sopts : jcp(dsort);
-
-	var collator = !clgot(ebi('nsort'), 'on') ? null :
-		new Intl.Collator([], {numeric: true});
 
 	try {
 		var is_srch = false;
@@ -4533,8 +4531,9 @@ function sortfiles(nodes) {
 				}
 				if (v2 === undefined) return 1 * rev;
 
-				var ret = rev * (typ == 'int' ? (v1 - v2) : collator ?
-					collator.compare(v1, v2) : v1.localeCompare(v2));
+				var ret = rev * (typ == 'int' ? (v1 - v2) :
+					ENATSORT ? NATSORT.compare(v1, v2) :
+					v1.localeCompare(v2));
 
 				if (ret === 0)
 					ret = onodes.indexOf(n1) - onodes.indexOf(n2);
@@ -7271,6 +7270,7 @@ var treectl = (function () {
 		treesz = clamp(icfg_get('treesz', 16), 10, 50);
 
 	var resort = function () {
+		ENATSORT = NATSORT && clgot(ebi('nsort'), 'on');
 		treectl.gentab(get_evpath(), treectl.lsc);
 	};
 	bcfg_bind(r, 'ireadme', 'ireadme', true);
@@ -8143,9 +8143,16 @@ var treectl = (function () {
 		}
 		delete res['a'];
 		var keys = Object.keys(res);
-		keys.sort(function (a, b) { return a.localeCompare(b); });
+		for (var a = 0; a < keys.length; a++)
+			keys[a] = [uricom_dec(keys[a]), keys[a]];
+
+		if (ENATSORT)
+			keys.sort(function (a, b) { return NATSORT.compare(a[0], b[0]); });
+		else
+			keys.sort(function (a, b) { return a[0].localeCompare(b[0]); });
+
 		for (var a = 0; a < keys.length; a++) {
-			var kk = keys[a],
+			var kk = keys[a][1],
 				m = /(\?k=[^\n]+)/.exec(kk),
 				kdk = m ? m[1] : '',
 				ks = kk.replace(kdk, '').slice(1),
