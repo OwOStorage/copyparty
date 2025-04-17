@@ -731,6 +731,7 @@ select which type of archive you want in the `[⚙️] config` tab:
   * `up2k.db` and `dir.txt` is always excluded
 * bsdtar supports streaming unzipping: `curl foo?zip | bsdtar -xv`
   * good, because copyparty's zip is faster than tar on small files
+    * but `?tar` is better for large files, especially if the total exceeds 4 GiB
 * `zip_crc` will take longer to download since the server has to read each file twice
   * this is only to support MS-DOS PKZIP v2.04g (october 1993) and older
     * how are you accessing copyparty actually

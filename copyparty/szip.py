@@ -54,6 +54,7 @@ def gen_fdesc(sz: int, crc32: int, z64: bool) -> bytes:
 
 def gen_hdr(
     h_pos: Optional[int],
+    z64: bool,
     fn: str,
     sz: int,
     lastmod: int,
@@ -70,7 +71,6 @@ def gen_hdr(
     # appnote 4.5 / zip 3.0 (2008) / unzip 6.0 (2009) says to add z64
     # extinfo for values which exceed H, but that becomes an off-by-one
     # (can't tell if it was clamped or exactly maxval), make it obvious
-    z64 = sz >= 0xFFFFFFFF
     z64v = [sz, sz] if z64 else []
     if h_pos and h_pos >= 0xFFFFFFFF:
         # central, also consider ptr to original header
@@ -244,6 +244,7 @@ class StreamZip(StreamArc):
 
         sz = st.st_size
         ts = st.st_mtime
+        h_pos = self.pos
 
         crc = 0
         if self.pre_crc:
@@ -252,8 +253,12 @@ class StreamZip(StreamArc):
 
             crc &= 0xFFFFFFFF
 
-        h_pos = self.pos
-        buf = gen_hdr(None, name, sz, ts, self.utf8, crc, self.pre_crc)
+        # some unzip-programs expect a 64bit data-descriptor
+        # even if the only 32bit-exceeding value is the offset,
+        # so force that by placeholdering the filesize too
+        z64 = h_pos >= 0xFFFFFFFF or sz >= 0xFFFFFFFF
+
+        buf = gen_hdr(None, z64, name, sz, ts, self.utf8, crc, self.pre_crc)
         yield self._ct(buf)
 
         for buf in yieldfile(src, self.args.iobuf):
@@ -265,8 +270,6 @@ class StreamZip(StreamArc):
         crc &= 0xFFFFFFFF
 
         self.items.append((name, sz, ts, crc, h_pos))
-
-        z64 = sz >= 4 * 1024 * 1024 * 1024
 
         if z64 or not self.pre_crc:
             buf = gen_fdesc(sz, crc, z64)
@@ -306,7 +309,8 @@ class StreamZip(StreamArc):
 
             cdir_pos = self.pos
             for name, sz, ts, crc, h_pos in self.items:
-                buf = gen_hdr(h_pos, name, sz, ts, self.utf8, crc, self.pre_crc)
+                z64 = h_pos >= 0xFFFFFFFF or sz >= 0xFFFFFFFF
+                buf = gen_hdr(h_pos, z64, name, sz, ts, self.utf8, crc, self.pre_crc)
                 mbuf += self._ct(buf)
                 if len(mbuf) >= 16384:
                     yield mbuf
