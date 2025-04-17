@@ -147,6 +147,7 @@ just run **[copyparty-sfx.py](https://github.com/9001/copyparty/releases/latest/
 * or if you are on android, [install copyparty in termux](#install-on-android)
 * or maybe you have a [synology nas / dsm](./docs/synology-dsm.md)
 * or if your computer is messed up and nothing else works, [try the pyz](#zipapp)
+* or if your OS is dead, give the [bootable flashdrive / cd-rom](https://a.ocv.me/pub/stuff/edcd001/enterprise-edition/) a spin
 * or if you don't trust copyparty yet and want to isolate it a little, then...
   * ...maybe [prisonparty](./bin/prisonparty.sh) to create a tiny [chroot](https://wiki.archlinux.org/title/Chroot) (very portable),
   * ...or [bubbleparty](./bin/bubbleparty.sh) to wrap it in [bubblewrap](https://github.com/containers/bubblewrap) (much better)
