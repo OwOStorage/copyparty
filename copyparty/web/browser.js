@@ -332,6 +332,7 @@ var Ls = {
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
 		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
 		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
+		"f_anota": "only {0} of the {1} items were selected;\nto select the full folder, first scroll to the bottom",
 
 		"f_dls": 'the file links in the current folder have\nbeen changed into download links',
 
@@ -937,6 +938,7 @@ var Ls = {
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
 		"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
 		"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
+		"f_anota": "kun {0} av totalt {1} elementer ble markert;\nfor å velge alt må du bla til bunnen av mappen først",
 
 		"f_dls": 'linkene i denne mappen er nå\nomgjort til nedlastningsknapper',
 
@@ -6759,11 +6761,16 @@ var ahotkeys = function (e) {
 	}
 	if (in_ftab || !aet || (ae && ae.closest('#ggrid'))) {
 		if ((k == 'KeyA' || k == 'a') && ctrl(e)) {
-			var sel = msel.getsel(),
+			var ntot = treectl.lsc.files.length + treectl.lsc.dirs.length,
+				sel = msel.getsel(),
 				all = msel.getall();
 
 			msel.evsel(e, sel.length < all.length);
 			msel.origin_id(null);
+			if (ntot > all.length)
+				toast.warn(10, L.f_anota.format(all.length, ntot), L.f_anota);
+			else if (toast.tag == L.f_anota)
+				toast.hide();
 			return ev(e);
 		}
 	}
