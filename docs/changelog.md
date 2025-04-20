@@ -1,4 +1,28 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0413-2151  `v1.16.20`  all sorted
+
+## 🧪 new features
+
+* when enabled, natural-sort will now also apply to tags, not just filenames 7b2bd6da
+
+## 🩹 bugfixes
+
+* some sorting-related stuff 7b2bd6da
+  * folders with non-ascii names would sort incorrectly in the navpane/sidebar
+  * natural-sort didn't apply correctly after changing the sort order
+* workaround [ffmpeg-bug 10797](https://trac.ffmpeg.org/ticket/10797) 98dcaee2
+  * reduces ram usage from 1534 to 230 MiB when generating spectrograms of s3xmodit songs (amiga chiptunes)
+* disable mdns if only listening on uds (unix-sockets) ffc16109 361aebf8
+
+## 🔧 other changes
+
+* hotkey CTRL-A will now select all files in gridview 233075ae
+  * and it toggles (just like in list-view) so try pressing it again
+* copyparty.exe: upgrade to pillow v11.2.1 c7aa1a35
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0408-2132  `v1.16.19`  GHOST
 
 did you know that every song named `GHOST` is a banger? it's true! [ghost](https://www.youtube.com/watch?v=NoUAwC4yiAw) // [ghost](https://www.youtube.com/watch?v=IKKar5SS29E) // [ghost](https://www.youtube.com/watch?v=tFSFlgm_tsw)

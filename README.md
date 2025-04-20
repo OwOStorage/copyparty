@@ -303,6 +303,8 @@ project goals / philosophy
 * adaptable, malleable, hackable
   * no build steps; modify the js/python without needing node.js or anything like that
 
+becoming rich is specifically *not* a motivation, but if you wanna donate then see my [github profile](https://github.com/9001) regarding donations for my FOSS stuff in general (also THANKS!)
+
 
 ## notes
 
