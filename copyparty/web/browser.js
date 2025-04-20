@@ -271,6 +271,7 @@ var Ls = {
 		"ml_eq": "audio equalizer",
 		"ml_drc": "dynamic range compressor",
 
+		"mt_loop": "loop/repeat one song\">🔁",
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
@@ -875,6 +876,7 @@ var Ls = {
 		"ml_eq": "audio equalizer (tonejustering)",
 		"ml_drc": "compressor (volum-utjevning)",
 
+		"mt_loop": "spill den samme sangen om og om igjen\">🔁",
 		"mt_shuf": "sangene i hver mappe$Nspilles i tilfeldig rekkefølge\">🔀",
 		"mt_aplay": "forsøk å starte avspilling hvis linken du klikket på for å åpne nettsiden inneholder en sang-ID$N$Nhvis denne deaktiveres så vil heller ikke nettside-URLen bli oppdatert med sang-ID'er når musikk spilles, i tilfelle innstillingene skulle gå tapt og nettsiden lastes på ny\">a▶",
 		"mt_preload": "hent ned litt av neste sang i forkant,$Nslik at pausen i overgangen blir mindre\">forles",
@@ -1479,6 +1481,7 @@ var Ls = {
 		"ml_eq": "音频均衡器",
 		"ml_drc": "动态范围压缩器",
 
+		"mt_loop": "循环播放当前的歌曲\">🔁", //m
 		"mt_shuf": "在每个文件夹中随机播放歌曲\">🔀",
 		"mt_aplay": "如果链接中有歌曲 ID，则自动播放,禁用此选项将停止在播放音乐时更新页面 URL 中的歌曲 ID，以防止在设置丢失但 URL 保留时自动播放\">自动播放▶",
 		"mt_preload": "在歌曲快结束时开始加载下一首歌，以实现无缝播放\">预加载",
@@ -2292,6 +2295,7 @@ var mpl = (function () {
 
 	ebi('op_player').innerHTML = (
 		'<div><h3>' + L.cl_opts + '</h3><div>' +
+		'<a href="#" class="tgl btn" id="au_loop" tt="' + L.mt_loop + '</a>' +
 		'<a href="#" class="tgl btn" id="au_shuf" tt="' + L.mt_shuf + '</a>' +
 		'<a href="#" class="tgl btn" id="au_aplay" tt="' + L.mt_aplay + '</a>' +
 		'<a href="#" class="tgl btn" id="au_preload" tt="' + L.mt_preload + '</a>' +
@@ -2343,6 +2347,10 @@ var mpl = (function () {
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
 	};
+	bcfg_bind(r, 'loop', 'au_loop', false, function (v) {
+		if (mp.au)
+			mp.au.loop = v;
+	});
 	bcfg_bind(r, 'shuf', 'au_shuf', false, function () {
 		mp.read_order();  // don't bind
 	});
@@ -2820,6 +2828,14 @@ function MPlayer() {
 		r.fau = new Audio(SR + '/.cpr/deps/busy.mp3?_=' + TS);
 		r.fau.loop = true;
 		r.fau.play();
+	};
+
+	r.set_ev = function () {
+		mp.au.onended = evau_end;
+		mp.au.onerror = evau_error;
+		mp.au.onprogress = pbar.drawpos;
+		mp.au.onplaying = mpui.progress_updater;
+		mp.au.onloadeddata = mp.au.onloadedmetadata = mp.nopause;
 	};
 }
 
@@ -4058,10 +4074,7 @@ function play(tid, is_ev, seek) {
 	else {
 		mp.au = new Audio();
 		mp.au2 = new Audio();
-		mp.au.onerror = evau_error;
-		mp.au.onprogress = pbar.drawpos;
-		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onended = next_song;
+		mp.set_ev();
 		widget.open();
 	}
 	mp.init_fau();
@@ -4074,13 +4087,9 @@ function play(tid, is_ev, seek) {
 		var t = mp.au;
 		mp.au = mp.au2;
 		mp.au2 = t;
-		t.onerror = t.onprogress = t.onended = null;
+		t.onerror = t.onprogress = t.onended = t.loop = null;
 		t.ld = 0; //owa
-		mp.au.onerror = evau_error;
-		mp.au.onprogress = pbar.drawpos;
-		mp.au.onplaying = mpui.progress_updater;
-		mp.au.onloadeddata = mp.au.onloadedmetadata = mp.nopause;
-		mp.au.onended = next_song;
+		mp.set_ev();
 		t = mp.au.currentTime;
 		if (isNum(t) && t > 0.1)
 			mp.au.currentTime = 0;
@@ -4118,6 +4127,7 @@ function play(tid, is_ev, seek) {
 
 	try {
 		mp.nopause();
+		mp.au.loop = mpl.loop;
 		if (mpl.aplay || is_ev !== -1)
 			mp.au.play();
 
@@ -4159,6 +4169,15 @@ function scroll2playing() {
 			'tr.play' : '#ggrid a.play').scrollIntoView();
 	}
 	catch (ex) { }
+}
+
+
+function evau_end(e) {
+	if (!mpl.loop)
+		return next_song(e);
+	ev(e);
+	mp.au.currentTime = 0;
+	mp.au.play();
 }
 
 

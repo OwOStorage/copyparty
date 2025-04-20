@@ -1036,6 +1036,7 @@ click the `play` link next to an audio file, or copy the link target to [share i
 
 open the `[🎺]` media-player-settings tab to configure it,
 * "switches":
+  * `[🔁]` repeats one single song forever
   * `[🔀]` shuffles the files inside each folder
   * `[preload]` starts loading the next track when it's about to end, reduces the silence between songs
   * `[full]` does a full preload by downloading the entire next file; good for unreliable connections, bad for slow connections

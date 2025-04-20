@@ -357,6 +357,7 @@ var tl_browser = {
 		"ml_eq": "audio equalizer",
 		"ml_drc": "dynamic range compressor",
 
+		"mt_loop": "loop/repeat one song\">🔁",
 		"mt_shuf": "shuffle the songs in each folder\">🔀",
 		"mt_aplay": "autoplay if there is a song-ID in the link you clicked to access the server$N$Ndisabling this will also stop the page URL from being updated with song-IDs when playing music, to prevent autoplay if these settings are lost but the URL remains\">a▶",
 		"mt_preload": "start loading the next song near the end for gapless playback\">preload",
@@ -402,6 +403,7 @@ var tl_browser = {
 		"mm_eunk": "Unknown Errol",
 		"mm_e404": "Could not play audio; error 404: File not found.",
 		"mm_e403": "Could not play audio; error 403: Access denied.\n\nTry pressing F5 to reload, maybe you got logged out",
+		"mm_e500": "Could not play audio; error 500: Check server logs.",
 		"mm_e5xx": "Could not play audio; server error ",
 		"mm_nof": "not finding any more audio files nearby",
 		"mm_prescan": "Looking for music to play next...",
