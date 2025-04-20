@@ -22,12 +22,6 @@ services:
       - 'traefik.http.routers.fs.rule=Host(`fs.example.com`)'
       - 'traefik.http.routers.fs.entrypoints=http'
       #- 'traefik.http.routers.fs.middlewares=authelia@docker'  # TODO: ???
-    healthcheck:
-      test: ["CMD-SHELL", "wget --spider -q 127.0.0.1:3923/?reset"]
-      interval: 1m
-      timeout: 2s
-      retries: 5
-      start_period: 15s
     stop_grace_period: 15s  # thumbnailer is allowed to continue finishing up for 10s after the shutdown signal
     environment:
       LD_PRELOAD: /usr/lib/libmimalloc-secure.so.NOPE
