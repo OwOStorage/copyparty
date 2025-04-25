@@ -305,6 +305,7 @@ var Ls = {
 
 		"mb_play": "play",
 		"mm_hashplay": "play this audio file?",
+		"mm_m3u": "press <code>Enter/OK</code> to Play\npress <code>ESC/Cancel</code> to Edit",
 		"mp_breq": "need firefox 82+ or chrome 73+ or iOS 15+",
 		"mm_bload": "now loading...",
 		"mm_bconv": "converting to {0}, please wait...",
@@ -911,6 +912,7 @@ var Ls = {
 
 		"mb_play": "lytt",
 		"mm_hashplay": "spill denne sangen?",
+		"mm_m3u": "trykk <code>Enter/OK</code> for å spille\ntrykk <code>ESC/Avbryt</code> for å redigere",
 		"mp_breq": "krever firefox 82+, chrome 73+, eller iOS 15+",
 		"mm_bload": "laster inn...",
 		"mm_bconv": "konverterer til {0}, vent litt...",
@@ -2630,6 +2632,7 @@ if (can_owa && APPLE && / OS ([1-9]|1[0-7])_/.test(UA))
 mpl.init_ac2();
 
 
+var re_m3u = /\.(m3u8?)$/i;
 var re_au_native = (can_ogg || have_acode) ? /\.(aac|flac|m4a|mp3|ogg|opus|wav)$/i : /\.(aac|flac|m4a|mp3|wav)$/i,
 	re_au_all = /\.(aac|ac3|aif|aiff|alac|alaw|amr|ape|au|dfpwm|dts|flac|gsm|it|itgz|itxz|itz|m4a|mdgz|mdxz|mdz|mo3|mod|mp2|mp3|mpc|mptm|mt2|mulaw|ogg|okt|opus|ra|s3m|s3gz|s3xz|s3z|tak|tta|ulaw|wav|wma|wv|xm|xmgz|xmxz|xmz|xpk|3gp|asf|avi|flv|m4v|mkv|mov|mp4|mpeg|mpeg2|mpegts|mpg|mpg2|nut|ogm|ogv|rm|ts|vob|webm|wmv)$/i;
 
@@ -2656,15 +2659,20 @@ function MPlayer() {
 
 		link = link[link.length - 1];
 		var url = link.getAttribute('href'),
-			m = re_audio.exec(url.split('?')[0]);
+			fn = url.split('?')[0];
 
-		if (m) {
+		if (re_audio.exec(fn)) {
 			var tid = link.getAttribute('id');
 			r.order.push(tid);
 			r.tracks[tid] = url;
 			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
 			ebi('a' + tid).onclick = ev_play;
 			clmod(trs[a], 'au', 1);
+		}
+		else if (re_m3u.exec(fn)) {
+			var tid = link.getAttribute('id');
+			tds[0].innerHTML = '<a id="a' + tid + '" href="#a' + tid + '" class="play">' + L.mb_play + '</a></td>';
+			ebi('a' + tid).onclick = ev_load_m3u;
 		}
 	}
 
@@ -4393,6 +4401,11 @@ function eval_hash() {
 
 	if (v.startsWith('#v=')) {
 		goto(v.slice(3));
+		return;
+	}
+
+	if (v.startsWith("#m3u=")) {
+		load_m3u(v.slice(5));
 		return;
 	}
 }
@@ -6900,7 +6913,7 @@ var ahotkeys = function (e) {
 
 
 // search
-(function () {
+var search_ui = (function () {
 	var sconf = [
 		[
 			L.s_sz,
@@ -6935,7 +6948,8 @@ var ahotkeys = function (e) {
 		]
 	];
 
-	var trs = [],
+	var r = {},
+		trs = [],
 		orig_url = null,
 		orig_html = null,
 		cap = 125;
@@ -7142,13 +7156,19 @@ var ahotkeys = function (e) {
 		search_in_progress = 0;
 		srch_msg(false, '');
 
-		var res = JSON.parse(this.responseText),
-			tagord = res.tag_order;
+		var res = JSON.parse(this.responseText);
+		r.render(res, this, true);
+	}
 
-		sortfiles(res.hits);
+	r.render = function (res, xhr, sort) {
+		var tagord = res.tag_order;
+
+		srch_msg(false, '');
+		if (sort)
+			sortfiles(res.hits);
 
 		var ofiles = ebi('files');
-		if (ofiles.getAttribute('ts') > this.ts)
+		if (xhr && ofiles.getAttribute('ts') > xhr.ts)
 			return;
 
 		treectl.hide();
@@ -7200,19 +7220,21 @@ var ahotkeys = function (e) {
 		}
 
 		ofiles = set_files_html(html.join('\n'));
-		ofiles.setAttribute("ts", this.ts);
-		ofiles.setAttribute("q_raw", this.q_raw);
+		ofiles.setAttribute("ts", xhr ? xhr.ts : 1);
+		ofiles.setAttribute("q_raw", xhr ? xhr.q_raw : 'playlist');
 		set_vq();
 		mukey.render();
 		reload_browser();
 		filecols.set_style(['File Name']);
 
-		sethash('q=' + uricom_enc(this.q_raw));
+		if (xhr)
+			sethash('q=' + uricom_enc(xhr.q_raw));
+
 		ebi('unsearch').onclick = unsearch;
 		var m = ebi('moar');
 		if (m)
 			m.onclick = moar;
-	}
+	};
 
 	function unsearch(e) {
 		ev(e);
@@ -7229,7 +7251,91 @@ var ahotkeys = function (e) {
 		cap *= 2;
 		do_search();
 	}
+
+	return r;
 })();
+
+
+function ev_load_m3u(e) {
+	ev(e);
+	var id = this.getAttribute('id').slice(1),
+		url = ebi(id).getAttribute('href').split('?')[0];
+
+	modal.confirm(L.mm_m3u,
+		function () { load_m3u(url); },
+		function () { window.location = url + '?edit'}
+	);
+	return false;
+}
+function load_m3u(url) {
+	var xhr = new XHR();
+	xhr.open('GET', url, true);
+	xhr.onload = render_m3u;
+	xhr.url = url;
+	xhr.send();
+	return false;
+}
+function render_m3u() {
+	if (!xhrchk(this, L.tv_xe1, L.tv_xe2))
+		return;
+
+	var evp = get_evpath(),
+		m3u = this.responseText,
+		xtd = m3u.slice(0, 12).indexOf('#EXTM3U') + 1,
+		lines = m3u.replace(/\r/g, '\n').split('\n'),
+		dur = 1,
+		artist = '',
+		title = '',
+		ret = {'hits': [], 'tag_order': ['artist', 'title', '.dur'], 'trunc': false};
+
+	for (var a = 0; a < lines.length; a++) {
+		var ln = lines[a].trim();
+		if (xtd && ln.startsWith('#')) {
+			var m = /^#EXTINF:([0-9]+)[, ](.*)/.exec(ln);
+			if (m) {
+				dur = m[1];
+				title = m[2];
+				var ofs = title.indexOf(' - ');
+				if (ofs > 0) {
+					artist = title.slice(0, ofs);
+					title = title.slice(ofs + 3);
+				}
+			}
+			continue;
+		}
+		if (ln.indexOf('.') < 0)
+			continue;
+
+		var n = ret.hits.length + 1,
+			url = ln;
+
+		if (url.indexOf(':\\'))  // C:\
+			url = url.split(/\\/g).pop();
+
+		url = url.replace(/\\/g, '/');
+		url = uricom_enc(url).replace(/%2f/gi, '/')
+
+		if (!url.startsWith('/'))
+			url = vjoin(evp, url);
+
+		ret.hits.push({
+			"ts": 946684800 + n,
+			"sz": 100000 + n,
+			"rp": url,
+			"tags": {".dur": dur, "artist": artist, "title": title}
+		});
+		dur = 1;
+		artist = title = '';
+	}
+
+	search_ui.render(ret, null, false);
+	sethash('m3u=' + this.url.split('?')[0].split('/').pop());
+	goto();
+
+	var el = QS('#files>tbody>tr.au>td>a.play');
+	if (el)
+		el.click();
+}
 
 
 function aligngriditems() {
