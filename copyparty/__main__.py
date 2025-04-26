@@ -1352,7 +1352,7 @@ def add_admin(ap):
 
 def add_thumbnail(ap):
     th_ram = (RAM_AVAIL or RAM_TOTAL or 9) * 0.6
-    th_ram = int(max(min(th_ram, 6), 1) * 10) / 10
+    th_ram = int(max(min(th_ram, 6), 0.3) * 10) / 10
     ap2 = ap.add_argument_group('thumbnail options')
     ap2.add_argument("--no-thumb", action="store_true", help="disable all thumbnails (volflag=dthumb)")
     ap2.add_argument("--no-vthumb", action="store_true", help="disable video thumbnails (volflag=dvthumb)")
