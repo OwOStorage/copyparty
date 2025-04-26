@@ -7332,7 +7332,12 @@ function ev_load_m3u(e) {
 
 	modal.confirm(L.mm_m3u,
 		function () { load_m3u(url); },
-		function () { window.location = url + '?edit'}
+		function () {
+			if (has(perms, 'write') && has(perms, 'delete'))
+				window.location = url + '?edit';
+			else
+				showfile.show(url);
+		}
 	);
 	return false;
 }
