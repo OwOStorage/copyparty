@@ -144,6 +144,8 @@ var Ls = {
 		"wt_seldl": "download selection as separate files$NHotkey: Y",
 		"wt_npirc": "copy irc-formatted track info",
 		"wt_nptxt": "copy plaintext track info",
+		"wt_m3ua": "add to m3u playlist (click <code>📻copy</code> later)",
+		"wt_m3uc": "copy m3u playlist to clipboard",
 		"wt_grid": "toggle grid / list view$NHotkey: G",
 		"wt_prev": "previous track$NHotkey: J",
 		"wt_play": "play / pause$NHotkey: P",
@@ -280,6 +282,7 @@ var Ls = {
 		"mt_fau": "on phones, prevent music from stopping if the next song doesn't preload fast enough (can make tags display glitchy)\">☕️",
 		"mt_waves": "waveform seekbar:$Nshow audio amplitude in the scrubber\">~s",
 		"mt_npclip": "show buttons for clipboarding the currently playing song\">/np",
+		"mt_m3u_c": "show buttons for clipboarding the$Nselected songs as m3u8 playlist entries\">📻",
 		"mt_octl": "os integration (media hotkeys / osd)\">os-ctl",
 		"mt_oseek": "allow seeking through os integration$N$Nnote: on some devices (iPhones),$Nthis replaces the next-song button\">seek",
 		"mt_oscv": "show album cover in osd\">art",
@@ -435,6 +438,10 @@ var Ls = {
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
+
+		"m3u_add1": "song added to m3u playlist",
+		"m3u_addn": "{0} songs added to m3u playlist",
+		"m3u_clip": "m3u playlist now copied to clipboard\n\nyou should create a new textfile named something.m3u and paste the playlist in that document; this will make it playable",
 
 		"gt_vau": "don't show videos, just play the audio\">🎧",
 		"gt_msel": "enable file selection; ctrl-click a file to override$N$N&lt;em&gt;when active: doubleclick a file / folder to open it&lt;/em&gt;$N$NHotkey: S\">multiselect",
@@ -751,6 +758,8 @@ var Ls = {
 		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
 		"wt_npirc": "kopiér sang-info (irc-formatert)",
 		"wt_nptxt": "kopiér sang-info",
+		"wt_m3ua": "legg til sang i m3u-spilleliste$N(husk å klikke på <code>📻copy</code> senere)",
+		"wt_m3uc": "kopiér m3u-spillelisten til utklippstavlen",
 		"wt_grid": "bytt mellom ikoner og listevisning$NSnarvei: G",
 		"wt_prev": "forrige sang$NSnarvei: J",
 		"wt_play": "play / pause$NSnarvei: P",
@@ -887,6 +896,7 @@ var Ls = {
 		"mt_fau": "for telefoner: forhindre at avspilling stopper hvis nettet er for tregt til å laste neste sang i tide. Hvis påskrudd, kan forårsake at sang-info ikke vises korrekt i OS'et\">☕️",
 		"mt_waves": "waveform seekbar:$Nvis volumkurve i avspillingsfeltet\">~s",
 		"mt_npclip": "vis knapper for å kopiere info om sangen du hører på\">/np",
+		"mt_m3u_c": "vis knapper for å kopiere de valgte$Nsangene som innslag i en m3u8 spilleliste\">📻",
 		"mt_octl": "integrering med operativsystemet (fjernkontroll, info-skjerm)\">os-ctl",
 		"mt_oseek": "tillat spoling med fjernkontroll$N$Nmerk: på noen enheter (iPhones) så vil$Ndette erstatte knappen for neste sang\">spoling",
 		"mt_oscv": "vis album-cover på infoskjermen\">bilde",
@@ -1042,6 +1052,10 @@ var Ls = {
 		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
+
+		"m3u_add1": "sangen ble lagt til i m3u-spillelisten",
+		"m3u_addn": "{0} sanger ble lagt til i m3u-spillelisten",
+		"m3u_clip": "m3u-spillelisten ble kopiert til utklippstavlen\n\nneste steg er å opprette et tekstdokument med filnavn som slutter på <code>.m3u</code> og lime inn spillelisten der",
 
 		"gt_vau": "ikke vis videofiler, bare spill lyden\">🎧",
 		"gt_msel": "markér filer istedenfor å åpne dem; ctrl-klikk filer for å overstyre$N$N&lt;em&gt;når aktiv: dobbelklikk en fil / mappe for å åpne&lt;/em&gt;$N$NSnarvei: S\">markering",
@@ -1893,6 +1907,9 @@ ebi('widget').innerHTML = (
 	'</span><span id="wnp"><a' +
 	' href="#" id="npirc" tt="' + L.wt_npirc + '">📋<span>irc</span></a><a' +
 	' href="#" id="nptxt" tt="' + L.wt_nptxt + '">📋<span>txt</span></a>' +
+	'</span><span id="wm3u"><a' +
+	' href="#" id="m3ua" tt="' + L.wt_m3ua + '">📻<span>add</span></a><a' +
+	' href="#" id="m3uc" tt="' + L.wt_m3uc + '">📻<span>copy</span></a>' +
 	'</span><a' +
 	'	href="#" id="wtgrid" tt="' + L.wt_grid + '">田</a><a' +
 	'	href="#" id="wtico">♫</a>' +
@@ -2308,6 +2325,7 @@ var mpl = (function () {
 		'<a href="#" class="tgl btn" id="au_fau" tt="' + L.mt_fau + '</a>' +
 		'<a href="#" class="tgl btn" id="au_waves" tt="' + L.mt_waves + '</a>' +
 		'<a href="#" class="tgl btn" id="au_npclip" tt="' + L.mt_npclip + '</a>' +
+		'<a href="#" class="tgl btn" id="au_m3u_c" tt="' + L.mt_m3u_c + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_ctl" tt="' + L.mt_octl + '</a>' +
 		'<a href="#" class="tgl btn" id="au_os_seek" tt="' + L.mt_oseek + '</a>' +
 		'<a href="#" class="tgl btn" id="au_osd_cv" tt="' + L.mt_oscv + '</a>' +
@@ -2350,6 +2368,7 @@ var mpl = (function () {
 		"pb_mode": (sread('pb_mode', ['loop', 'next']) || 'next').split('-')[0],
 		"os_ctl": bcfg_get('au_os_ctl', have_mctl) && have_mctl,
 		'traversals': 0,
+		'm3ut': '#EXTM3U\n',
 	};
 	bcfg_bind(r, 'loop', 'au_loop', false, function (v) {
 		if (mp.au)
@@ -2378,6 +2397,9 @@ var mpl = (function () {
 	bcfg_bind(r, 'osd_cv', 'au_osd_cv', true, announce);
 	bcfg_bind(r, 'clip', 'au_npclip', false, function (v) {
 		clmod(ebi('wtoggle'), 'np', v && mp.au);
+	});
+	bcfg_bind(r, 'm3uen', 'au_m3u_c', false, function (v) {
+		clmod(ebi('wtoggle'), 'm3u', v && (mp.au || msel.getsel().length));
 	});
 	bcfg_bind(r, 'follow', 'au_follow', false, setaufollow);
 	bcfg_bind(r, 'ac_flac', 'ac_flac', true);
@@ -2888,6 +2910,8 @@ var widget = (function () {
 		wtico = ebi('wtico'),
 		nptxt = ebi('nptxt'),
 		npirc = ebi('npirc'),
+		m3ua = ebi('m3ua'),
+		m3uc = ebi('m3uc'),
 		touchmode = false,
 		was_paused = true;
 
@@ -2944,6 +2968,49 @@ var widget = (function () {
 
 		cliptxt(m, function () {
 			toast.ok(1, L.clipped, null, 'top');
+		});
+	};
+	m3ua.onclick = function (e) {
+		ev(e);
+		var el,
+			files = [],
+			sel = msel.getsel();
+
+		for (var a = 0; a < sel.length; a++) {
+			el = ebi(sel[a].id).closest('tr');
+			if (clgot(el, 'au'))
+				files.push(el);
+		}
+		el = QS('#files tr.play');
+		if (!sel.length && el)
+			files.push(el);
+
+		for (var a = 0; a < files.length; a++) {
+			var md = ft2dict(files[a])[0],
+				dur = md['.dur'] || '1',
+				tag = '';
+
+			if (md.artist && md.title)
+				tag = md.artist + ' - ' + md.title;
+			else if (md.artist)
+				tag = md.artist + ' - ' + md.file;
+			else if (md.title)
+				tag = md.title;
+
+			if (dur.indexOf(':') > 0) {
+				dur = dur.split(':');
+				dur = 60 * parseInt(dur[0]) + parseInt(dur[1]);
+			}
+			else dur = parseInt(dur);
+
+			mpl.m3ut += '#EXTINF:' + dur + ',' + tag + '\n' + uricom_dec(get_evpath()) + md.file + '\n';
+		}
+		toast.ok(2, files.length == 1 ? L.m3u_add1 : L.m3u_addn.format(files.length), null, 'top');
+	};
+	m3uc.onclick = function (e) {
+		ev(e);
+		cliptxt(mpl.m3ut, function () {
+			toast.ok(15, L.m3u_clip, null, 'top');
 		});
 	};
 	r.set(sread('au_open') == 1);
@@ -4129,6 +4196,7 @@ function play(tid, is_ev, seek) {
 	clmod(ebi(oid), 'act', 1);
 	clmod(ebi(oid).closest('tr'), 'play', 1);
 	clmod(ebi('wtoggle'), 'np', mpl.clip);
+	clmod(ebi('wtoggle'), 'm3u', mpl.m3uen);
 	if (thegrid)
 		thegrid.loadsel();
 
@@ -4749,6 +4817,7 @@ var fileman = (function () {
 		clmod(bshr, 'hide', hshr);
 
 		clmod(ebi('wfm'), 'act', QS('#wfm a.en:not(.hide)'));
+		clmod(ebi('wtoggle'), 'm3u', mpl.m3uen && (nsel || (mp && mp.au)));
 
 		var wfs = ebi('wfs'), h = '';
 		try {

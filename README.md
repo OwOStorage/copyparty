@@ -1044,6 +1044,7 @@ open the `[🎺]` media-player-settings tab to configure it,
   * `[full]` does a full preload by downloading the entire next file; good for unreliable connections, bad for slow connections
   * `[~s]` toggles the seekbar waveform display
   * `[/np]` enables buttons to copy the now-playing info as an irc message
+  * `[📻]` enables buttons to create an m3u playlist with the selected songs
   * `[os-ctl]` makes it possible to control audio playback from the lockscreen of your device (enables [mediasession](https://developer.mozilla.org/en-US/docs/Web/API/MediaSession))
   * `[seek]` allows seeking with lockscreen controls (buggy on some devices)
   * `[art]` shows album art on the lockscreen
