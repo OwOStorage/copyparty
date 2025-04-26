@@ -9637,6 +9637,11 @@ function sandbox(tgt, rules, allow, cls, html) {
 		clmod(tgt, 'sb');
 		return false;
 	}
+	if (!CLOSEST) {
+		tgt.textContent = html;
+		clmod(tgt, 'sb');
+		return false;
+	}
 	clmod(tgt, 'sb', 1);
 
 	var tid = tgt.getAttribute('id'),
