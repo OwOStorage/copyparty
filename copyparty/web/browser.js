@@ -8313,7 +8313,7 @@ var treectl = (function () {
 		document.documentElement.scrollLeft = 0;
 		setTimeout(function () {
 			r.gentab(get_evpath(), r.lsc);
-			ebi('wrap').style.opacity = 'unset';
+			ebi('wrap').style.opacity = CLOSEST ? 'unset' : 1;
 		}, 1);
 	};
 
@@ -8466,7 +8466,7 @@ var wfp_debounce = (function () {
 		if (--r.n <= 0) {
 			r.n = 0;
 			clearTimeout(r.t);
-			ebi('wfp').style.opacity = 'unset';
+			ebi('wfp').style.opacity = CLOSEST ? 'unset' : 1;
 		}
 	};
 	r.reset = function () {
@@ -9704,7 +9704,7 @@ window.addEventListener("message", function (e) {
 					el.parentNode.removeChild(el.previousSibling);
 
 			el.style.height = (parseInt(t[2]) + SBH) + 'px';
-			el.style.visibility = 'unset';
+			el.style.visibility = CLOSEST ? 'unset' : 'block';
 			wfp_debounce.show();
 		}
 		else if (t[0] == 'iscroll') {
