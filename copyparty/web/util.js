@@ -1229,7 +1229,7 @@ function dl_file(url) {
 function cliptxt(txt, ok) {
     var fb = function () {
         console.log('clip-fb');
-        var o = mknod('input');
+        var o = mknod('textarea');
         o.value = txt;
         document.body.appendChild(o);
         o.focus();
@@ -1239,6 +1239,8 @@ function cliptxt(txt, ok) {
         ok();
     };
     try {
+        if (!window.isSecureContext)
+            throw 1;
         navigator.clipboard.writeText(txt).then(ok, fb);
     }
     catch (ex) { fb(); }
