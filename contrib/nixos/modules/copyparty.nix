@@ -1,29 +1,31 @@
-{ config, pkgs, lib, ... }:
-
-with lib;
-
-let
+{
+  config,
+  pkgs,
+  lib,
+  ...
+}:
+with lib; let
   mkKeyValue = key: value:
-    if value == true then
-    # sets with a true boolean value are coerced to just the key name
+    if value == true
+    then
+      # sets with a true boolean value are coerced to just the key name
       key
-    else if value == false then
-    # or omitted completely when false
+    else if value == false
+    then
+      # or omitted completely when false
       ""
-    else
-      (generators.mkKeyValueDefault { inherit mkValueString; } ": " key value);
+    else (generators.mkKeyValueDefault {inherit mkValueString;} ": " key value);
 
-  mkAttrsString = value: (generators.toKeyValue { inherit mkKeyValue; } value);
+  mkAttrsString = value: (generators.toKeyValue {inherit mkKeyValue;} value);
 
   mkValueString = value:
-    if isList value then
-      (concatStringsSep ", " (map mkValueString value))
-    else if isAttrs value then
-      "\n" + (mkAttrsString value)
-    else
-      (generators.mkValueStringDefault { } value);
+    if isList value
+    then (concatStringsSep ", " (map mkValueString value))
+    else if isAttrs value
+    then "\n" + (mkAttrsString value)
+    else (generators.mkValueStringDefault {} value);
 
-  mkSectionName = value: "[" + (escape [ "[" "]" ] value) + "]";
+  mkSectionName = value: "[" + (escape ["[" "]"] value) + "]";
 
   mkSection = name: attrs: ''
     ${mkSectionName name}
@@ -49,12 +51,12 @@ let
     ${concatStringsSep "\n" (mapAttrsToList mkVolume cfg.volumes)}
   '';
 
-  name = "copyparty";
   cfg = config.services.copyparty;
-  configFile = pkgs.writeText "${name}.conf" configStr;
-  runtimeConfigPath = "/run/${name}/${name}.conf";
-  home = "/var/lib/${name}";
-  defaultShareDir = "${home}/data";
+  configFile = pkgs.writeText "copyparty.conf" configStr;
+  runtimeConfigPath = "/run/copyparty/copyparty.conf";
+  externalCacheDir = "/var/cache/copyparty";
+  externalStateDir = "/var/lib/copyparty";
+  defaultShareDir = "${externalStateDir}/data";
 in {
   options.services.copyparty = {
     enable = mkEnableOption "web-based file manager";
@@ -65,6 +67,35 @@ in {
       defaultText = "pkgs.copyparty";
       description = ''
         Package of the application to run, exposed for overriding purposes.
+      '';
+    };
+
+    mkHashWrapper = mkOption {
+      type = types.bool;
+      default = true;
+      description = ''
+        Make a shell script wrapper called 'copyparty-hash' with all options set here,
+        that launches the hashing cli.
+      '';
+    };
+
+    user = mkOption {
+      type = types.str;
+      default = "copyparty";
+      description = ''
+        The user that copyparty will run under.
+
+        If changed from default, you are responsible for making sure the user exists.
+      '';
+    };
+
+    group = mkOption {
+      type = types.str;
+      default = "copyparty";
+      description = ''
+        The group that copyparty will run under.
+
+        If changed from default, you are responsible for making sure the user exists.
       '';
     };
 
@@ -79,22 +110,25 @@ in {
       description = ''
         Global settings to apply.
         Directly maps to values in the [global] section of the copyparty config.
+        Cannot set "c" or "hist", those are set by this module.
         See `${getExe cfg.package} --help` for more details.
       '';
       default = {
         i = "127.0.0.1";
         no-reload = true;
+        hist = externalCacheDir;
       };
       example = literalExpression ''
         {
           i = "0.0.0.0";
           no-reload = true;
+          hist = ${externalCacheDir};
         }
       '';
     };
 
     accounts = mkOption {
-      type = types.attrsOf (types.submodule ({ ... }: {
+      type = types.attrsOf (types.submodule ({...}: {
         options = {
           passwordFile = mkOption {
             type = types.str;
@@ -109,7 +143,7 @@ in {
       description = ''
         A set of copyparty accounts to create.
       '';
-      default = { };
+      default = {};
       example = literalExpression ''
         {
           ed.passwordFile = "/run/keys/copyparty/ed";
@@ -118,10 +152,10 @@ in {
     };
 
     volumes = mkOption {
-      type = types.attrsOf (types.submodule ({ ... }: {
+      type = types.attrsOf (types.submodule ({...}: {
         options = {
           path = mkOption {
-            type = types.str;
+            type = types.path;
             description = ''
               Path of a directory to share.
             '';
@@ -177,7 +211,7 @@ in {
                 nohash = "\.iso$";
               };
             '';
-            default = { };
+            default = {};
           };
         };
       }));
@@ -185,7 +219,7 @@ in {
       default = {
         "/" = {
           path = defaultShareDir;
-          access = { r = "*"; };
+          access = {r = "*";};
         };
       };
       example = literalExpression ''
@@ -204,52 +238,65 @@ in {
     };
   };
 
-  config = mkIf cfg.enable {
+  config = mkIf cfg.enable (let
+    command = "${getExe cfg.package} -c ${runtimeConfigPath}";
+  in {
     systemd.services.copyparty = {
       description = "http file sharing hub";
-      wantedBy = [ "multi-user.target" ];
+      wantedBy = ["multi-user.target"];
 
       environment = {
         PYTHONUNBUFFERED = "true";
-        XDG_CONFIG_HOME = "${home}/.config";
+        XDG_CONFIG_HOME = externalStateDir;
       };
 
       preStart = let
-        replaceSecretCommand = name: attrs:
-          "${getExe pkgs.replace-secret} '${
-            passwordPlaceholder name
-          }' '${attrs.passwordFile}' ${runtimeConfigPath}";
+        replaceSecretCommand = name: attrs: "${getExe pkgs.replace-secret} '${
+          passwordPlaceholder name
+        }' '${attrs.passwordFile}' ${runtimeConfigPath}";
       in ''
         set -euo pipefail
         install -m 600 ${configFile} ${runtimeConfigPath}
         ${concatStringsSep "\n"
-        (mapAttrsToList replaceSecretCommand cfg.accounts)}
+          (mapAttrsToList replaceSecretCommand cfg.accounts)}
       '';
 
       serviceConfig = {
         Type = "simple";
-        ExecStart = "${getExe cfg.package} -c ${runtimeConfigPath}";
-
+        ExecStart = command;
         # Hardening options
-        User = "copyparty";
-        Group = "copyparty";
-        RuntimeDirectory = name;
+        User = cfg.user;
+        Group = cfg.group;
+        RuntimeDirectory = ["copyparty"];
         RuntimeDirectoryMode = "0700";
-        StateDirectory = [ name "${name}/data" "${name}/.config" ];
+        StateDirectory = ["copyparty"];
         StateDirectoryMode = "0700";
-        WorkingDirectory = home;
+        CacheDirectory = lib.mkIf (cfg.settings ? hist) ["copyparty"];
+        CacheDirectoryMode = lib.mkIf (cfg.settings ? hist) "0700";
+        WorkingDirectory = externalStateDir;
+        BindReadOnlyPaths =
+          [
+            "/nix/store"
+            "-/etc/resolv.conf"
+            "-/etc/nsswitch.conf"
+            "-/etc/hosts"
+            "-/etc/localtime"
+          ]
+          ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
+        BindPaths =
+          (
+            if cfg.settings ? hist
+            then [cfg.settings.hist]
+            else []
+          )
+          ++ [externalStateDir]
+          ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
+        # ProtectSystem = "strict";
+        # Note that unlike what 'ro' implies,
+        # this actually makes it impossible to read anything in the root FS,
+        # except for things explicitly mounted via `RuntimeDirectory`, `StateDirectory`, `CacheDirectory`, and `BindReadOnlyPaths`.
+        # This is because TemporaryFileSystem creates a *new* *empty* filesystem for the process, so only bindmounts are visible.
         TemporaryFileSystem = "/:ro";
-        BindReadOnlyPaths = [
-          "/nix/store"
-          "-/etc/resolv.conf"
-          "-/etc/nsswitch.conf"
-          "-/etc/hosts"
-          "-/etc/localtime"
-        ] ++ (mapAttrsToList (k: v: "-${v.passwordFile}") cfg.accounts);
-        BindPaths = [ home ] ++ (mapAttrsToList (k: v: v.path) cfg.volumes);
-        # Would re-mount paths ignored by temporary root
-        #ProtectSystem = "strict";
-        ProtectHome = true;
         PrivateTmp = true;
         PrivateDevices = true;
         ProtectKernelTunables = true;
@@ -269,15 +316,48 @@ in {
         NoNewPrivileges = true;
         LockPersonality = true;
         RestrictRealtime = true;
+        MemoryDenyWriteExecute = true;
       };
     };
 
-    users.groups.copyparty = { };
-    users.users.copyparty = {
+    # ensure volumes exist:
+    systemd.tmpfiles.settings."copyparty" = (
+      lib.attrsets.mapAttrs' (
+        name: value:
+          lib.attrsets.nameValuePair (value.path) {
+            d = {
+              #: in front of things means it wont change it if the directory already exists.
+              group = ":${cfg.group}";
+              user = ":${cfg.user}";
+              mode = ":755";
+            };
+          }
+      )
+      cfg.volumes
+    );
+
+    users.groups.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {};
+    users.users.copyparty = lib.mkIf (cfg.user == "copyparty" && cfg.group == "copyparty") {
       description = "Service user for copyparty";
       group = "copyparty";
-      home = home;
+      home = externalStateDir;
       isSystemUser = true;
     };
-  };
+    environment.systemPackages = lib.mkIf cfg.mkHashWrapper [
+      (pkgs.writeShellScriptBin
+      "copyparty-hash"
+      ''
+        set -a  # automatically export variables
+        # set same environment variables as the systemd service
+        ${lib.pipe config.systemd.services.copyparty.environment [
+          (lib.filterAttrs (n: v: v != null && n != "PATH"))
+          (lib.mapAttrs (_: v: "${v}"))
+          (lib.toShellVars)
+        ]}
+        PATH=${config.systemd.services.copyparty.environment.PATH}:$PATH
+
+        exec ${command} --ah-cli
+      '')
+    ];
+  });
 }
