@@ -34,7 +34,7 @@ remove the ones that are not relevant:
 ### Server details (if you're NOT using docker/podman)
 remove the ones that are not relevant:
 * **server OS / version:** 
-* **what copyparty did you grab:** (sfx/exe/pip/aur/...)
+* **what copyparty did you grab:** (sfx/exe/pip/arch/...)
 * **how you're running it:** (in a terminal, as a systemd-service, ...)
 * run copyparty with `--version` and grab the last 3 lines (they start with `copyparty`, `CPython`, `sqlite`) and paste them below this line:
 * **copyparty arguments and/or config-file:** 

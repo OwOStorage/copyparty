@@ -104,7 +104,7 @@ turn almost any device into a file server with resumable uploads/downloads using
         * [feature chickenbits](#feature-chickenbits) - buggy feature? rip it out
         * [feature beefybits](#feature-beefybits) - force-enable features with known issues on your OS/env
 * [packages](#packages) - the party might be closer than you think
-    * [arch package](#arch-package) - now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
+    * [arch package](#arch-package) - `pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
     * [fedora package](#fedora-package) - does not exist yet
     * [nix package](#nix-package) - `nix profile install github:9001/copyparty`
     * [nixos module](#nixos-module)
@@ -2206,9 +2206,13 @@ if your distro/OS is not mentioned below, there might be some hints in the [«on
 
 ## arch package
 
-now [available on aur](https://aur.archlinux.org/packages/copyparty) maintained by [@icxes](https://github.com/icxes)
+`pacman -S copyparty` (in [arch linux extra](https://archlinux.org/packages/extra/any/copyparty/))
 
 it comes with a [systemd service](./contrib/package/arch/copyparty.service) and expects to find one or more [config files](./docs/example.conf) in `/etc/copyparty.d/`
+
+after installing it, you may want to `cp /usr/lib/systemd/system/copyparty.service /etc/systemd/system/` and then `vim /etc/systemd/system/copyparty.service` to change what user/group it is running as (you only need to do this once)
+
+NOTE: there used to be an aur package; this evaporated when copyparty was adopted by the official archlinux repos. If you're still using the aur package, please move
 
 
 ## fedora package
