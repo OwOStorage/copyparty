@@ -2931,7 +2931,8 @@ class HttpCli(object):
         self.parser.drop()
 
         self.log("logout " + self.uname)
-        self.asrv.forget_session(self.conn.hsrv.broker, self.uname)
+        if not self.uname.startswith("s_"):
+            self.asrv.forget_session(self.conn.hsrv.broker, self.uname)
         self.get_pwd_cookie("x")
 
         dst = self.args.SRS + "?h"
@@ -5504,6 +5505,7 @@ class HttpCli(object):
                 raise Pebkac(400, "selected file not found on disk: [%s]" % (fn,))
 
         pw = req.get("pw") or ""
+        pw = self.asrv.ah.hash(pw)
         now = int(time.time())
         sexp = req["exp"]
         exp = int(sexp) if sexp else 0
