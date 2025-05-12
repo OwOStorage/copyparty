@@ -52,7 +52,7 @@ example usage as a volflag in a copyparty config file:
 ### CONFIG
 
 # filetypes to process; ignores everything else
-EXTS = "mp3 flac ogg opus m4a aac wav wma"
+EXTS = "mp3 flac ogg oga opus m4a aac wav wma"
 
 # the name of the subdir to put the normalized files in
 SUBDIR = "normalized"
