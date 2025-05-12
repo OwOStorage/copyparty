@@ -178,6 +178,7 @@ class Cfg(Namespace):
             mte={"a": True},
             mth={},
             mtp=[],
+            put_name="put-{now.6f}-{cip}.bin",
             mv_retry="0/0",
             rm_retry="0/0",
             s_rd_sz=256 * 1024,

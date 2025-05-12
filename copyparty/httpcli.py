@@ -2100,8 +2100,7 @@ class HttpCli(object):
         suffix = "-{:.6f}-{}".format(time.time(), self.dip())
         nameless = not fn
         if nameless:
-            suffix += ".bin"
-            fn = "put" + suffix
+            fn = vfs.flags["put_name2"].format(now=time.time(), cip=self.dip())
 
         params = {"suffix": suffix, "fdir": fdir}
         if self.args.nw:

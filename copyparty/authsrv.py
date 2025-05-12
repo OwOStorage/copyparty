@@ -2074,6 +2074,10 @@ class AuthSrv(object):
             if len(zs) == 3:  # fc5 => ffcc55
                 vol.flags["tcolor"] = "".join([x * 2 for x in zs])
 
+            # volflag syntax currently doesn't allow for ':' in value
+            zs = vol.flags["put_name"]
+            vol.flags["put_name2"] = zs.replace("{now.", "{now:.")
+
             if vol.flags.get("neversymlink"):
                 vol.flags["hardlinkonly"] = True  # was renamed
             if vol.flags.get("hardlinkonly"):
