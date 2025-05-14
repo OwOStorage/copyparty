@@ -226,6 +226,7 @@ var tl_browser = {
 		"wt_pst": "paste a previously cut / copied selection$NHotkey: ctrl-V",
 		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
 		"wt_selinv": "invert selection",
+		"wt_zip1": "download this folder as archive",
 		"wt_selzip": "download selection as archive",
 		"wt_seldl": "download selection as separate files$NHotkey: Y",
 		"wt_npirc": "copy irc-formatted track info",

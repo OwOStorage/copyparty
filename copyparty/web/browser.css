@@ -1160,8 +1160,8 @@ html.y #widget.open {
 	border: 1px solid var(--bg-u5);
 	border-width: 0 .1em 0 0;
 }
-#wfm.act+#wzip,
-#wfm.act+#wzip+#wnp {
+#wfm.act+#wzip1+#wzip,
+#wfm.act+#wzip1+#wzip+#wnp {
 	margin-left: .2em;
 	padding-left: .2em;
 	border-left-width: .1em;
@@ -1179,18 +1179,23 @@ html.y #widget.open {
 #wtoggle.np #wnp {
 	display: inline-block;
 }
+#wtoggle.sel #wzip1,
 #wtoggle.sel.np #wnp {
 	display: none;
 }
 #wfm a,
 #wnp a,
 #wm3u a,
+#zip1,
 #wzip a {
 	font-size: .5em;
 	padding: 0 .3em;
 	margin: -.3em .1em;
 	position: relative;
 	display: inline-block;
+}
+#zip1 {
+	font-size: .38em;
 }
 #wm3u a {
 	margin: -.2em .1em;
@@ -1205,9 +1210,13 @@ html.y #widget.open {
 }
 #wfm span,
 #wm3u span,
+#zip1 span,
 #wnp span {
 	font-size: .6em;
 	display: block;
+}
+#zip1 span {
+	font-size: .9em;
 }
 #wnp span {
 	font-size: .7em;

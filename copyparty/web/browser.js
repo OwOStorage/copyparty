@@ -140,6 +140,7 @@ var Ls = {
 		"wt_pst": "paste a previously cut / copied selection$NHotkey: ctrl-V",
 		"wt_selall": "select all files$NHotkey: ctrl-A (when file focused)",
 		"wt_selinv": "invert selection",
+		"wt_zip1": "download this folder as archive",
 		"wt_selzip": "download selection as archive",
 		"wt_seldl": "download selection as separate files$NHotkey: Y",
 		"wt_npirc": "copy irc-formatted track info",
@@ -754,6 +755,7 @@ var Ls = {
 		"wt_pst": "lim inn filer (som tidligere ble klippet ut / kopiert et annet sted)$NSnarvei: ctrl-V",
 		"wt_selall": "velg alle filer$NSnarvei: ctrl-A (mens fokus er på en fil)",
 		"wt_selinv": "inverter utvalg",
+		"wt_zip1": "last ned denne mappen som et arkiv",
 		"wt_selzip": "last ned de valgte filene som et arkiv",
 		"wt_seldl": "last ned de valgte filene$NSnarvei: Y",
 		"wt_npirc": "kopiér sang-info (irc-formatert)",
@@ -1368,6 +1370,7 @@ var Ls = {
 		"wt_pst": "粘贴之前剪切/复制的选择$N快捷键: ctrl-V",
 		"wt_selall": "选择所有文件$N快捷键: ctrl-A（当文件被聚焦时）",
 		"wt_selinv": "反转选择",
+		"wt_zip1": "将此文件夹下载为归档文件", //m
 		"wt_selzip": "将选择下载为归档文件",
 		"wt_seldl": "将选择下载为单独的文件$N快捷键: Y",
 		"wt_npirc": "复制 IRC 格式的曲目信息",
@@ -1908,6 +1911,8 @@ ebi('widget').innerHTML = (
 	' href="#" id="fcut" tt="' + L.wt_cut + '">✂<span>cut</span></a><a' +
 	' href="#" id="fcpy" tt="' + L.wt_cpy + '">⧉<span>copy</span></a><a' +
 	' href="#" id="fpst" tt="' + L.wt_pst + '">📋<span>paste</span></a>' +
+	'</span><span id="wzip1"><a' +
+	' href="#" id="zip1" tt="' + L.wt_zip1 + '">📦<span>zip</span></a>' +
 	'</span><span id="wzip"><a' +
 	' href="#" id="selall" tt="' + L.wt_selall + '">sel.<br />all</a><a' +
 	' href="#" id="selinv" tt="' + L.wt_selinv + '">sel.<br />inv.</a><a' +
@@ -9082,6 +9087,15 @@ var arcfmt = (function () {
 		}
 		ebi('selzip').textContent = fmt.split('_')[0];
 		ebi('selzip').setAttribute('fmt', arg);
+
+		QS('#zip1 span').textContent = fmt.split('_')[0];
+		ebi('zip1').setAttribute("href",
+			get_evpath() + (dk ? '?k=' + dk + '&': '?') + arg);
+
+		if (!have_zip) {
+			ebi('zip1').style.display = 'none';
+			ebi('selzip').style.display = 'none';
+		}
 	}
 
 	function try_render() {
@@ -9320,7 +9334,10 @@ var msel = (function () {
 		r.selui(true);
 		arcfmt.render();
 		fileman.render();
-		ebi('selzip').style.display = is_srch ? 'none' : '';
+
+		var zipvis = (is_srch || !have_zip) ? 'none' : '';
+		ebi('selzip').style.display = zipvis;
+		ebi('zip1').style.display = zipvis;
 	}
 	return r;
 })();
