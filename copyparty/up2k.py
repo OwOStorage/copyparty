@@ -2120,11 +2120,12 @@ class Up2k(object):
                 return -1
 
             w = bw[:-1].decode("ascii")
+            w16 = w[:16]
 
             with self.mutex:
                 try:
                     q = "select rd, fn, ip, at from up where substr(w,1,16)=? and +w=?"
-                    rd, fn, ip, at = cur.execute(q, (w[:16], w)).fetchone()
+                    rd, fn, ip, at = cur.execute(q, (w16, w)).fetchone()
                 except:
                     # file modified/deleted since spooling
                     continue
@@ -2133,8 +2134,12 @@ class Up2k(object):
                     rd, fn = s3dec(rd, fn)
 
                 if "mtp" in flags:
+                    q = "select 1 from mt where w=? and +k='t:mtp' limit 1"
+                    if cur.execute(q, (w16,)).fetchone():
+                        continue
+
                     q = "insert into mt values (?,'t:mtp','a')"
-                    cur.execute(q, (w[:16],))
+                    cur.execute(q, (w16,))
 
             abspath = djoin(ptop, rd, fn)
             self.pp.msg = "c%d %s" % (nq, abspath)
@@ -2190,7 +2195,7 @@ class Up2k(object):
                     return tf, -1
 
                 if flt == 1:
-                    q = "select w from mt where w = ?"
+                    q = "select 1 from mt where w=? and +k != 't:mtp'"
                     if c2.execute(q, (row[0][:16],)).fetchone():
                         continue
 
