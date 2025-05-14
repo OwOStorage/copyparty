@@ -2583,6 +2583,11 @@ def _fs_mvrm(
             now = time.time()
             if ex.errno == errno.ENOENT:
                 return False
+            if not attempt and ex.errno == errno.EXDEV:
+                t = "using copy+delete (%s)\n  %s\n  %s"
+                log(t % (ex.strerror, src, dst))
+                osfun = shutil.move
+                continue
             if now - t0 > maxtime or attempt == 90209:
                 raise
             if not attempt:
@@ -2607,15 +2612,18 @@ def atomic_move(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -
     elif flags.get("mv_re_t"):
         _fs_mvrm(log, src, dst, True, flags)
     else:
-        os.replace(bsrc, bdst)
-
-
-def wrename(log: "NamedLogger", src: str, dst: str, flags: dict[str, Any]) -> bool:
-    if not flags.get("mv_re_t"):
-        os.rename(fsenc(src), fsenc(dst))
-        return True
-
-    return _fs_mvrm(log, src, dst, False, flags)
+        try:
+            os.replace(bsrc, bdst)
+        except OSError as ex:
+            if ex.errno != errno.EXDEV:
+                raise
+            t = "using copy+delete (%s);\n  %s\n  %s"
+            log(t % (ex.strerror, src, dst))
+            try:
+                os.unlink(bdst)
+            except:
+                pass
+            shutil.move(bsrc, bdst)
 
 
 def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:

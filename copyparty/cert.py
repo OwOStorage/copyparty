@@ -1,13 +1,11 @@
 import calendar
 import errno
-import filecmp
 import json
 import os
-import shutil
 import time
 
 from .__init__ import ANYWIN
-from .util import Netdev, load_resource, runcmd, wrename, wunlink
+from .util import Netdev, atomic_move, load_resource, runcmd, wunlink
 
 HAVE_CFSSL = not os.environ.get("PRTY_NO_CFSSL")
 
@@ -122,7 +120,7 @@ def _gen_ca(log: "RootLogger", args):
         wunlink(nlog, bname + ".key", VF)
     except:
         pass
-    wrename(nlog, bname + "-key.pem", bname + ".key", VF)
+    atomic_move(nlog, bname + "-key.pem", bname + ".key", VF)
     wunlink(nlog, bname + ".csr", VF)
 
     log("cert", "new ca OK", 2)
@@ -215,7 +213,7 @@ def _gen_srv(log: "RootLogger", args, netdevs: dict[str, Netdev]):
         wunlink(nlog, bname + ".key", VF)
     except:
         pass
-    wrename(nlog, bname + "-key.pem", bname + ".key", VF)
+    atomic_move(nlog, bname + "-key.pem", bname + ".key", VF)
     wunlink(nlog, bname + ".csr", VF)
 
     with open(os.path.join(args.crt_dir, "ca.pem"), "rb") as f:

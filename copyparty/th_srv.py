@@ -23,6 +23,7 @@ from .util import (
     VF_CAREFUL,
     Cooldown,
     Daemon,
+    atomic_move,
     afsenc,
     fsenc,
     min_ex,
@@ -30,7 +31,6 @@ from .util import (
     statdir,
     ub64enc,
     vsplit,
-    wrename,
     wunlink,
 )
 
@@ -412,7 +412,7 @@ class ThumbSrv(object):
                 wunlink(self.log, ap_unpk, vn.flags)
 
             try:
-                wrename(self.log, ttpath, tpath, vn.flags)
+                atomic_move(self.log, ttpath, tpath, vn.flags)
             except Exception as ex:
                 if not os.path.exists(tpath):
                     t = "failed to move  [%s]  to  [%s]:  %r"
@@ -677,7 +677,7 @@ class ThumbSrv(object):
                 except:
                     pass
             else:
-                wrename(self.log, wtpath, tpath, vn.flags)
+                atomic_move(self.log, wtpath, tpath, vn.flags)
 
     def conv_spec(self, abspath: str, tpath: str, fmt: str, vn: VFS) -> None:
         ret, _ = ffprobe(abspath, int(vn.flags["convt"] / 2))

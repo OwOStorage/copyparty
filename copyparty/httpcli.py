@@ -113,7 +113,6 @@ from .util import (
     vol_san,
     vroots,
     vsplit,
-    wrename,
     wunlink,
     yieldfile,
 )
@@ -3569,7 +3568,7 @@ class HttpCli(object):
                 except:
                     pass
             if dp:
-                wrename(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
+                atomic_move(self.log, fp, os.path.join(dp, mfile2), vfs.flags)
 
         assert self.parser.gen  # !rm
         p_field, _, p_data = next(self.parser.gen)
