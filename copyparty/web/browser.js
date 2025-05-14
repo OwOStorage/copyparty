@@ -1372,6 +1372,8 @@ var Ls = {
 		"wt_seldl": "将选择下载为单独的文件$N快捷键: Y",
 		"wt_npirc": "复制 IRC 格式的曲目信息",
 		"wt_nptxt": "复制纯文本格式的曲目信息",
+		"wt_m3ua": "添加到 m3u 播放列表（稍后点击 <code>📻copy</code>）", //m
+		"wt_m3uc": "复制 m3u 播放列表到剪贴板", //m
 		"wt_grid": "切换网格/列表视图$N快捷键: G",
 		"wt_prev": "上一曲$N快捷键: J",
 		"wt_play": "播放/暂停$N快捷键: P",
@@ -1508,6 +1510,7 @@ var Ls = {
 		"mt_fau": "在手机上，如果下一首歌未能快速预加载，防止音乐停止（可能导致标签显示异常）\">☕️",
 		"mt_waves": "波形进度条：$N显示音频幅度\">进度条",
 		"mt_npclip": "显示当前播放歌曲的剪贴板按钮\">♪剪切板",
+		"mt_m3u_c": "显示按钮以将所选歌曲$N复制为 m3u8 播放列表条目\">📻", //m
 		"mt_octl": "操作系统集成（媒体快捷键 / OSD）\">OSD",
 		"mt_oseek": "允许通过操作系统集成进行跳转$N$N注意：在某些设备（如 iPhone）上，$N这将替代下一首歌按钮\">seek",
 		"mt_oscv": "在 OSD 中显示专辑封面\">封面",
@@ -1533,6 +1536,7 @@ var Ls = {
 
 		"mb_play": "播放",
 		"mm_hashplay": "播放这个音频文件？",
+		"mm_m3u": "按 <code>Enter/确定</code> 播放\n按 <code>ESC/取消</code> 编辑", //m
 		"mp_breq": "需要 Firefox 82+ 或 Chrome 73+ 或 iOS 15+",
 		"mm_bload": "正在加载...",
 		"mm_bconv": "正在转换为 {0}，请稍等...",
@@ -1560,6 +1564,7 @@ var Ls = {
 		"f_bigtxt": "这个文件大小为 {0} MiB -- 真的以文本形式查看？",
 		"fbd_more": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_more">显示 {2}</a> 或 <a href="#" id="bd_all">显示全部</a></div>',
 		"fbd_all": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_all">显示全部</a></div>',
+		"f_anota": "仅选择了 {0} 个项目，共 {1} 个；\n要选择整个文件夹，请先滚动到底部", //m
 
 		"f_dls": '当前文件夹中的文件链接已\n更改为下载链接',
 
@@ -1593,7 +1598,7 @@ var Ls = {
 		"fs_tsrc": "共享的文件或文件夹",
 		"fs_ppwd": "密码可选",
 		"fs_w8": "正在创建文件共享...",
-		"fs_ok": "按 <code>Enter/OK</code> 复制到剪贴板\n按 <code>ESC/Cancel</code> 关闭",
+		"fs_ok": "按 <code>Enter/确定</code> 复制到剪贴板\n按 <code>ESC/取消</code> 关闭",
 
 		"frt_dec": "可能修复一些损坏的文件名\">url-decode",
 		"frt_rst": "将修改后的文件名重置为原始文件名\">↺ 重置",
@@ -1661,6 +1666,10 @@ var Ls = {
 		"tvt_next": "显示下一个文档$N快捷键: K\">⬇ 下一个",
 		"tvt_sel": "选择文件&nbsp;（用于剪切/删除/...）$N快捷键: S\">选择",
 		"tvt_edit": "在文本编辑器中打开文件$N快捷键: E\">✏️ 编辑",
+
+		"m3u_add1": "歌曲已添加到 m3u 播放列表", //m
+		"m3u_addn": "已添加 {0} 首歌曲到 m3u 播放列表", //m
+		"m3u_clip": "m3u 播放列表已复制到剪贴板\n\n请创建一个以 <code>.m3u</code> 结尾的文本文件，\n并将播放列表粘贴到该文件中；\n这样就可以播放了", //m
 
 		"gt_vau": "不显示视频，仅播放音频\">🎧",
 		"gt_msel": "启用文件选择；按住 ctrl 键点击文件以覆盖$N$N&lt;em&gt;当启用时：双击文件/文件夹以打开它&lt;/em&gt;$N$N快捷键：S\">多选",
