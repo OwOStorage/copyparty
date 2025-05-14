@@ -71,6 +71,9 @@ def main():
     ## selecting it inside the print at the end:
     ##
 
+    # move all uploads to one specific folder
+    into_junk = {"vp": "/junk"}
+
     # create a subfolder named after the filetype and move it into there
     into_subfolder = {"vp": ext}
 
@@ -92,8 +95,8 @@ def main():
         by_category = {}  # no action
 
     # now choose the default effect to apply; can be any of these:
-    # into_subfolder  into_toplevel  into_sibling  by_category
-    effect = {"vp": "/junk"}
+    # into_junk  into_subfolder  into_toplevel  into_sibling  by_category
+    effect = into_sibling
 
     ##
     ## but we can keep going, adding more speicifc rules

@@ -3236,7 +3236,7 @@ class Up2k(object):
                             if hr.get("reloc"):
                                 x = pathmod(self.vfs, dst, vp, hr["reloc"])
                                 if x:
-                                    zvfs = vfs
+                                    ud1 = (vfs.vpath, job["prel"], job["name"])
                                     pdir, _, job["name"], (vfs, rem) = x
                                     dst = os.path.join(pdir, job["name"])
                                     job["vcfg"] = vfs.flags
@@ -3244,7 +3244,8 @@ class Up2k(object):
                                     job["vtop"] = vfs.vpath
                                     job["prel"] = rem
                                     job["name"] = sanitize_fn(job["name"], "")
-                                    if zvfs.vpath != vfs.vpath:
+                                    ud2 = (vfs.vpath, job["prel"], job["name"])
+                                    if ud1 != ud2:
                                         # print(json.dumps(job, sort_keys=True, indent=4))
                                         job["hash"] = cj["hash"]
                                         self.log("xbu reloc1:%d..." % (depth,), 6)
@@ -4999,14 +5000,15 @@ class Up2k(object):
             if hr.get("reloc"):
                 x = pathmod(self.vfs, ap_chk, vp_chk, hr["reloc"])
                 if x:
-                    zvfs = vfs
+                    ud1 = (vfs.vpath, job["prel"], job["name"])
                     pdir, _, job["name"], (vfs, rem) = x
                     job["vcfg"] = vf = vfs.flags
                     job["ptop"] = vfs.realpath
                     job["vtop"] = vfs.vpath
                     job["prel"] = rem
                     job["name"] = sanitize_fn(job["name"], "")
-                    if zvfs.vpath != vfs.vpath:
+                    ud2 = (vfs.vpath, job["prel"], job["name"])
+                    if ud1 != ud2:
                         self.log("xbu reloc2:%d..." % (depth,), 6)
                         return self._handle_json(job, depth + 1)
 
