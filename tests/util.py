@@ -82,6 +82,19 @@ def get_ramdisk():
             return subdir(vol)
 
     if os.path.exists("/Volumes"):
+        sck = socket.socket(socket.AF_INET, socket.SOCK_STREAM)
+        while True:
+            try:
+                sck.bind(("127.0.0.1", 2775))
+                break
+            except:
+                print("waiting for 2775")
+                time.sleep(0.5)
+
+        v = "/Volumes/cptd"
+        if os.path.exists(v):
+            return subdir(v)
+
         # hdiutil eject /Volumes/cptd/
         devname, _ = chkcmd("hdiutil attach -nomount ram://131072".split())
         devname = devname.strip()
@@ -97,6 +110,7 @@ def get_ramdisk():
                 except:
                     pass
 
+                sck.close()
                 return subdir("/Volumes/cptd")
             except Exception as ex:
                 print(repr(ex))
