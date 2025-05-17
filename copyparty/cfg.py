@@ -75,6 +75,7 @@ def vf_vmap() -> dict[str, str]:
         "th_x3": "th3x",
     }
     for k in (
+        "bup_ck",
         "dbd",
         "forget_ip",
         "hsortn",
@@ -95,6 +96,7 @@ def vf_vmap() -> dict[str, str]:
         "og_title_i",
         "og_tpl",
         "og_ua",
+        "put_ck",
         "put_name",
         "mv_retry",
         "rm_retry",
@@ -167,6 +169,8 @@ flagcats = {
         "nosub": "forces all uploads into the top folder of the vfs",
         "magic": "enables filetype detection for nameless uploads",
         "put_name": "fallback filename for nameless uploads",
+        "put_ck": "default checksum-hasher for PUT/WebDAV uploads",
+        "bup_ck": "default checksum-hasher for bup/basic uploads",
         "gz": "allows server-side gzip compression of uploads with ?gz",
         "xz": "allows server-side lzma compression of uploads with ?xz",
         "pk": "forces server-side compression, optional arg: xz,9",

@@ -2179,28 +2179,26 @@ class HttpCli(object):
                 # small toctou, but better than clobbering a hardlink
                 wunlink(self.log, path, vfs.flags)
 
-        halg = "sha512"
         hasher = None
         copier = hashcopy
-        if "ck" in self.ouparam or "ck" in self.headers:
-            halg = zs = self.ouparam.get("ck") or self.headers.get("ck") or ""
-            if not zs or zs == "no":
-                copier = justcopy
-                halg = ""
-            elif zs == "md5":
-                hasher = hashlib.md5(**USED4SEC)
-            elif zs == "sha1":
-                hasher = hashlib.sha1(**USED4SEC)
-            elif zs == "sha256":
-                hasher = hashlib.sha256(**USED4SEC)
-            elif zs in ("blake2", "b2"):
-                hasher = hashlib.blake2b(**USED4SEC)
-            elif zs in ("blake2s", "b2s"):
-                hasher = hashlib.blake2s(**USED4SEC)
-            elif zs == "sha512":
-                pass
-            else:
-                raise Pebkac(500, "unknown hash alg")
+        halg = self.ouparam.get("ck") or self.headers.get("ck") or vfs.flags["put_ck"]
+        if halg == "sha512":
+            pass
+        elif halg == "no":
+            copier = justcopy
+            halg = ""
+        elif halg == "md5":
+            hasher = hashlib.md5(**USED4SEC)
+        elif halg == "sha1":
+            hasher = hashlib.sha1(**USED4SEC)
+        elif halg == "sha256":
+            hasher = hashlib.sha256(**USED4SEC)
+        elif halg in ("blake2", "b2"):
+            hasher = hashlib.blake2b(**USED4SEC)
+        elif halg in ("blake2s", "b2s"):
+            hasher = hashlib.blake2s(**USED4SEC)
+        else:
+            raise Pebkac(500, "unknown hash alg")
 
         f, fn = ren_open(fn, *open_a, **params)
         try:
@@ -3083,15 +3081,18 @@ class HttpCli(object):
         vfs, rem = self.asrv.vfs.get(self.vpath, self.uname, False, True)
         self._assert_safe_rem(rem)
 
-        halg = "sha512"
         hasher = None
-        copier = hashcopy
         if nohash:
             halg = ""
             copier = justcopy
-        elif "ck" in self.ouparam or "ck" in self.headers:
-            halg = self.ouparam.get("ck") or self.headers.get("ck") or ""
-            if not halg or halg == "no":
+        else:
+            copier = hashcopy
+            halg = (
+                self.ouparam.get("ck") or self.headers.get("ck") or vfs.flags["bup_ck"]
+            )
+            if halg == "sha512":
+                pass
+            elif halg == "no":
                 copier = justcopy
                 halg = ""
             elif halg == "md5":
@@ -3104,8 +3105,6 @@ class HttpCli(object):
                 hasher = hashlib.blake2b(**USED4SEC)
             elif halg in ("blake2s", "b2s"):
                 hasher = hashlib.blake2s(**USED4SEC)
-            elif halg == "sha512":
-                pass
             else:
                 raise Pebkac(500, "unknown hash alg")
 
