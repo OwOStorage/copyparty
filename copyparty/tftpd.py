@@ -284,6 +284,7 @@ class Tftpd(object):
             if not ptn or not ptn.match(fn.lower()):
                 return None
 
+        tsdt = datetime.fromtimestamp
         vn, rem = self.asrv.vfs.get(vpath, "*", True, False)
         fsroot, vfs_ls, vfs_virt = vn.ls(
             rem,
@@ -296,7 +297,7 @@ class Tftpd(object):
         dirs1 = [(v.st_mtime, v.st_size, k + "/") for k, v in vfs_ls if k in dnames]
         fils1 = [(v.st_mtime, v.st_size, k) for k, v in vfs_ls if k not in dnames]
         real1 = dirs1 + fils1
-        realt = [(datetime.fromtimestamp(mt, UTC), sz, fn) for mt, sz, fn in real1]
+        realt = [(tsdt(max(0, mt), UTC), sz, fn) for mt, sz, fn in real1]
         reals = [
             (
                 "%04d-%02d-%02d %02d:%02d:%02d"

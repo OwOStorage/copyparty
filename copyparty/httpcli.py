@@ -1412,7 +1412,7 @@ class HttpCli(object):
             desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
             desc = html_escape(desc, True, True) if desc else title
             mime = html_escape(guess_mime(title))
-            lmod = formatdate(i["ts"])
+            lmod = formatdate(max(0, i["ts"]))
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
                 """\
@@ -1569,7 +1569,7 @@ class HttpCli(object):
         for x in fgen:
             rp = vjoin(vtop, x["vp"])
             st: os.stat_result = x["st"]
-            mtime = st.st_mtime
+            mtime = max(0, st.st_mtime)
             if stat.S_ISLNK(st.st_mode):
                 try:
                     st = bos.stat(os.path.join(tap, x["vp"]))
@@ -3978,7 +3978,7 @@ class HttpCli(object):
             if ptop is not None:
                 assert job and ap_data  # type: ignore  # !rm
                 sz = job["size"]
-                file_ts = job["lmod"]
+                file_ts = max(0, job["lmod"])
                 editions["plain"] = (ap_data, sz)
                 break
 
@@ -6120,7 +6120,7 @@ class HttpCli(object):
                 margin = "-"
 
             sz = inf.st_size
-            zd = datetime.fromtimestamp(linf.st_mtime, UTC)
+            zd = datetime.fromtimestamp(max(0, linf.st_mtime), UTC)
             dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
                 zd.year,
                 zd.month,

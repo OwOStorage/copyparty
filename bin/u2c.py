@@ -1289,7 +1289,7 @@ class Ctl(object):
                 if self.ar.jw:
                     print("%s  %s" % (wark, vp))
                 else:
-                    zd = datetime.datetime.fromtimestamp(file.lmod, UTC)
+                    zd = datetime.datetime.fromtimestamp(max(0, file.lmod), UTC)
                     dt = "%04d-%02d-%02d %02d:%02d:%02d" % (
                         zd.year,
                         zd.month,
