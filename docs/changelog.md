@@ -1,4 +1,30 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0426-2149  `v1.17.0`  mixtape.m3u
+
+## 🧪 new features
+
+* [m3u playlists](https://github.com/9001/copyparty/#playlists) 897f9d32 ad200f2b 4195762d fff45552
+  * create and play m3u / m3u8 files
+
+## 🩹 bugfixes
+
+* improve support for ie11 (yes, internet explorer 11) 3090c748 95157d02
+* now possible to launch the password-hasher cli while another instance is running dbfc899d
+  * in preparation of #157 / #159
+
+## 🔧 other changes
+
+* make better decisions when running in a VM with less than 1 GiB RAM dc3b7a27
+
+## 🌠 fun facts
+
+* this release contains code written [less than 1masl](https://a.ocv.me/pub/g/nerd-stuff/PXL_20250425_170037812.jpg) and was gonna be named [hash again](https://www.youtube.com/watch?v=twUFbqyul_M) since it was originally just the password-hasher fix, but then kipun suggested adding playlist support (thx kipun)
+* [donations](https://github.com/9001/) are now also possible through github -- good alternative to paypal (y)
+  * and thanks a lot for the support (and kind words therein) so far, appreciate it :>
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0420-1836  `v1.16.21`  unzip-compat
 
 a couple guys have been asking if I accept donations -- thanks a lot!! added a few options on [my github page](https://github.com/9001/) :>
