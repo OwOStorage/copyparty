@@ -189,11 +189,11 @@ class HttpCli(object):
         self.log_src = conn.log_src  # mypy404
         self.gen_fk = self._gen_fk if self.args.log_fk else gen_filekey
         self.tls: bool = hasattr(self.s, "cipher")
+        self.is_vproxied = bool(self.args.R)
 
         # placeholders; assigned by run()
         self.keepalive = False
         self.is_https = False
-        self.is_vproxied = False
         self.in_hdr_recv = True
         self.headers: dict[str, str] = {}
         self.mode = " "  # http verb
@@ -401,7 +401,6 @@ class HttpCli(object):
                     self.bad_xff = True
                 else:
                     self.ip = cli_ip
-                    self.is_vproxied = bool(self.args.R)
                     self.log_src = self.conn.set_rproxy(self.ip)
                     self.host = self.headers.get("x-forwarded-host") or self.host
                     trusted_xff = True
@@ -534,6 +533,7 @@ class HttpCli(object):
             else:
                 t = "incorrect --rp-loc or webserver config; expected vpath starting with %r but got %r"
                 self.log(t % (self.args.R, vpath), 1)
+                self.is_vproxied = False
 
         self.ouparam = uparam.copy()
 
