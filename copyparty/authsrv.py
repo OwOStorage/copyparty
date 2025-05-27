@@ -2563,6 +2563,7 @@ class AuthSrv(object):
                 "idxh": int(self.args.ih),
                 "themes": self.args.themes,
                 "turbolvl": self.args.turbo,
+                "nosubtle": self.args.nosubtle,
                 "u2j": self.args.u2j,
                 "u2sz": self.args.u2sz,
                 "u2ts": vf["u2ts"],

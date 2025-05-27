@@ -335,6 +335,8 @@ var tl_browser = {
 
 		"cut_mt": "use multithreading to accelerate file hashing$N$Nthis uses web-workers and requires$Nmore RAM (up to 512 MiB extra)$N$Nmakes https 30% faster, http 4.5x faster\">mt",
 
+		"cut_wasm": "use wasm instead of the browser's built-in hasher; improves speed on chrome-based browsers but increases CPU load, and many older versions of chrome have bugs which makes the browser consume all RAM and crash if this is enabled\">wasm",
+
 		"cft_text": "favicon text (blank and refresh to disable)",
 		"cft_fg": "foreground color",
 		"cft_bg": "background color",

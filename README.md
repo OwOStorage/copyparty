@@ -2518,6 +2518,11 @@ below are some tweaks roughly ordered by usefulness:
 
 when uploading files,
 
+* when uploading from very fast storage (NVMe SSD) with chrome/firefox, enable `[wasm]` in the `[⚙️] settings` tab to more effectively use all CPU-cores for hashing
+  * don't do this on Safari (runs faster without)
+  * don't do this on older browsers; likely to provoke browser-bugs (browser eats all RAM and crashes)
+  * can be made default-enabled serverside with `--nosubtle 137` (chrome v137+) or `--nosubtle 2` (chrome+firefox)
+
 * chrome is recommended (unfortunately), at least compared to firefox:
   * up to 90% faster when hashing, especially on SSDs
   * up to 40% faster when uploading over extremely fast internets

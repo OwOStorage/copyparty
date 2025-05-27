@@ -69,7 +69,7 @@ try {
 
     CHROME = navigator.userAgentData.brands.find(function (d) { return d.brand == 'Chromium' });
     if (CHROME)
-        VCHROME = CHROME.version;
+        VCHROME = parseInt(CHROME.version);
     else
         VCHROME = 0;
 

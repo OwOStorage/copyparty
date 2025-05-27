@@ -1,6 +1,18 @@
 "use strict";
 
 
+(function () {
+    var x = sread('nosubtle');
+    if (x === '0' || x === '1')
+        nosubtle = parseInt(x);
+    if ((nosubtle > 1 && !CHROME && !FIREFOX) ||
+        (nosubtle > 2 && !CHROME) ||
+        (CHROME && nosubtle > VCHROME) ||
+        !WebAssembly)
+        nosubtle = 0;
+})();
+
+
 function goto_up2k() {
     if (up2k === false)
         return goto('bup');
@@ -23,7 +35,7 @@ var up2k = null,
     m = 'will use ' + sha_js + ' instead of native sha512 due to';
 
 try {
-    if (sread('nosubtle') || window.nosubtle)
+    if (nosubtle)
         throw 'chickenbit';
     var cf = crypto.subtle || crypto.webkitSubtle;
     cf.digest('SHA-512', new Uint8Array(1)).then(
@@ -825,7 +837,7 @@ function up2k_init(subtle) {
             }
             qsr('#u2depmsg');
             var o = mknod('div', 'u2depmsg');
-            o.innerHTML = m;
+            o.innerHTML = nosubtle ? '' : m;
             ebi('u2foot').appendChild(o);
         }
         loading_deps = true;
@@ -881,7 +893,8 @@ function up2k_init(subtle) {
     bcfg_bind(uc, 'turbo', 'u2turbo', turbolvl > 1, draw_turbo);
     bcfg_bind(uc, 'datechk', 'u2tdate', turbolvl < 3, null);
     bcfg_bind(uc, 'az', 'u2sort', u2sort.indexOf('n') + 1, set_u2sort);
-    bcfg_bind(uc, 'hashw', 'hashw', !!WebAssembly && !(CHROME && MOBILE) && (!subtle || !CHROME), set_hashw);
+    bcfg_bind(uc, 'hashw', 'hashw', !!WebAssembly && !(CHROME && MOBILE) && (!subtle || !CHROME || VCHROME > 136), set_hashw);
+    bcfg_bind(uc, 'hwasm', 'nosubtle', nosubtle, set_nosubtle);
     bcfg_bind(uc, 'upnag', 'upnag', false, set_upnag);
     bcfg_bind(uc, 'upsfx', 'upsfx', false, set_upsfx);
 
@@ -1442,6 +1455,7 @@ function up2k_init(subtle) {
             if (CHROME) {
                 // chrome-bug 383568268 // #124
                 nw = Math.max(1, (nw > 4 ? 4 : (nw - 1)));
+                if (VCHROME < 137)
                 nw = (subtle && !MOBILE && nw > 2) ? 2 : nw;
             }
 
@@ -3289,6 +3303,12 @@ function up2k_init(subtle) {
             bcfg_set('hashw', uc.hashw = false);
             toast.err(10, L.u_nowork);
         }
+    }
+
+    function set_nosubtle(v) {
+        if (!WebAssembly)
+            return toast.err(10, L.u_nowork);
+        modal.confirm(L.lang_set, location.reload.bind(location), null);
     }
 
     function set_upnag(en) {
