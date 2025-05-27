@@ -2587,10 +2587,6 @@ class HttpCli(object):
             x = self.conn.hsrv.broker.ask("up2k.handle_json", body, self.u2fh.aps)
             ret = x.get()
 
-        if self.is_vproxied:
-            if "purl" in ret:
-                ret["purl"] = self.args.SR + ret["purl"]
-
         if self.args.shr and self.vpath.startswith(self.args.shr1):
             # strip common suffix (uploader's folder structure)
             vp_req, vp_vfs = vroots(self.vpath, vjoin(dbv.vpath, vrem))
@@ -2599,6 +2595,10 @@ class HttpCli(object):
                 zt = (self.vpath, dbv.vpath, vrem, vp_req, vp_vfs, ret["purl"])
                 raise Pebkac(500, t % zt)
             ret["purl"] = vp_req + ret["purl"][len(vp_vfs) :]
+
+        if self.is_vproxied:
+            if "purl" in ret:
+                ret["purl"] = self.args.SR + ret["purl"]
 
         ret = json.dumps(ret)
         self.log(ret)
