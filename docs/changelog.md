@@ -1,4 +1,36 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0518-2234  `v1.17.1`  as seen on archlinux
+
+## 🧪 new features
+
+* new toolbar button to zip/tar the currently open folder 256dad8c
+* new options to specify the default checksum algorithm for PUT/bup/WebDAV uploads 0de09860
+* #164 new option `--put-name` to specify the filename of nameless uploads 5dcd88a6
+  * the default is still `put-TIMESTAMP-IPADDRESS.bin`
+
+## 🩹 bugfixes
+
+* #162 password-protected shares was incompatible with password-hashing c3ef3fdc
+* #161 m3u playlist creation was only possible over https 94352f27
+* when relocating/redirecting an upload from an xbu hook (execute-before-upload), could miss an already existing file at the destination and create another copy 0a9a8077
+* some edgecases when moving files between filesystems f425ff51
+* improve tagscan-resume after a server restart (primarily for dupes) 41fa6b25
+* support prehistoric timestamps in fat16 vhd-drives on windows 261236e3
+
+## 🔧 other changes
+
+* #159 the nixos module was improved (thx @gabevenberg and @chinponya!) d1bca1f5
+* an archlinux maintainer adopted the aur package; copyparty is now [officially in arch](https://archlinux.org/packages/extra/any/copyparty/) b9ba783c
+* #162 add KDE Dolphin instructions to the conect-page d4a8071d
+* audioplayer now knows that `.oga` means `.ogg`
+
+## 🌠 fun facts
+
+* this release contains code [pair-programmed during an anime rave](https://a.ocv.me/pub/g/nerd-stuff/PXL_20250503_222654610.jpg)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0426-2149  `v1.17.0`  mixtape.m3u
 
 ## 🧪 new features
