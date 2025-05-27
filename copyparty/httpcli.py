@@ -1233,10 +1233,19 @@ class HttpCli(object):
                 else:
                     return self.tx_404(True)
             else:
-                vfs = self.asrv.vfs
-                if vfs.badcfg1:
-                    t = "<h2>access denied due to failsafe; check server log</h2>"
-                    html = self.j2s("splash", this=self, msg=t)
+                if (
+                    self.asrv.badcfg1
+                    and "h" not in self.ouparam
+                    and "hc" not in self.ouparam
+                ):
+                    zs1 = "copyparty refused to start due to a failsafe: invalid server config; check server log"
+                    zs2 = 'you may <a href="/?h">access the controlpanel</a> but nothing will work until you shutdown the copyparty container and %s config-file (or provide the configuration as command-line arguments)'
+                    if self.asrv.is_lxc and len(self.asrv.cfg_files_loaded) == 1:
+                        zs2 = zs2 % ("add a",)
+                    else:
+                        zs2 = zs2 % ("fix the",)
+
+                    html = self.j2s("msg", h1=zs1, h2=zs2)
                     self.reply(html.encode("utf-8", "replace"), 500)
                     return True
 

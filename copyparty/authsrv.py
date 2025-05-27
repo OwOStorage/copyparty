@@ -357,7 +357,6 @@ class VFS(object):
         self.flags = flags  # config options
         self.root = self
         self.dev = 0  # st_dev
-        self.badcfg1 = False
         self.nodes: dict[str, VFS] = {}  # child nodes
         self.histtab: dict[str, str] = {}  # all realpath->histpath
         self.dbpaths: dict[str, str] = {}  # all realpath->dbpath
@@ -877,6 +876,7 @@ class AuthSrv(object):
         self.warn_anonwrite = warn_anonwrite
         self.line_ctr = 0
         self.indent = ""
+        self.is_lxc = args.c == ["/z/initcfg"]
 
         # fwd-decl
         self.vfs = VFS(log_func, "", "", "", AXS(), {})
@@ -887,6 +887,8 @@ class AuthSrv(object):
         self.defpw: dict[str, str] = {}
         self.grps: dict[str, list[str]] = {}
         self.re_pwd: Optional[re.Pattern] = None
+        self.cfg_files_loaded: list[str] = []
+        self.badcfg1 = False
 
         # all volumes observed since last restart
         self.idp_vols: dict[str, str] = {}  # vpath->abspath
@@ -1482,8 +1484,10 @@ class AuthSrv(object):
         daxs: dict[str, AXS] = {}
         mflags: dict[str, dict[str, Any]] = {}  # vpath:flags
         mount: dict[str, tuple[str, str]] = {}  # dst:src (vp:(ap,vp0))
+        cfg_files_loaded: list[str] = []
 
         self.idp_vols = {}  # yolo
+        self.badcfg1 = False
 
         if self.args.a:
             # list of username:password
@@ -1544,6 +1548,7 @@ class AuthSrv(object):
                     zst = [(max(0, len(x) - 2) * " ") + "└" + x[-1] for x in zstt]
                     t = "loaded {} config files:\n{}"
                     self.log(t.format(len(zst), "\n".join(zst)))
+                    cfg_files_loaded = zst
 
                 except:
                     lns = lns[: self.line_ctr]
@@ -1568,9 +1573,14 @@ class AuthSrv(object):
         if not mount and not self.args.idp_h_usr:
             # -h says our defaults are CWD at root and read/write for everyone
             axs = AXS(["*"], ["*"], None, None)
-            if os.path.exists("/z/initcfg"):
-                t = "Read-access has been disabled due to failsafe: Docker detected, but the config does not define any volumes. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to all of /w/ by adding the following arguments to the docker container:  -v .::rw"
-                self.log(t, 1)
+            if self.is_lxc:
+                t = "Read-access has been disabled due to failsafe: Docker detected, but %s. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to all of /w/ by adding the following arguments to the docker container:  -v .::rw"
+                if len(cfg_files_loaded) == 1:
+                    self.log(t % ("no config-file was provided",), 1)
+                    t = "it is strongly recommended to add a config-file instead, for example based on https://github.com/9001/copyparty/blob/hovudstraum/docs/examples/docker/basic-docker-compose/copyparty.conf"
+                    self.log(t, 3)
+                else:
+                    self.log(t % ("the config does not define any volumes",), 1)
                 axs = AXS()
             elif self.args.c:
                 t = "Read-access has been disabled due to failsafe: No volumes were defined by the config-file. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to the working-directory by adding the following arguments:  -v .::rw"
@@ -1578,7 +1588,7 @@ class AuthSrv(object):
                 axs = AXS()
             vfs = VFS(self.log_func, absreal("."), "", "", axs, {})
             if not axs.uread:
-                vfs.badcfg1 = True
+                self.badcfg1 = True
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
             zsd = {"d2d": True, "tcolor": self.args.tcolor}
@@ -2433,6 +2443,7 @@ class AuthSrv(object):
         self.defpw = defpw
         self.grps = grps
         self.iacct = {v: k for k, v in acct.items()}
+        self.cfg_files_loaded = cfg_files_loaded
 
         self.load_sessions()
 
