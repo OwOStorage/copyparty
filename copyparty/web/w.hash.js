@@ -4,6 +4,16 @@
 function hex2u8(txt) {
     return new Uint8Array(txt.match(/.{2}/g).map(function (b) { return parseInt(b, 16); }));
 }
+function esc(txt) {
+    return txt.replace(/[&"<>]/g, function (c) {
+        return {
+            '&': '&amp;',
+            '"': '&quot;',
+            '<': '&lt;',
+            '>': '&gt;'
+        }[c];
+    });
+}
 
 
 var subtle = null;
@@ -19,6 +29,8 @@ catch (ex) {
 }
 function load_fb() {
     subtle = null;
+    if (self.hashwasm)
+        return;
     importScripts('deps/sha512.hw.js');
     console.log('using fallback hasher');
 }

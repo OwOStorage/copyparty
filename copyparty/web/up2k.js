@@ -1445,6 +1445,12 @@ function up2k_init(subtle) {
                 nw = (subtle && !MOBILE && nw > 2) ? 2 : nw;
             }
 
+            var x = sread('u2hashers') || window.u2hashers;
+            if (x) {
+                console.log('u2hashers is overriding default-value ' + nw);
+                nw = parseInt(x);
+            }
+
             for (var a = 0; a < nw; a++)
                 hws.push(new Worker(SR + '/.cpr/w.hash.js?_=' + TS));
 
@@ -2213,6 +2219,7 @@ function up2k_init(subtle) {
             reading = 0,
             max_readers = 1,
             opt_readers = 2,
+            failed = false,
             free = [],
             busy = {},
             nbusy = 0,
@@ -2262,6 +2269,14 @@ function up2k_init(subtle) {
                 tasker();
         }
 
+        function go_fail() {
+            failed = true;
+            if (nbusy)
+                return;
+            apop(st.busy.hash, t);
+            st.bytes.finished += t.size;
+        }
+
         function onmsg(d) {
             d = d.data;
             var k = d[0];
@@ -2276,6 +2291,12 @@ function up2k_init(subtle) {
                 return vis_exh(d[1], 'up2k.js', '', '', d[1]);
 
             if (k == "fail") {
+                var nchunk = d[1];
+                free.push(busy[nchunk]);
+                delete busy[nchunk];
+                nbusy--;
+                reading--;
+
                 pvis.seth(t.n, 1, d[1]);
                 pvis.seth(t.n, 2, d[2]);
                 console.log(d[1], d[2]);
@@ -2283,9 +2304,7 @@ function up2k_init(subtle) {
                     got_oserr();
 
                 pvis.move(t.n, 'ng');
-                apop(st.busy.hash, t);
-                st.bytes.finished += t.size;
-                return;
+                return go_fail();
             }
 
             if (k == "ferr")
@@ -2317,6 +2336,9 @@ function up2k_init(subtle) {
                 st.bytes.hashed += sz;
                 t.hash.push(nchunk);
                 pvis.hashed(t);
+
+                if (failed)
+                    return go_fail();
 
                 if (t.hash.length < nchunks)
                     return nbusy < opt_readers && go_next();
