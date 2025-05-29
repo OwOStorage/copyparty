@@ -34,6 +34,7 @@ shift
 ./make-sfx.sh "$@"
 f=../dist/copyparty-sfx
 [ -e $f.py ] && s= || s=-gz
+# TODO: the -gz suffix is gone, can drop all the $s stuff probably
 
 $f$s.py --version >/dev/null
 

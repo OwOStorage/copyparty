@@ -22,6 +22,7 @@
     * [dev env setup](#dev-env-setup)
     * [just the sfx](#just-the-sfx)
     * [build from release tarball](#build-from-release-tarball) - uses the included prebuilt webdeps
+    * [build from scratch](#build-from-scratch) - how the sausage is made
     * [complete release](#complete-release)
 * [debugging](#debugging)
     * [music playback halting on phones](#music-playback-halting-on-phones) - mostly fine on android
@@ -338,7 +339,7 @@ for the `re`pack to work, first run one of the sfx'es once to unpack it
 
 you need python 3.9 or newer due to type hints
 
-the rest is mostly optional; if you need a working env for vscode or similar
+setting up a venv with the below packages is only necessary if you want it for vscode or similar
 
 ```sh
 python3 -m venv .venv
@@ -390,6 +391,39 @@ python3 setup.py build
 # you now have a wheel which you can install. or extract and repackage:
 python3 setup.py install --skip-build --prefix=/usr --root=$HOME/pe/copyparty
 ```
+
+
+## build from scratch
+
+how the sausage is made:
+
+to get started, first `cd` into the `scripts` folder
+
+* the first step is the webdeps; they end up in `../copyparty/web/deps/` for example `../copyparty/web/deps/marked.js.gz` -- if you need to build the webdeps, run `make -C deps-docker`
+  * this needs rootless podman and the `podman-docker` compat-layer to pretend it's docker, although it *should* be possible to use rootful/rootless docker too
+  * if you don't have rootless podman/docker then `sudo make -C deps-docker` is fine too
+  * alternatively, you can entirely skip building the webdeps and instead extract the compiled webdeps from the latest github release with `./make-sfx.sh fast dl-wd`
+
+* next, build `copyparty-sfx.py` by running `./make-sfx.sh gz fast`
+  * this is a dependency for most of the remaining steps, since they take the sfx as input
+  * removing `fast` makes it compress better
+  * removing `gz` too compresses even better, but startup gets slower
+
+* if you want to build the `.pyz` standalone "binary", now run `./make-pyz.sh`
+
+* if you want to build a pypi package, now run `./make-pypi-release.sh d`
+
+* if you want to build a docker-image, you have two options:
+  * if you want to use podman to build all docker-images for all supported architectures, now run `(cd docker; ./make.sh hclean; ./make.sh hclean pull img)`
+  * if you want to use docker to build all docker-images for your native architecture, now run `sudo make -C docker`
+  * if you want to do something else, please take a look at `docker/make.sh` or `docker/Makefile` for inspiration
+
+* if you want to build the windows exe, first grab some snacks and a beer, [you'll need it](https://github.com/9001/copyparty/tree/hovudstraum/scripts/pyinstaller)
+
+the complete list of buildtime dependencies to do a build from scratch is as follows:
+
+* on ubuntu-server, install podman or [docker](https://get.docker.com/), and then `sudo apt install make zip bzip2`
+  * because ubuntu is specifically what someone asked about :-p
 
 
 ## complete release

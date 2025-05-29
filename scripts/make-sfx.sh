@@ -537,6 +537,7 @@ find | grep -E '\.(js|html)$' | while IFS= read -r f; do
 done
 
 gzres() {
+	local pk=
 	[ $zopf ] && command -v zopfli && pk="zopfli --i$zopf"
 	[ $zopf ] && command -v pigz && pk="pigz -11 -I $zopf"
 	[ -z "$pk" ] && pk='gzip'
@@ -628,7 +629,6 @@ suf=
 [ $use_gz ] && {
 	sed -r 's/"r:bz2"/"r:gz"/' <$py >$py.t
 	py=$py.t
-	suf=-gz
 }
 
 "$pybin" $py --sfx-make tar.bz2 $ver $ts

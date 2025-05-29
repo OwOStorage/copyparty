@@ -2832,5 +2832,7 @@ if there's a wall of base64 in the log (thread stacks) then please include that,
 
 for build instructions etc, see [./docs/devnotes.md](./docs/devnotes.md)
 
+specifically you may want to [build the sfx](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#just-the-sfx) or [build from scratch](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#build-from-scratch)
+
 see [./docs/TODO.md](./docs/TODO.md) for planned features / fixes / changes
 
