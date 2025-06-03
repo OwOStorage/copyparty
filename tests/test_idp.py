@@ -234,3 +234,42 @@ class TestVFS(unittest.TestCase):
         au.idp_checkin(None, "iud", "su")
         self.assertAxsAt(au, "team/su/iuc", [["iuc", "iud"]])
         self.assertAxsAt(au, "team/su/iud", [["iuc", "iud"]])
+
+    def test_7(self):
+        """
+        conditional idp-vols
+        """
+        _, cfgdir, xcfg = self.prep()
+        au = AuthSrv(Cfg(c=[cfgdir + "/7.conf"], **xcfg), self.log)
+        au.idp_checkin(None, "iua", "ga")
+        au.idp_checkin(None, "iuab", "ga,gb")
+        au.idp_checkin(None, "iuabc", "ga,gb,gc")
+        au.idp_checkin(None, "iub", "gb")
+        au.idp_checkin(None, "iubc", "gb,gc")
+        au.idp_checkin(None, "iuc", "gc")
+        zs = """
+u/iua
+u/iuab
+u/iuabc
+u/iub
+u/iubc
+u/iuc
+uya/iua
+uya/iuab
+uya/iuabc
+uyab/iuab
+uyab/iuabc
+una/iub
+una/iubc
+una/iuc
+unab/iuc
+gya/ga
+gna/gb
+gna/gc
+gnab/gc
+"""
+        zl1 = sorted(zs.strip().split("\n"))[:]
+        zl2 = sorted(list(au.vfs.all_vols))[:]
+        # print(" ".join(zl1))
+        # print(" ".join(zl2))
+        self.assertListEqual(zl1, zl2)

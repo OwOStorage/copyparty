@@ -72,7 +72,9 @@ SSEELOG = " ({})".format(SEE_LOG)
 BAD_CFG = "invalid config; {}".format(SEE_LOG)
 SBADCFG = " ({})".format(BAD_CFG)
 
-PTN_U_GRP = re.compile(r"\$\{u%([+-])([^}]+)\}")
+PTN_U_GRP = re.compile(r"\$\{u(%[+-][^}]+)\}")
+PTN_G_GRP = re.compile(r"\$\{g(%[+-][^}]+)\}")
+PTN_SIGIL = re.compile(r"(\${[ug][}%])")
 
 
 class CfgEx(Exception):
@@ -965,15 +967,27 @@ class AuthSrv(object):
             un_gn = [("", "")]
 
         for un, gn in un_gn:
-            m = PTN_U_GRP.search(dst0)
-            if m:
-                req, gnc = m.groups()
-                hit = gnc in (un_gns.get(un) or [])
-                if req == "+":
-                    if not hit:
-                        continue
-                elif hit:
+            rejected = False
+            for ptn in [PTN_U_GRP, PTN_G_GRP]:
+                m = ptn.search(dst0)
+                if not m:
                     continue
+                zs = m.group(1)
+                zs = zs.replace(",%+", "\n%+")
+                zs = zs.replace(",%-", "\n%-")
+                for rule in zs.split("\n"):
+                    gnc = rule[2:]
+                    if ptn == PTN_U_GRP:
+                        # is user member of group?
+                        hit = gnc in (un_gns.get(un) or [])
+                    else:
+                        # is it this specific group?
+                        hit = gn == gnc
+
+                    if rule.startswith("%+") != hit:
+                        rejected = True
+            if rejected:
+                continue
 
             # if ap/vp has a user/group placeholder, make sure to keep
             # track so the same user/group is mapped when setting perms;
@@ -988,6 +1002,8 @@ class AuthSrv(object):
 
             src = src1.replace("${g}", gn or "\n")
             dst = dst1.replace("${g}", gn or "\n")
+            src = PTN_G_GRP.sub(gn or "\n", src)
+            dst = PTN_G_GRP.sub(gn or "\n", dst)
             if src == src1 and dst == dst1:
                 gn = ""
 
@@ -1862,7 +1878,7 @@ class AuthSrv(object):
             is_shr = shr and zv.vpath.split("/")[0] == shr
             if histp and not is_shr and histp in rhisttab:
                 zv2 = rhisttab[histp]
-                t = "invalid config; multiple volumes share the same histpath (database+thumbnails location):\n  histpath: %s\n  volume 1: /%s  [%s]\n  volume 2: %s  [%s]"
+                t = "invalid config; multiple volumes share the same histpath (database+thumbnails location):\n  histpath: %s\n  volume 1: /%s  [%s]\n  volume 2: /%s  [%s]"
                 t = t % (histp, zv2.vpath, zv2.realpath, zv.vpath, zv.realpath)
                 self.log(t, 1)
                 raise Exception(t)
@@ -1876,7 +1892,7 @@ class AuthSrv(object):
             is_shr = shr and zv.vpath.split("/")[0] == shr
             if dbp and not is_shr and dbp in rdbpaths:
                 zv2 = rdbpaths[dbp]
-                t = "invalid config; multiple volumes share the same dbpath (database location):\n  dbpath: %s\n  volume 1: /%s  [%s]\n  volume 2: %s  [%s]"
+                t = "invalid config; multiple volumes share the same dbpath (database location):\n  dbpath: %s\n  volume 1: /%s  [%s]\n  volume 2: /%s  [%s]"
                 t = t % (dbp, zv2.vpath, zv2.realpath, zv.vpath, zv.realpath)
                 self.log(t, 1)
                 raise Exception(t)
@@ -2393,7 +2409,7 @@ class AuthSrv(object):
             idp_vn, _ = vfs.get(idp_vp, "*", False, False)
             idp_vp0 = idp_vn.vpath0
 
-            sigils = set(re.findall(r"(\${[ug][}%])", idp_vp0))
+            sigils = set(PTN_SIGIL.findall(idp_vp0))
             if len(sigils) > 1:
                 t = '\nWARNING: IdP-volume "/%s" created by "/%s" has multiple IdP placeholders: %s'
                 self.idp_warn.append(t % (idp_vp, idp_vp0, list(sigils)))

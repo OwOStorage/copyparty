@@ -8,7 +8,7 @@ turn almost any device into a file server with resumable uploads/downloads using
 * 🔌 protocols: [http](#the-browser) // [webdav](#webdav-server) // [ftp](#ftp-server) // [tftp](#tftp-server) // [smb/cifs](#smb-server)
 * 📱 [android app](#android-app) // [iPhone shortcuts](#ios-shortcuts)
 
-👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running from a basement in finland
+👉 **[Get started](#quickstart)!** or visit the **[read-only demo server](https://a.ocv.me/pub/demo/)** 👀 running on a nuc in my basement
 
 📷 **screenshots:** [browser](#the-browser) // [upload](#uploading) // [unpost](#unpost) // [thumbnails](#thumbnails) // [search](#searching) // [fsearch](#file-search) // [zip-DL](#zip-downloads) // [md-viewer](#markdown-viewer)
 
