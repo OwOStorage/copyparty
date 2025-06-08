@@ -2579,6 +2579,7 @@ class AuthSrv(object):
                 "txt_ext": self.args.textfiles.replace(",", " "),
                 "def_hcols": list(vf.get("mth") or []),
                 "unlist0": vf.get("unlist") or "",
+                "see_dots": self.args.see_dots,
                 "dgrid": "grid" in vf,
                 "dgsel": "gsel" in vf,
                 "dnsort": "nsort" in vf,

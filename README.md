@@ -561,6 +561,8 @@ a client can request to see dotfiles in directory listings if global option `-ed
 
 dotfiles do not appear in search results unless one of the above is true, **and** the global option / volflag `dotsrch` is set
 
+> even if user has permission to see dotfiles, they are default-hidden unless `--see-dots` is set, and/or user has enabled the `dotfiles` option in the settings tab
+
 config file example, where the same permission to see dotfiles is given in two different ways just for reference:
 
 ```yaml

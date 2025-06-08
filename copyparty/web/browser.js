@@ -7504,7 +7504,7 @@ var treectl = (function () {
 	bcfg_bind(r, 'idxh', 'idxh', idxh, setidxh);
 	bcfg_bind(r, 'dyn', 'dyntree', true, onresize);
 	bcfg_bind(r, 'csel', 'csel', dgsel);
-	bcfg_bind(r, 'dots', 'dotfiles', false, function (v) {
+	bcfg_bind(r, 'dots', 'dotfiles', see_dots, function (v) {
 		r.goto();
 		var xhr = new XHR();
 		xhr.open('GET', SR + '/?setck=dots=' + (v ? 'y' : ''), true);
