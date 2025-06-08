@@ -2716,6 +2716,7 @@ class HttpCli(object):
         locked = chashes  # remaining chunks to be received in this request
         written = []  # chunks written to disk, but not yet released by up2k
         num_left = -1  # num chunks left according to most recent up2k release
+        bail1 = False  # used in sad path to avoid contradicting error-text
         treport = time.time()  # ratelimit up2k reporting to reduce overhead
 
         if "x-up2k-subc" in self.headers:
@@ -2854,7 +2855,6 @@ class HttpCli(object):
             except:
                 # maybe busted handle (eg. disk went full)
                 f.close()
-                chashes = []  # exception flag
                 raise
         finally:
             if locked:
@@ -2863,13 +2863,14 @@ class HttpCli(object):
                 num_left, t = x.get()
                 if num_left < 0:
                     self.loud_reply(t, status=500)
-                    if chashes:  # kills exception bubbling otherwise
-                        return False
+                    bail1 = True
                 else:
                     t = "got %d more chunks, %d left"
                     self.log(t % (len(written), num_left), 6)
 
         if num_left < 0:
+            if bail1:
+                return False
             raise Pebkac(500, "unconfirmed; see serverlog")
 
         if not num_left and fpool:
