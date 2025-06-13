@@ -273,3 +273,35 @@ gnab/gc
         # print(" ".join(zl1))
         # print(" ".join(zl2))
         self.assertListEqual(zl1, zl2)
+
+    def test_8(self):
+        """
+        conditional non-idp vols
+        """
+        _, cfgdir, xcfg = self.prep()
+        xcfg = {"vc": True}
+        au = AuthSrv(Cfg(c=[cfgdir + "/8.conf"], **xcfg), self.log)
+        zs = """
+u/iua
+u/iuab
+u/iuabc
+u/iub
+u/iubc
+u/iuc
+uya/iua
+uya/iuab
+uya/iuabc
+uyab/iuab
+uyab/iuabc
+una/iub
+una/iubc
+una/iuc
+unab/iuc
+gya/ga
+gna/gb
+gna/gc
+gnab/gc
+"""
+        zl1 = sorted(zs.strip().split("\n"))[:]
+        zl2 = sorted(list(au.vfs.all_vols))[:]
+        self.assertListEqual(zl1, zl2)
