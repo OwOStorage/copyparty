@@ -29,19 +29,19 @@ uname -s | grep NT-10 && w10=1 || {
 fns=(
   altgraph-0.17.4-py2.py3-none-any.whl
   pefile-2023.2.7-py3-none-any.whl
-  pywin32_ctypes-0.2.2-py3-none-any.whl
-  setuptools-70.3.0-py3-none-any.whl
-  upx-4.2.4-win32.zip
+  pywin32_ctypes-0.2.3-py3-none-any.whl
+  upx-5.0.1-win32.zip
 )
 [ $w10 ] && fns+=(
   jinja2-3.1.6-py3-none-any.whl
-  MarkupSafe-2.1.5-cp312-cp312-win_amd64.whl
+  MarkupSafe-3.0.2-cp313-cp313-win_amd64.whl
   mutagen-1.47.0-py3-none-any.whl
-  packaging-24.1-py3-none-any.whl
-  pillow-11.2.1-cp312-cp312-win_amd64.whl
-  pyinstaller-6.10.0-py3-none-win_amd64.whl
-  pyinstaller_hooks_contrib-2024.8-py3-none-any.whl
-  python-3.12.10-amd64.exe
+  packaging-25.0-py3-none-any.whl
+  pillow-11.2.1-cp313-cp313-win_amd64.whl
+  pyinstaller-6.14.1-py3-none-win_amd64.whl
+  pyinstaller_hooks_contrib-2025.5-py3-none-any.whl
+  python-3.13.5-amd64.exe
+  setuptools-80.9.0-py3-none-any.whl
 )
 [ $w7 ] && fns+=(
   future-1.0.0-py3-none-any.whl
@@ -49,6 +49,7 @@ fns=(
   packaging-24.0-py3-none-any.whl
   pip-24.0-py3-none-any.whl
   pyinstaller_hooks_contrib-2023.8-py2.py3-none-any.whl
+  setuptools-70.3.0-py3-none-any.whl
   typing_extensions-4.7.1-py3-none-any.whl
   zipp-3.15.0-py3-none-any.whl
 )
@@ -80,7 +81,7 @@ close and reopen git-bash so python is in PATH
 
 ===[ copy-paste into git-bash ]================================
 uname -s | grep NT-10 && w10=1 || w7=1
-[ $w7 ] && pyv=37 || pyv=312
+[ $w7 ] && pyv=37 || pyv=313
 appd=$(cygpath.exe "$APPDATA")
 cd ~/Downloads &&
 yes | unzip upx-*-win32.zip &&

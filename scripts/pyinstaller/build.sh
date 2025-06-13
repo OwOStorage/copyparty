@@ -16,7 +16,7 @@ uname -s | grep WOW64 && m=64 || m=32
 uname -s | grep NT-10 && w10=1 || w7=1
 [ $w7 ] && [ -e up2k.sh ] && [ ! "$1" ] && ./up2k.sh
 
-[ $w7 ] && pyv=37 || pyv=312
+[ $w7 ] && pyv=37 || pyv=313
 esuf=
 [ $w7 ] && [ $m = 32 ] && esuf=32
 [ $w7 ] && [ $m = 64 ] && esuf=-winpe64
@@ -89,14 +89,17 @@ excl=(
     urllib.request
     urllib.response
     urllib.robotparser
-    zipfile
 )
 [ $w10 ] && excl+=(
+    _pyrepl
+    distutils
+    setuptools
     PIL.ImageQt
     PIL.ImageShow
     PIL.ImageTk
     PIL.ImageWin
     PIL.PdfParser
+    zipimport
 ) || excl+=(
     inspect
     PIL
@@ -104,6 +107,7 @@ excl=(
     PIL.Image
     PIL.ImageDraw
     PIL.ImageOps
+    zipfile
 )
 excl=( "${excl[@]/#/--exclude-module }" )
 
