@@ -3814,6 +3814,16 @@ class HttpCli(object):
 
         return txt
 
+    def _can_tail(self, volflags: dict[str, Any]) -> bool:
+        lvl = volflags["tail_who"]
+        if "notail" in volflags or not lvl:
+            raise Pebkac(400, "tail is disabled in server config")
+        elif lvl <= 1 and not self.can_admin:
+            raise Pebkac(400, "tail is admin-only on this server")
+        elif lvl <= 2 and self.uname in ("", "*"):
+            raise Pebkac(400, "you must be authenticated to use ?tail on this server")
+        return True
+
     def _can_zip(self, volflags: dict[str, Any]) -> str:
         lvl = volflags["zip_who"]
         if self.args.no_zip or not lvl:
@@ -3958,6 +3968,8 @@ class HttpCli(object):
         logmsg = "{:4} {} ".format("", self.req)
         logtail = ""
 
+        is_tail = "tail" in self.uparam and self._can_tail(self.vn.flags)
+
         if ptop is not None:
             ap_data = "<%s>" % (req_path,)
             try:
@@ -4071,6 +4083,7 @@ class HttpCli(object):
             and can_range
             and file_sz
             and "," not in hrange
+            and not is_tail
         ):
             try:
                 if not hrange.lower().startswith("bytes"):
@@ -4156,13 +4169,18 @@ class HttpCli(object):
             return True
 
         dls = self.conn.hsrv.dls
+        if is_tail:
+            upper = 1 << 30
+            if len(dls) > self.args.tail_cmax:
+                raise Pebkac(400, "too many active downloads to start a new tail")
+
         if upper - lower > 0x400000:  # 4m
             now = time.time()
             self.dl_id = "%s:%s" % (self.ip, self.addr[1])
             dls[self.dl_id] = (now, 0)
             self.conn.hsrv.dli[self.dl_id] = (
                 now,
-                upper - lower,
+                0 if is_tail else upper - lower,
                 self.vn,
                 self.vpath,
                 self.uname,
@@ -4173,6 +4191,9 @@ class HttpCli(object):
             return self.tx_pipe(
                 ptop, req_path, ap_data, job, lower, upper, status, mime, logmsg
             )
+        elif is_tail:
+            self.tx_tail(open_args, status, mime)
+            return False
 
         ret = True
         with open_func(*open_args) as f:
@@ -4201,6 +4222,106 @@ class HttpCli(object):
             self.log("{},  {}".format(logmsg, spd))
 
         return ret
+
+    def tx_tail(
+        self,
+        open_args: list[Any],
+        status: int,
+        mime: str,
+    ) -> None:
+        self.send_headers(length=None, status=status, mime=mime)
+        abspath: bytes = open_args[0]
+        sec_rate = self.args.tail_rate
+        sec_ka = self.args.tail_ka
+        sec_fd = self.args.tail_fd
+        wr_slp = self.args.s_wr_slp
+        wr_sz = self.args.s_wr_sz
+        dls = self.conn.hsrv.dls
+        dl_id = self.dl_id
+
+        # non-numeric = full file from start
+        # positive = absolute offset from start
+        # negative = start that many bytes from eof
+        try:
+            ofs = int(self.uparam["tail"])
+        except:
+            ofs = 0
+
+        f = None
+        try:
+            st = os.stat(abspath)
+            f = open(*open_args)
+            f.seek(0, os.SEEK_END)
+            eof = f.tell()
+            f.seek(0)
+            if ofs < 0:
+                ofs = max(0, ofs + eof)
+
+            self.log("tailing from byte %d: %r" % (ofs, abspath), 6)
+
+            # send initial data asap
+            remains = sendfile_py(
+                self.log,  # d/c
+                ofs,
+                eof,
+                f,
+                self.s,
+                wr_sz,
+                wr_slp,
+                False,  # d/c
+                dls,
+                dl_id,
+            )
+            sent = (eof - ofs) - remains
+            ofs = eof - remains
+            f.seek(ofs)
+
+            gone = 0
+            t_fd = t_ka = time.time()
+            while True:
+                assert f  # !rm
+                buf = f.read(4096)
+                now = time.time()
+                if buf:
+                    t_fd = t_ka = now
+                    self.s.sendall(buf)
+                    sent += len(buf)
+                    dls[dl_id] = (time.time(), sent)
+                    continue
+
+                time.sleep(sec_rate)
+                if t_ka < now - sec_ka:
+                    t_ka = now
+                    self.s.send(b"\x00")
+                if t_fd < now - sec_fd:
+                    try:
+                        st2 = os.stat(open_args[0])
+                        if st2.st_ino != st.st_ino or st2.st_size < sent:
+                            assert f  # !rm
+                            # open new file before closing previous to avoid toctous (open may fail; cannot null f before)
+                            f2 = open(*open_args)
+                            f.close()
+                            f = f2
+                            f.seek(0, os.SEEK_END)
+                            if f.tell() < sent:
+                                ofs = sent = 0  # shrunk; send from start
+                            else:
+                                ofs = sent  # just new fd? resume from same ofs
+                            f.seek(ofs)
+                            self.log("reopened at byte %d: %r" % (ofs, abspath), 6)
+                            gone = 0
+                            st = st2
+                    except:
+                        gone += 1
+                        if gone > 3:
+                            self.log("file deleted; disconnecting")
+                            break
+        except IOError as ex:
+            if ex.errno not in (errno.EPIPE, errno.ESHUTDOWN, errno.EBADFD):
+                raise
+        finally:
+            if f:
+                f.close()
 
     def tx_pipe(
         self,
@@ -4762,7 +4883,6 @@ class HttpCli(object):
             if zi == 2 or (zi == 1 and self.avol):
                 dl_list = self.get_dls()
         for t0, t1, sent, sz, vp, dl_id, uname in dl_list:
-            rem = sz - sent
             td = max(0.1, now - t0)
             rd, fn = vsplit(vp)
             if not rd:

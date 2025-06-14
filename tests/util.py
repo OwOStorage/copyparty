@@ -143,7 +143,7 @@ class Cfg(Namespace):
     def __init__(self, a=None, v=None, c=None, **ka0):
         ka = {}
 
-        ex = "chpw daw dav_auth dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic hardlink_only nid nih no_acode no_athumb no_bauth no_clone no_cp no_dav no_db_ip no_del no_dirsz no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tarcmp no_thumb no_vthumb no_zip nrand nsort nw og og_no_head og_s_title ohead q rand re_dirsz rss smb srch_dbg srch_excl stats uqe vague_403 vc ver wo_up_readme write_uplog xdev xlink xvol zipmaxu zs"
+        ex = "chpw daw dav_auth dav_mac dav_rt e2d e2ds e2dsa e2t e2ts e2tsr e2v e2vu e2vp early_ban ed emp exp force_js getmod grid gsel hardlink ih ihead magic hardlink_only nid nih no_acode no_athumb no_bauth no_clone no_cp no_dav no_db_ip no_del no_dirsz no_dupe no_lifetime no_logues no_mv no_pipe no_poll no_readme no_robots no_sb_md no_sb_lg no_scandir no_tail no_tarcmp no_thumb no_vthumb no_zip nrand nsort nw og og_no_head og_s_title ohead q rand re_dirsz rss smb srch_dbg srch_excl stats uqe vague_403 vc ver wo_up_readme write_uplog xdev xlink xvol zipmaxu zs"
         ka.update(**{k: False for k in ex.split()})
 
         ex = "dav_inf dedup dotpart dotsrch hook_v no_dhash no_fastboot no_fpool no_htp no_rescan no_sendfile no_ses no_snap no_up_list no_voldump re_dhash see_dots plain_ip"
@@ -152,10 +152,10 @@ class Cfg(Namespace):
         ex = "ah_cli ah_gen css_browser dbpath hist ipu js_browser js_other mime mimes no_forget no_hash no_idx nonsus_urls og_tpl og_ua ua_nodoc ua_nozip"
         ka.update(**{k: None for k in ex.split()})
 
-        ex = "hash_mt hsortn safe_dedup srch_time u2abort u2j u2sz"
+        ex = "hash_mt hsortn safe_dedup srch_time tail_fd tail_rate u2abort u2j u2sz"
         ka.update(**{k: 1 for k in ex.split()})
 
-        ex = "au_vol dl_list mtab_age reg_cap s_thead s_tbody th_convt ups_who zip_who"
+        ex = "au_vol dl_list mtab_age reg_cap s_thead s_tbody tail_who th_convt ups_who zip_who"
         ka.update(**{k: 9 for k in ex.split()})
 
         ex = "db_act forget_ip k304 loris no304 nosubtle re_maxage rproxy rsp_jtr rsp_slp s_wr_slp snap_wri theme themes turbo u2ow zipmaxn zipmaxs"

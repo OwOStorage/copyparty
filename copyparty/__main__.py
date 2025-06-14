@@ -1270,6 +1270,7 @@ def add_optouts(ap):
     ap2.add_argument("--no-tarcmp", action="store_true", help="disable download as compressed tar (?tar=gz, ?tar=bz2, ?tar=xz, ?tar=gz:9, ...)")
     ap2.add_argument("--no-lifetime", action="store_true", help="do not allow clients (or server config) to schedule an upload to be deleted after a given time")
     ap2.add_argument("--no-pipe", action="store_true", help="disable race-the-beam (lockstep download of files which are currently being uploaded) (volflag=nopipe)")
+    ap2.add_argument("--no-tail", action="store_true", help="disable streaming a growing files with ?tail (volflag=notail)")
     ap2.add_argument("--no-db-ip", action="store_true", help="do not write uploader-IP into the database; will also disable unpost, you may want \033[32m--forget-ip\033[0m instead (volflag=no_db_ip)")
 
 
@@ -1397,6 +1398,15 @@ def add_transcoding(ap):
     ap2.add_argument("--no-acode", action="store_true", help="disable audio transcoding")
     ap2.add_argument("--no-bacode", action="store_true", help="disable batch audio transcoding by folder download (zip/tar)")
     ap2.add_argument("--ac-maxage", metavar="SEC", type=int, default=86400, help="delete cached transcode output after \033[33mSEC\033[0m seconds")
+
+
+def add_tail(ap):
+    ap2 = ap.add_argument_group('tailing options (realtime streaming of a growing file)')
+    ap2.add_argument("--tail-who", metavar="LVL", type=int, default=2, help="who can tail? [\033[32m0\033[0m]=nobody, [\033[32m1\033[0m]=admins, [\033[32m2\033[0m]=authenticated-with-read-access, [\033[32m3\033[0m]=everyone-with-read-access (volflag=tail_who)")
+    ap2.add_argument("--tail-cmax", metavar="N", type=int, default=64, help="do not allow starting a new tail if more than \033[33mN\033[0m active downloads")
+    ap2.add_argument("--tail-rate", metavar="SEC", type=float, default=0.2, help="check for new data every \033[33mSEC\033[0m seconds (volflag=tail_rate)")
+    ap2.add_argument("--tail-ka", metavar="SEC", type=float, default=3.0, help="send a zerobyte if connection is idle for \033[33mSEC\033[0m seconds to prevent disconnect")
+    ap2.add_argument("--tail-fd", metavar="SEC", type=float, default=1.0, help="check if file was replaced (new fd) if idle for \033[33mSEC\033[0m seconds (volflag=tail_fd)")
 
 
 def add_rss(ap):
@@ -1590,6 +1600,7 @@ def run_argparse(
     add_db_metadata(ap)
     add_thumbnail(ap)
     add_transcoding(ap)
+    add_tail(ap)
     add_rss(ap)
     add_ftp(ap)
     add_webdav(ap)

@@ -191,6 +191,9 @@ authenticate using header `Cookie: cppwd=foo` or url param `&pw=foo`
 | GET | `?v` | open image/video/audio in mediaplayer |
 | GET | `?txt` | get file at URL as plaintext |
 | GET | `?txt=iso-8859-1` | ...with specific charset |
+| GET | `?tail` | continuously stream a growing file |
+| GET | `?tail=1024` | ...starting from byte 1024 |
+| GET | `?tail=-128` | ...starting 128 bytes from the end |
 | GET | `?th` | get image/video at URL as thumbnail |
 | GET | `?th=opus` | convert audio file to 128kbps opus |
 | GET | `?th=caf` | ...in the iOS-proprietary container |
