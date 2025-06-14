@@ -699,7 +699,10 @@ enabling `multiselect` lets you click files to select them, and then shift-click
 * `multiselect` is mostly intended for phones/tablets, but the `sel` option in the `[⚙️] settings` tab is better suited for desktop use, allowing selection by CTRL-clicking and range-selection with SHIFT-click, all without affecting regular clicking
   * the `sel` option can be made default globally with `--gsel` or per-volume with volflag `gsel`
 
-to show `/icons/exe.png` as the thumbnail for all .exe files, `--ext-th=exe=/icons/exe.png` (optionally as a volflag)
+to show `/icons/exe.png` and `/icons/elf.gif` as the thumbnail for all `.exe` and `.elf` files respectively, do this: `--ext-th=exe=/icons/exe.png --ext-th=elf=/icons/elf.gif`
+* optionally as separate volflags for each mapping; see config file example below
+* the supported image formats are [jpg, png, gif, webp, ico](https://developer.mozilla.org/en-US/docs/Web/Media/Guides/Formats/Image_types)
+  * be careful with svg; chrome will crash if you have too many unique svg files showing on the same page (the limit is 250 or so) -- showing the same handful of svg files thousands of times is ok however
 
 config file example:
 
@@ -716,6 +719,7 @@ config file example:
     dthumb   # disable ALL thumbnails and audio transcoding
     dvthumb  # only disable video thumbnails
     ext-th:  exe=/ico/exe.png  # /ico/exe.png is the thumbnail of *.exe
+    ext-th:  elf=/ico/elf.gif  # ...and /ico/elf.gif is used for *.elf
     th-covers:  folder.png,folder.jpg,cover.png,cover.jpg  # the default
 ```
 
