@@ -56,6 +56,7 @@ made in Norway 🇳🇴
         * [creating a playlist](#creating-a-playlist) - with a standalone mediaplayer or copyparty
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
+    * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
         * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
     * [other tricks](#other-tricks)
@@ -257,7 +258,8 @@ also see [comparison to similar software](./docs/versus.md)
     * ☑ play video files as audio (converted on server)
     * ☑ create and play [m3u8 playlists](#playlists)
   * ☑ image gallery with webm player
-  * ☑ textfile browser with syntax hilighting
+  * ☑ [textfile browser](#textfile-viewer) with syntax hilighting
+    * ☑ realtime streaming of growing files (logfiles and such)
   * ☑ [thumbnails](#thumbnails)
     * ☑ ...of images using Pillow, pyvips, or FFmpeg
     * ☑ ...of videos using FFmpeg
@@ -1125,6 +1127,18 @@ not available on iPhones / iPads because AudioContext currently breaks backgroun
 ### fix unreliable playback on android
 
 due to phone / app settings,  android phones may randomly stop playing music when the power saver kicks in, especially at the end of an album -- you can fix it by [disabling power saving](https://user-images.githubusercontent.com/241032/235262123-c328cca9-3930-4948-bd18-3949b9fd3fcf.png) in the [app settings](https://user-images.githubusercontent.com/241032/235262121-2ffc51ae-7821-4310-a322-c3b7a507890c.png) of the browser you use for music streaming (preferably a dedicated one)
+
+
+## textfile viewer
+
+with realtime streaming of logfiles and such  , and terminal colors work too
+
+(TODO: add screenshots)
+
+click `-txt-` next to a textfile to open the viewer, which has the following toolbar buttons:
+
+* `✏️ edit` opens the textfile editor
+* `📡 follow` starts monitoring the file for changes, streaming new lines in realtime
 
 
 ## markdown viewer
@@ -2424,6 +2438,9 @@ interact with copyparty using non-browser clients
 * sharex (screenshot utility): see [./contrib/sharex.sxcu](./contrib/#sharexsxcu)
   * and for screenshots on macos, see [./contrib/ishare.iscu](./contrib/#ishareiscu)
   * and for screenshots on linux, see [./contrib/flameshot.sh](./contrib/flameshot.sh)
+
+* [Custom Uploader](https://f-droid.org/en/packages/com.nyx.custom_uploader/) (an Android app) as an alternative to copyparty's own [PartyUP!](#android-app)
+  * works if you set UploadURL to `https://your.com/foo/?want=url&pw=hunter2` and FormDataName `f`
 
 * contextlet (web browser integration); see [contrib contextlet](contrib/#send-to-cppcontextletjson)
 

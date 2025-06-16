@@ -337,6 +337,7 @@ var Ls = {
 		"f_empty": 'this folder is empty',
 		"f_chide": 'this will hide the column «{0}»\n\nyou can unhide columns in the settings tab',
 		"f_bigtxt": "this file is {0} MiB large -- really view as text?",
+		"f_bigtxt2": "view just the end of the file instead? this will also enable following/tailing, showing newly added lines of text in real time",
 		"fbd_more": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_more">show {2}</a> or <a href="#" id="bd_all">show all</a></div>',
 		"fbd_all": '<div id="blazy">showing <code>{0}</code> of <code>{1}</code> files; <a href="#" id="bd_all">show all</a></div>',
 		"f_anota": "only {0} of the {1} items were selected;\nto select the full folder, first scroll to the bottom",
@@ -441,6 +442,10 @@ var Ls = {
 		"tvt_next": "show next document$NHotkey: K\">⬇ next",
 		"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
+		"tvt_tail": "monitor file for changes; show new lines in real time\">📡 follow",
+		"tvt_atail": "lock scroll to bottom of page\">⚓",
+		"tvt_ctail": "decode terminal colors (ansi escape codes)\">🌈",
+		"tvt_ntail": "scrollback limit (how many bytes of text to keep loaded)",
 
 		"m3u_add1": "song added to m3u playlist",
 		"m3u_addn": "{0} songs added to m3u playlist",
@@ -540,6 +545,7 @@ var Ls = {
 		"u_https3": "for better performance",
 		"u_ancient": 'your browser is impressively ancient -- maybe you should <a href="#" onclick="goto(\'bup\')">use bup instead</a>',
 		"u_nowork": "need firefox 53+ or chrome 57+ or iOS 11+",
+		"tail_2old": "need firefox 105+ or chrome 71+ or iOS 14.5+",
 		"u_nodrop": 'your browser is too old for drag-and-drop uploading',
 		"u_notdir": "that's not a folder!\n\nyour browser is too old,\nplease try dragdrop instead",
 		"u_uri": "to dragdrop images from other browser windows,\nplease drop it onto the big upload button",
@@ -954,6 +960,7 @@ var Ls = {
 		"f_empty": 'denne mappen er tom',
 		"f_chide": 'dette vil skjule kolonnen «{0}»\n\nfanen for "andre innstillinger" lar deg vise kolonnen igjen',
 		"f_bigtxt": "denne filen er hele {0} MiB -- vis som tekst?",
+		"f_bigtxt2": "vil du se bunnen av filen istedenfor? du vil da også se nye linjer som blir lagt til på slutten av filen i sanntid",
 		"fbd_more": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_more">vis {2}</a> eller <a href="#" id="bd_all">vis alle</a></div>',
 		"fbd_all": '<div id="blazy">viser <code>{0}</code> av <code>{1}</code> filer; <a href="#" id="bd_all">vis alle</a></div>',
 		"f_anota": "kun {0} av totalt {1} elementer ble markert;\nfor å velge alt må du bla til bunnen av mappen først",
@@ -1058,6 +1065,10 @@ var Ls = {
 		"tvt_next": "vis neste dokument$NSnarvei: K\">⬇ neste",
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
+		"tvt_tail": "overvåk filen for endringer og vis nye linjer i sanntid\">📡 følg",
+		"tvt_atail": "hold de nyeste linjene synlig (lås til bunnen av siden)\">⚓",
+		"tvt_ctail": "forstå og vis terminalfarger (ansi-sekvenser)\">🌈",
+		"tvt_ntail": "maks-grense for antall bokstaver som skal vises i vinduet",
 
 		"m3u_add1": "sangen ble lagt til i m3u-spillelisten",
 		"m3u_addn": "{0} sanger ble lagt til i m3u-spillelisten",
@@ -1157,6 +1168,7 @@ var Ls = {
 		"u_https3": "for høyere hastighet",
 		"u_ancient": 'nettleseren din er prehistorisk -- mulig du burde <a href="#" onclick="goto(\'bup\')">bruke bup istedenfor</a>',
 		"u_nowork": "krever firefox 53+, chrome 57+, eller iOS 11+",
+		"tail_2old": "krever firefox 105+, chrome 71+, eller iOS 14.5+",
 		"u_nodrop": 'nettleseren din er for gammel til å laste opp filer ved å dra dem inn i vinduet',
 		"u_notdir": "mottok ikke mappen!\n\nnettleseren din er for gammel,\nprøv å dra mappen inn i vinduet istedenfor",
 		"u_uri": "for å laste opp bilder ifra andre nettleservinduer,\nslipp bildet rett på den store last-opp-knappen",
@@ -1571,6 +1583,7 @@ var Ls = {
 		"f_empty": '该文件夹为空',
 		"f_chide": '隐藏列 «{0}»\n\n你可以在设置选项卡中重新显示列',
 		"f_bigtxt": "这个文件大小为 {0} MiB -- 真的以文本形式查看？",
+		"f_bigtxt2": " 你想查看文件的结尾部分吗？这也将启用实时跟踪功能，能够实时显示新添加的文本行。", //m
 		"fbd_more": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_more">显示 {2}</a> 或 <a href="#" id="bd_all">显示全部</a></div>',
 		"fbd_all": '<div id="blazy">显示 <code>{0}</code> 个文件中的 <code>{1}</code> 个；<a href="#" id="bd_all">显示全部</a></div>',
 		"f_anota": "仅选择了 {0} 个项目，共 {1} 个；\n要选择整个文件夹，请先滚动到底部", //m
@@ -1675,6 +1688,10 @@ var Ls = {
 		"tvt_next": "显示下一个文档$N快捷键: K\">⬇ 下一个",
 		"tvt_sel": "选择文件&nbsp;（用于剪切/删除/...）$N快捷键: S\">选择",
 		"tvt_edit": "在文本编辑器中打开文件$N快捷键: E\">✏️ 编辑",
+		"tvt_tail": "监视文件更改，并实时显示新增的行\">📡 跟踪", //m
+		"tvt_atail": "锁定到底部，显示最新内容\">⚓", //m
+		"tvt_ctail": "解析终端颜色（ANSI 转义码）\">🌈", //m
+		"tvt_ntail": "滚动历史上限（保留多少字节的文本）", //m
 
 		"m3u_add1": "歌曲已添加到 m3u 播放列表", //m
 		"m3u_addn": "已添加 {0} 首歌曲到 m3u 播放列表", //m
@@ -1774,6 +1791,7 @@ var Ls = {
 		"u_https3": "以获得更好的性能",
 		"u_ancient": '你的浏览器非常古老 -- 也许你应该 <a href="#" onclick="goto(\'bup\')">改用 bup</a>',
 		"u_nowork": "需要 Firefox 53+ 或 Chrome 57+ 或 iOS 11+",
+		"tail_2old": "需要 Firefox 105+ 或 Chrome 71+ 或 iOS 14.5+",
 		"u_nodrop": '浏览器版本低，不支持通过拖动文件到窗口来上传文件',
 		"u_notdir": "不是文件夹！\n\n您的浏览器太旧；\n请尝试将文件夹拖入窗口",
 		"u_uri": "要从其他浏览器窗口拖放图片，\n请将其拖放到大的上传按钮上",
@@ -5912,16 +5930,73 @@ var showfile = (function () {
 		}
 		r.mktree();
 		if (em) {
-			render(em);
+			if (r.taildoc)
+				r.show(em[0], true);
+			else
+				render(em);
 			em = null;
 		}
 	};
 
+	r.tail = function (url, no_push) {
+		r.abrt = new AbortController();
+		render([url, '', ''], no_push);
+		var me = r.tail_id = Date.now(),
+			wfp = ebi('wfp'),
+			edoc = ebi('doc'),
+			txt = '';
+
+		url = addq(url, 'tail=-' + r.tailnb);
+		fetch(url, {'signal': r.abrt.signal}).then(function(rsp) {
+			var ro = rsp.body.pipeThrough(
+				new TextDecoderStream('utf-8', {'fatal': false}),
+				{'signal': r.abrt.signal}).getReader();
+
+			var rf = function() {
+				ro.read().then(function(v) {
+					if (r.tail_id != me)
+						return;
+					v = v.value;
+					if (v == '\x00')
+						return rf();
+					txt += v;
+					var ofs = txt.length - r.tailnb;
+					if (ofs > 0) {
+						var ofs2 = txt.indexOf('\n', ofs);
+						if (ofs2 >= ofs && ofs - ofs2 < 512)
+							ofs = ofs2;
+						txt = txt.slice(ofs);
+					}
+					var html = esc(txt);
+					if (r.tailansi)
+						html = r.ansify(html);
+					edoc.innerHTML = html;
+					if (r.tail2end)
+						window.scrollTo(0, wfp.offsetTop - window.innerHeight);
+					rf();
+				});
+			};
+			if (r.tail_id == me)
+				rf();
+		});
+	};
+
+	r.untail = function () {
+		if (!r.abrt)
+			return;
+		r.abrt.abort();
+		r.tail_id = -1;
+	};
+
 	r.show = function (url, no_push) {
+		r.untail();
 		var xhr = new XHR(),
 			m = /[?&](k=[^&#]+)/.exec(url);
 
 		url = url.split('?')[0] + (m ? '?' + m[1] : '');
+		if (r.taildoc)
+			return r.tail(url, no_push);
+
 		xhr.url = url;
 		xhr.fname = uricom_dec(url.split('/').pop());
 		xhr.no_push = no_push;
@@ -5961,7 +6036,7 @@ var showfile = (function () {
 
 	function render(doc, no_push) {
 		r.q = null;
-		var url = doc[0],
+		var url = r.url = doc[0],
 			lnh = doc[1],
 			txt = doc[2],
 			name = url.split('?')[0].split('/').pop(),
@@ -5985,12 +6060,12 @@ var showfile = (function () {
 				el = el || QS('#doc>code');
 				Prism.highlightElement(el);
 				if (el.className == 'language-ans' || (!lang && /\x1b\[[0-9;]{0,16}m/.exec(txt.slice(0, 4096))))
-					r.ansify(el);
+					el.innerHTML = r.ansify(el.innerHTML);
 			}
 			catch (ex) { }
 		}
 
-		if (txt.length > 1024 * 256)
+		if (!txt || txt.length > 1024 * 256)
 			fun = function (el) { };
 
 		qsr('#doc');
@@ -6034,11 +6109,11 @@ var showfile = (function () {
 		tree_scrollto();
 	}
 
-	r.ansify = function (el) {
+	r.ansify = function (html) {
 		var ctab = (light ?
 			'bfbfbf d30253 497600 b96900 006fbb a50097 288276 2d2d2d 9f9f9f 943b55 3a5600 7f4f00 00507d 683794 004343 000000' :
 			'404040 f03669 b8e346 ffa402 02a2ff f65be3 3da698 d2d2d2 606060 c75b79 c8e37e ffbe4a 71cbff b67fe3 9cf0ed ffffff').split(/ /g),
-			src = el.innerHTML.split(/\x1b\[/g),
+			src = html.split(/\x1b\[/g),
 			out = ['<span>'], fg = 7, bg = null, bfg = 0, bbg = 0, inv = 0, bold = 0;
 
 		for (var a = 0; a < src.length; a++) {
@@ -6091,7 +6166,7 @@ var showfile = (function () {
 
 			out.push(s + '">' + txt);
 		}
-		el.innerHTML = out.join('');
+		return out.join('');
 	};
 
 	r.mktree = function () {
@@ -6138,6 +6213,14 @@ var showfile = (function () {
 		msel.selui();
 	};
 
+	r.tgltail = function () {
+		if (!window.TextDecoderStream) {
+			bcfg_set('taildoc', r.taildoc = false);
+			return toast.err(10, L.tail_2old);
+		}
+		r.show(r.url, true);
+	};
+
 	var bdoc = ebi('bdoc');
 	bdoc.className = 'line-numbers';
 	bdoc.innerHTML = (
@@ -6148,15 +6231,28 @@ var showfile = (function () {
 		'<a href="#" class="btn" id="nextdoc" tt="' + L.tvt_next + '</a>\n' +
 		'<a href="#" class="btn" id="seldoc" tt="' + L.tvt_sel + '</a>\n' +
 		'<a href="#" class="btn" id="editdoc" tt="' + L.tvt_edit + '</a>\n' +
+		'<a href="#" class="btn tgl" id="taildoc" tt="' + L.tvt_tail + '</a>\n' +
+		'<a href="#" class="btn tgl" id="tail2end" tt="' + L.tvt_atail + '</a>\n' +
+		'<a href="#" class="btn tgl" id="tailansi" tt="' + L.tvt_ctail + '</a>\n' +
+		'<input type="text" id="tailnb" value="" ' + NOAC + ' style="width:4em" tt="' + L.tvt_ntail + '" />' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
+		r.untail();
 		thegrid.setvis(true);
 	};
 	ebi('dldoc').setAttribute('download', '');
 	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
 	ebi('nextdoc').onclick = function () { tree_neigh(1); };
 	ebi('seldoc').onclick = r.tglsel;
+	bcfg_bind(r, 'taildoc', 'taildoc', false, r.tgltail);
+	bcfg_bind(r, 'tail2end', 'tail2end', true);
+	bcfg_bind(r, 'tailansi', 'tailansi', false, r.tgltail);
+
+	r.tailnb = ebi('tailnb').value = icfg_get('tailnb', 131072);
+	ebi('tailnb').oninput = function (e) {
+		swrite('tailnb', r.tailnb = this.value);
+	};
 
 	return r;
 })();
@@ -10111,13 +10207,18 @@ ebi('files').onclick = ebi('docul').onclick = function (e) {
 			fun = function () {
 				showfile.show(href, tgt.getAttribute('lang'));
 			},
+			tfun = function () {
+				bcfg_set('taildoc', showfile.taildoc = true);
+				fun();
+			},
 			szs = ft2dict(a.closest('tr'))[0].sz,
 			sz = parseInt(szs.replace(/[, ]/g, ''));
 
-		if (sz < 1024 * 1024)
+		if (sz < 1024 * 1024 || showfile.taildoc)
 			fun();
 		else
-			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, null);
+			modal.confirm(L.f_bigtxt.format(f2f(sz / 1024 / 1024, 1)), fun, function() {
+				modal.confirm(L.f_bigtxt2, tfun, null)});
 
 		return ev(e);
 	}

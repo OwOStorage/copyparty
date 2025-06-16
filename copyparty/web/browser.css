@@ -1825,10 +1825,11 @@ html.y #tree.nowrap .ntree a+a:hover {
 	line-height: 2.3em;
 	margin-bottom: 1.5em;
 }
+#hdoc,
 #ghead {
 	position: sticky;
 	top: -.3em;
-	z-index: 1;
+	z-index: 2;
 }
 .ghead .btn {
 	position: relative;
@@ -1837,6 +1838,17 @@ html.y #tree.nowrap .ntree a+a:hover {
 .ghead>span {
 	white-space: pre;
 	padding-left: .3em;
+}
+#tail2end,
+#tailansi,
+#tailnb {
+	display: none;
+}
+#taildoc.on+#tail2end,
+#taildoc.on+#tail2end+#tailansi,
+#taildoc.on+#tail2end+#tailansi+#tailnb {
+	display: inherit;
+	display: unset;
 }
 #op_unpost {
 	padding: 1em;

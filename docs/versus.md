@@ -168,6 +168,7 @@ symbol legend,
 | upload a 999 TiB file   | █ |   |   |   | █ | █ | • |   | █ |   | █ | ╱ | ╱ |
 | CTRL-V from device      | █ |   |   | █ |   |   |   |   |   |   |   |   |   |
 | race the beam ("p2p")   | █ |   |   |   |   |   |   |   |   |   |   |   |   |
+| "tail -f" streaming     | █ |   |   |   |   |   |   |   |   |   |   |   |   |
 | keep last-modified time | █ |   |   | █ | █ | █ |   |   |   |   |   | █ |   |
 | upload rules            | ╱ | ╱ | ╱ | ╱ | ╱ |   |   | ╱ | ╱ |   | ╱ | ╱ | ╱ |
 | ┗ max disk usage        | █ | █ | █ |   | █ |   |   |   | █ |   |   | █ | █ |
@@ -192,6 +193,8 @@ symbol legend,
 * `CTRL-V from device` = press CTRL-C in Windows Explorer (or whatever) and paste into the webbrowser to upload it
 
 * `race the beam` = files can be downloaded while they're still uploading; downloaders are slowed down such that the uploader is always ahead
+
+* `tail -f` = when viewing or downloading a logfile, the connection can remain open to keep showing new lines as they are added in real time
 
 * `upload routing` = depending on filetype / contents / uploader etc., the file can be redirected to another location or otherwise transformed; mitigates limitations such as [sharex#3992](https://github.com/ShareX/ShareX/issues/3992)
   * copyparty example: [reloc-by-ext](https://github.com/9001/copyparty/tree/hovudstraum/bin/hooks#before-upload)

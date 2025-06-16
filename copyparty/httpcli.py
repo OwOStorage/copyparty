@@ -4247,6 +4247,7 @@ class HttpCli(object):
         except:
             ofs = 0
 
+        ofs0 = ofs
         f = None
         try:
             st = os.stat(abspath)
@@ -4276,6 +4277,13 @@ class HttpCli(object):
             ofs = eof - remains
             f.seek(ofs)
 
+            try:
+                st2 = os.stat(open_args[0])
+                if st.st_ino == st2.st_ino:
+                    st = st2  # for filesize
+            except:
+                pass
+
             gone = 0
             t_fd = t_ka = time.time()
             while True:
@@ -4296,21 +4304,26 @@ class HttpCli(object):
                 if t_fd < now - sec_fd:
                     try:
                         st2 = os.stat(open_args[0])
-                        if st2.st_ino != st.st_ino or st2.st_size < sent:
+                        if st2.st_ino != st.st_ino or st2.st_size < sent or st2.st_size < st.st_size:
                             assert f  # !rm
                             # open new file before closing previous to avoid toctous (open may fail; cannot null f before)
                             f2 = open(*open_args)
                             f.close()
                             f = f2
                             f.seek(0, os.SEEK_END)
-                            if f.tell() < sent:
+                            eof = f.tell()
+                            if eof < sent:
                                 ofs = sent = 0  # shrunk; send from start
+                                zb = b"\n\n*** file size decreased -- rewinding to the start of the file ***\n\n"
+                                self.s.sendall(zb)
+                                if ofs0 < 0 and eof > -ofs0:
+                                    ofs = eof + ofs0
                             else:
                                 ofs = sent  # just new fd? resume from same ofs
                             f.seek(ofs)
                             self.log("reopened at byte %d: %r" % (ofs, abspath), 6)
                             gone = 0
-                            st = st2
+                        st = st2
                     except:
                         gone += 1
                         if gone > 3:
