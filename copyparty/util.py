@@ -153,6 +153,14 @@ try:
 except:
     HAVE_PSUTIL = False
 
+try:
+    if os.environ.get("PRTY_NO_MAGIC"):
+        raise Exception()
+
+    import magic
+except:
+    pass
+
 if True:  # pylint: disable=using-constant-test
     import types
     from collections.abc import Callable, Iterable
@@ -175,8 +183,6 @@ if True:  # pylint: disable=using-constant-test
 
 
 if TYPE_CHECKING:
-    import magic
-
     from .authsrv import VFS
     from .broker_util import BrokerCli
     from .up2k import Up2k
@@ -1256,8 +1262,6 @@ class Magician(object):
         self.magic: Optional["magic.Magic"] = None
 
     def ext(self, fpath: str) -> str:
-        import magic
-
         try:
             if self.bad_magic:
                 raise Exception()
@@ -3152,11 +3156,13 @@ def unescape_cookie(orig: str) -> str:
     return "".join(ret)
 
 
-def guess_mime_ext(url: str) -> str:
+def guess_mime(
+    url: str, path: str = "", fallback: str = "application/octet-stream"
+) -> str:
     try:
         ext = url.rsplit(".", 1)[1].lower()
     except:
-        return None
+        ext = ""
 
     ret = MIMES.get(ext)
 
@@ -3164,22 +3170,14 @@ def guess_mime_ext(url: str) -> str:
         x = mimetypes.guess_type(url)
         ret = "application/{}".format(x[1]) if x[1] else x[0]
 
-    return ret
-
-
-def guess_mime(url: str, path: str = None, fallback: str = "application/octet-stream") -> str:
-    ret = guess_mime_ext(url)
-
     if not ret and path:
-        import magic
-
         try:
-            with open(path, 'rb', 0) as f:
-                ret = magic.from_buffer(f.read(4096), mime = True)
-                if ret == "text/html":
+            with open(fsenc(path), "rb", 0) as f:
+                ret = magic.from_buffer(f.read(4096), mime=True)
+                if ret.startswith("text/htm"):
                     # avoid serving up HTML content unless there was actually a .html extension
                     ret = "text/plain"
-        except:
+        except Exception as ex:
             pass
 
     if not ret:

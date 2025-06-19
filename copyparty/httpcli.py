@@ -1412,8 +1412,12 @@ class HttpCli(object):
         except:
             pass
 
+        ap = ""
+        use_magic = "rmagic" in self.vn.flags
+
         for i in hits:
-            f = fsenc(os.path.join(self.vn.realpath, i["rp"])) if "magic" in self.vn.flags else None
+            if use_magic:
+                ap = os.path.join(self.vn.realpath, i["rp"])
 
             iurl = html_escape("%s%s" % (baseurl, i["rp"]), True, True)
             title = unquotep(i["rp"].split("?")[0].split("/")[-1])
@@ -1422,7 +1426,7 @@ class HttpCli(object):
             tag_a = str(i["tags"].get("artist") or "")
             desc = "%s - %s" % (tag_a, tag_t) if tag_t and tag_a else (tag_t or tag_a)
             desc = html_escape(desc, True, True) if desc else title
-            mime = html_escape(guess_mime(title, f))
+            mime = html_escape(guess_mime(title, ap))
             lmod = formatdate(max(0, i["ts"]))
             zsa = (iurl, iurl, title, desc, lmod, iurl, mime, i["sz"])
             zs = (
@@ -1575,6 +1579,9 @@ class HttpCli(object):
             None, 207, "text/xml; charset=" + enc, {"Transfer-Encoding": "chunked"}
         )
 
+        ap = ""
+        use_magic = "rmagic" in vn.flags
+
         ret = '<?xml version="1.0" encoding="{}"?>\n<D:multistatus xmlns:D="DAV:">'
         ret = ret.format(uenc)
         for x in fgen:
@@ -1601,9 +1608,9 @@ class HttpCli(object):
                 "supportedlock": '<D:lockentry xmlns:D="DAV:"><D:lockscope><D:exclusive/></D:lockscope><D:locktype><D:write/></D:locktype></D:lockentry>',
             }
             if not isdir:
-                f = fsenc(os.path.join(tap, x["vp"])) if "magic" in self.vn.flags else None
-
-                pvs["getcontenttype"] = html_escape(guess_mime(rp), f)
+                if use_magic:
+                    ap = os.path.join(tap, x["vp"])
+                pvs["getcontenttype"] = html_escape(guess_mime(rp, ap))
                 pvs["getcontentlength"] = str(st.st_size)
 
             for k, v in pvs.items():
@@ -4160,8 +4167,8 @@ class HttpCli(object):
             mime = "text/plain; charset={}".format(self.uparam["txt"] or "utf-8")
         elif "mime" in self.uparam:
             mime = str(self.uparam.get("mime"))
-        elif "magic" in self.vn.flags:
-            mime = guess_mime(req_path, fsenc(fs_path))
+        elif "rmagic" in self.vn.flags:
+            mime = guess_mime(req_path, fs_path)
         else:
             mime = guess_mime(req_path)
 
@@ -4314,7 +4321,11 @@ class HttpCli(object):
                 if t_fd < now - sec_fd:
                     try:
                         st2 = os.stat(open_args[0])
-                        if st2.st_ino != st.st_ino or st2.st_size < sent or st2.st_size < st.st_size:
+                        if (
+                            st2.st_ino != st.st_ino
+                            or st2.st_size < sent
+                            or st2.st_size < st.st_size
+                        ):
                             assert f  # !rm
                             # open new file before closing previous to avoid toctous (open may fail; cannot null f before)
                             f2 = open(*open_args)

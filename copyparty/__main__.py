@@ -964,6 +964,7 @@ def add_general(ap, nc, srvname):
     ap2.add_argument("--name", metavar="TXT", type=u, default=srvname, help="server name (displayed topleft in browser and in mDNS)")
     ap2.add_argument("--mime", metavar="EXT=MIME", type=u, action="append", help="map file \033[33mEXT\033[0mension to \033[33mMIME\033[0mtype, for example [\033[32mjpg=image/jpeg\033[0m]")
     ap2.add_argument("--mimes", action="store_true", help="list default mimetype mapping and exit")
+    ap2.add_argument("--rmagic", action="store_true", help="do expensive analysis to improve accuracy of returned mimetypes; will make file-downloads, rss, and webdav slower (volflag=rmagic)")
     ap2.add_argument("--license", action="store_true", help="show licenses and exit")
     ap2.add_argument("--version", action="store_true", help="show versions and exit")
 
@@ -1024,7 +1025,7 @@ def add_upload(ap):
     ap2.add_argument("--u2ts", metavar="TXT", type=u, default="c", help="how to timestamp uploaded files; [\033[32mc\033[0m]=client-last-modified, [\033[32mu\033[0m]=upload-time, [\033[32mfc\033[0m]=force-c, [\033[32mfu\033[0m]=force-u (volflag=u2ts)")
     ap2.add_argument("--rand", action="store_true", help="force randomized filenames, \033[33m--nrand\033[0m chars long (volflag=rand)")
     ap2.add_argument("--nrand", metavar="NUM", type=int, default=9, help="randomized filenames length (volflag=nrand)")
-    ap2.add_argument("--magic", action="store_true", help="enable filetype detection on extensionless files (volflag=magic)")
+    ap2.add_argument("--magic", action="store_true", help="enable filetype detection on nameless uploads (volflag=magic)")
     ap2.add_argument("--df", metavar="GiB", type=u, default="0", help="ensure \033[33mGiB\033[0m free disk space by rejecting upload requests; assumes gigabytes unless a unit suffix is given: [\033[32m256m\033[0m], [\033[32m4\033[0m], [\033[32m2T\033[0m] (volflag=df)")
     ap2.add_argument("--sparse", metavar="MiB", type=int, default=4, help="windows-only: minimum size of incoming uploads through up2k before they are made into sparse files")
     ap2.add_argument("--turbo", metavar="LVL", type=int, default=0, help="configure turbo-mode in up2k client; [\033[32m-1\033[0m] = forbidden/always-off, [\033[32m0\033[0m] = default-off and warn if enabled, [\033[32m1\033[0m] = default-off, [\033[32m2\033[0m] = on, [\033[32m3\033[0m] = on and disable datecheck")
