@@ -3815,6 +3815,10 @@ class HttpCli(object):
         return txt
 
     def _can_tail(self, volflags: dict[str, Any]) -> bool:
+        zp = self.args.ua_nodoc
+        if zp and zp.search(self.ua):
+            t = "this URL contains no valuable information for bots/crawlers"
+            raise Pebkac(403, t)
         lvl = volflags["tail_who"]
         if "notail" in volflags or not lvl:
             raise Pebkac(400, "tail is disabled in server config")

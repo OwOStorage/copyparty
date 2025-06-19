@@ -5817,7 +5817,9 @@ var fileman = (function () {
 
 
 var showfile = (function () {
-	var r = {};
+	var r = {
+		'nrend': 0,
+	};
 	r.map = {
 		'.ahk': 'autohotkey',
 		'.bas': 'basic',
@@ -5956,10 +5958,10 @@ var showfile = (function () {
 				ro.read().then(function(v) {
 					if (r.tail_id != me)
 						return;
-					v = v.value;
-					if (v == '\x00')
+					var vt = v.done ? '\n*** lost connection to copyparty ***' : v.value;
+					if (vt == '\x00')
 						return rf();
-					txt += v;
+					txt += vt;
 					var ofs = txt.length - r.tailnb;
 					if (ofs > 0) {
 						var ofs2 = txt.indexOf('\n', ofs);
@@ -5973,7 +5975,8 @@ var showfile = (function () {
 					edoc.innerHTML = html;
 					if (r.tail2end)
 						window.scrollTo(0, wfp.offsetTop - window.innerHeight);
-					rf();
+					if (!v.done)
+						rf();
 				});
 			};
 			if (r.tail_id == me)
@@ -6036,6 +6039,7 @@ var showfile = (function () {
 
 	function render(doc, no_push) {
 		r.q = null;
+		r.nrend++;
 		var url = r.url = doc[0],
 			lnh = doc[1],
 			txt = doc[2],
@@ -6050,9 +6054,13 @@ var showfile = (function () {
 		ebi('editdoc').style.display = (has(perms, 'write') && (is_md || has(perms, 'delete'))) ? '' : 'none';
 
 		var wr = ebi('bdoc'),
+			nrend = r.nrend,
 			defer = !Prism.highlightElement;
 
 		var fun = function (el) {
+			if (r.nrend != nrend)
+				return;
+
 			try {
 				if (lnh.slice(0, 5) == '#doc.')
 					sethash(lnh.slice(1));
@@ -6065,8 +6073,11 @@ var showfile = (function () {
 			catch (ex) { }
 		}
 
-		if (!txt || txt.length > 1024 * 256)
+		var skip_prism = !txt || txt.length > 1024 * 256;
+		if (skip_prism) {
 			fun = function (el) { };
+			is_md = false;
+		}
 
 		qsr('#doc');
 		var el = mknod('pre', 'doc');
@@ -6078,7 +6089,7 @@ var showfile = (function () {
 		else {
 			el.textContent = txt;
 			el.innerHTML = '<code>' + el.innerHTML + '</code>';
-			if (!window.no_prism) {
+			if (!window.no_prism && !skip_prism) {
 				if ((lang == 'conf' || lang == 'cfg') && ('\n' + txt).indexOf('\n# -*- mode: yaml -*-') + 1)
 					lang = 'yaml';
 

@@ -183,7 +183,7 @@ function vis_exh(msg, url, lineNo, columnNo, error) {
     if (url.indexOf(' > eval') + 1 && !evalex_fatal)
         return;  // md timer
 
-    if (IE && url.indexOf('prism.js') + 1)
+    if (url.indexOf('prism.js') + 1)
         return;
 
     if (url.indexOf('easymde.js') + 1)
