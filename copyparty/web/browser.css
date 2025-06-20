@@ -3239,7 +3239,7 @@ html.d #treepar {
 
   	#ggrid>a>span {
 		text-align: center;
-		padding: 0.2em;
+		padding: .2em .2em .15em .2em;
 	}
 }
 
