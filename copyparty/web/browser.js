@@ -6558,6 +6558,7 @@ var thegrid = (function () {
 				ohref = esc(ao.getAttribute('href')),
 				href = ohref.split('?')[0],
 				ext = '',
+				ext0 = '',
 				name = uricom_dec(vsplit(href)[1]),
 				ref = ao.getAttribute('id'),
 				isdir = href.endsWith('/'),
@@ -6570,17 +6571,19 @@ var thegrid = (function () {
 					ar.shift();
 
 				ar.reverse();
+				ext0 = ar[0];
 				for (var b = 0; b < Math.min(2, ar.length); b++) {
 					if (ar[b].length > 7)
 						break;
 
-					ext = ar[b] + '.' + ext;
+					ext = ext ? (ar[b] + '.' + ext) : ar[b];
 				}
-				ext = (ext || 'unk.').slice(0, -1);
+				if (!ext)
+					ext = 'unk';
 			}
 
-			if (use_ext_th && ext_th[ext]) {
-				ihref = ext_th[ext];
+			if (use_ext_th && (ext_th[ext] || ext_th[ext0])) {
+				ihref = ext_th[ext] || ext_th[ext0];
 			}
 			else if (r.thumbs) {
 				ihref = addq(ihref, 'th=' + (have_webp ? 'w' : 'j'));
