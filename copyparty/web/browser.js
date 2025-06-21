@@ -443,6 +443,7 @@ var Ls = {
 		"tvt_sel": "select file &nbsp; ( for cut / copy / delete / ... )$NHotkey: S\">sel",
 		"tvt_edit": "open file in text editor$NHotkey: E\">✏️ edit",
 		"tvt_tail": "monitor file for changes; show new lines in real time\">📡 follow",
+		"tvt_wrap": "word-wrap\">↵",
 		"tvt_atail": "lock scroll to bottom of page\">⚓",
 		"tvt_ctail": "decode terminal colors (ansi escape codes)\">🌈",
 		"tvt_ntail": "scrollback limit (how many bytes of text to keep loaded)",
@@ -1066,6 +1067,7 @@ var Ls = {
 		"tvt_sel": "markér filen &nbsp; ( for utklipp / sletting / ... )$NSnarvei: S\">merk",
 		"tvt_edit": "redigér filen$NSnarvei: E\">✏️ endre",
 		"tvt_tail": "overvåk filen for endringer og vis nye linjer i sanntid\">📡 følg",
+		"tvt_wrap": "tekstbryting\">↵",
 		"tvt_atail": "hold de nyeste linjene synlig (lås til bunnen av siden)\">⚓",
 		"tvt_ctail": "forstå og vis terminalfarger (ansi-sekvenser)\">🌈",
 		"tvt_ntail": "maks-grense for antall bokstaver som skal vises i vinduet",
@@ -1689,6 +1691,7 @@ var Ls = {
 		"tvt_sel": "选择文件&nbsp;（用于剪切/删除/...）$N快捷键: S\">选择",
 		"tvt_edit": "在文本编辑器中打开文件$N快捷键: E\">✏️ 编辑",
 		"tvt_tail": "监视文件更改，并实时显示新增的行\">📡 跟踪", //m
+		"tvt_wrap": "自动换行\">↵", //m
 		"tvt_atail": "锁定到底部，显示最新内容\">⚓", //m
 		"tvt_ctail": "解析终端颜色（ANSI 转义码）\">🌈", //m
 		"tvt_ntail": "滚动历史上限（保留多少字节的文本）", //m
@@ -2983,6 +2986,9 @@ var widget = (function () {
 			was_paused = paused;
 			ebi('bplay').innerHTML = paused ? '▶' : '⏸';
 		}
+	};
+	r.setvis = function () {
+		widget.style.display = !has(perms, "read") || showfile.abrt ? 'none' : '';
 	};
 	wtico.onclick = function (e) {
 		if (!touchmode)
@@ -5942,6 +5948,7 @@ var showfile = (function () {
 
 	r.tail = function (url, no_push) {
 		r.abrt = new AbortController();
+		widget.setvis();
 		render([url, '', ''], no_push);
 		var me = r.tail_id = Date.now(),
 			wfp = ebi('wfp'),
@@ -5988,7 +5995,9 @@ var showfile = (function () {
 		if (!r.abrt)
 			return;
 		r.abrt.abort();
+		r.abrt = null;
 		r.tail_id = -1;
+		widget.setvis();
 	};
 
 	r.show = function (url, no_push) {
@@ -6099,6 +6108,8 @@ var showfile = (function () {
 				else
 					import_js(SR + '/.cpr/deps/prism.js', function () { fun(); });
 			}
+			if (!txt && r.wrap)
+				el.className = 'wrap';
 		}
 
 		wr.appendChild(el);
@@ -6232,6 +6243,10 @@ var showfile = (function () {
 		r.show(r.url, true);
 	};
 
+	r.tglwrap = function () {
+		r.show(r.url, true);
+	};
+
 	var bdoc = ebi('bdoc');
 	bdoc.className = 'line-numbers';
 	bdoc.innerHTML = (
@@ -6243,19 +6258,24 @@ var showfile = (function () {
 		'<a href="#" class="btn" id="seldoc" tt="' + L.tvt_sel + '</a>\n' +
 		'<a href="#" class="btn" id="editdoc" tt="' + L.tvt_edit + '</a>\n' +
 		'<a href="#" class="btn tgl" id="taildoc" tt="' + L.tvt_tail + '</a>\n' +
+		'<div id="tailbtns">\n' +
+		'<a href="#" class="btn tgl" id="wrapdoc" tt="' + L.tvt_wrap + '</a>\n' +
 		'<a href="#" class="btn tgl" id="tail2end" tt="' + L.tvt_atail + '</a>\n' +
 		'<a href="#" class="btn tgl" id="tailansi" tt="' + L.tvt_ctail + '</a>\n' +
 		'<input type="text" id="tailnb" value="" ' + NOAC + ' style="width:4em" tt="' + L.tvt_ntail + '" />' +
+		'</div>\n' +
 		'</div>'
 	);
 	ebi('xdoc').onclick = function () {
 		r.untail();
 		thegrid.setvis(true);
+		bcfg_bind(r, 'taildoc', 'taildoc', false, r.tgltail);
 	};
 	ebi('dldoc').setAttribute('download', '');
 	ebi('prevdoc').onclick = function () { tree_neigh(-1); };
 	ebi('nextdoc').onclick = function () { tree_neigh(1); };
 	ebi('seldoc').onclick = r.tglsel;
+	bcfg_bind(r, 'wrap', 'wrapdoc', true, r.tglwrap);
 	bcfg_bind(r, 'taildoc', 'taildoc', false, r.tgltail);
 	bcfg_bind(r, 'tail2end', 'tail2end', true);
 	bcfg_bind(r, 'tailansi', 'tailansi', false, r.tgltail);
@@ -6264,6 +6284,11 @@ var showfile = (function () {
 	ebi('tailnb').oninput = function (e) {
 		swrite('tailnb', r.tailnb = this.value);
 	};
+
+	if (/[?&]tail\b/.exec(sloc0)) {
+		clmod(ebi('taildoc'), 'on', 1);
+		r.taildoc = true;
+	}
 
 	return r;
 })();
@@ -8690,7 +8715,7 @@ function apply_perms(res) {
 	if (up2k)
 		up2k.set_fsearch();
 
-	ebi('widget').style.display = have_read ? '' : 'none';
+	widget.setvis();
 	thegrid.setvis();
 	if (!have_read && have_write)
 		goto('up2k');

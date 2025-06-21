@@ -4246,11 +4246,13 @@ class HttpCli(object):
         status: int,
         mime: str,
     ) -> None:
+        vf = self.vn.flags
         self.send_headers(length=None, status=status, mime=mime)
         abspath: bytes = open_args[0]
-        sec_rate = self.args.tail_rate
+        sec_rate = vf["tail_rate"]
+        sec_max = vf["tail_tmax"]
+        sec_fd = vf["tail_fd"]
         sec_ka = self.args.tail_ka
-        sec_fd = self.args.tail_fd
         wr_slp = self.args.s_wr_slp
         wr_sz = self.args.s_wr_sz
         dls = self.conn.hsrv.dls
@@ -4264,6 +4266,7 @@ class HttpCli(object):
         except:
             ofs = 0
 
+        t0 = time.time()
         ofs0 = ofs
         f = None
         try:
@@ -4307,6 +4310,13 @@ class HttpCli(object):
                 assert f  # !rm
                 buf = f.read(4096)
                 now = time.time()
+
+                if sec_max and now - t0 >= sec_max:
+                    self.log("max duration exceeded; kicking client", 6)
+                    zb = b"\n\n*** max duration exceeded; disconnecting ***\n"
+                    self.s.sendall(zb)
+                    break
+
                 if buf:
                     t_fd = t_ka = now
                     self.s.sendall(buf)

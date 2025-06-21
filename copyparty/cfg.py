@@ -105,6 +105,7 @@ def vf_vmap() -> dict[str, str]:
         "sort",
         "tail_fd",
         "tail_rate",
+        "tail_tmax",
         "tail_who",
         "tcolor",
         "unlist",
@@ -311,8 +312,9 @@ flagcats = {
     },
     "tailing": {
         "notail": "disable ?tail (download a growing file continuously)",
-        "tail_fd=1": "interval for checking if file was replaced (new fd)",
-        "tail_rate=0.2": "interval for checking for new data",
+        "tail_fd=1": "check if file was replaced (new fd) every 1 sec",
+        "tail_rate=0.2": "check for new data every 0.2 sec",
+        "tail_tmax=30": "kill connection after 30 sec",
         "tail_who=2": "restrict ?tail access (1=admins,2=authed,3=everyone)",
     },
     "others": {

@@ -2075,12 +2075,13 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip nrand u2abort u2ow ups_who zip_who"
+            zs = "forget_ip nrand tail_who u2abort u2ow ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
 
-            for k in ("convt",):
+            zs = "convt tail_fd tail_rate tail_tmax"
+            for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = float(vol.flags[k])
 

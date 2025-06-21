@@ -1839,14 +1839,10 @@ html.y #tree.nowrap .ntree a+a:hover {
 	white-space: pre;
 	padding-left: .3em;
 }
-#tail2end,
-#tailansi,
-#tailnb {
+#tailbtns {
 	display: none;
 }
-#taildoc.on+#tail2end,
-#taildoc.on+#tail2end+#tailansi,
-#taildoc.on+#tail2end+#tailansi+#tailnb {
+#taildoc.on+#tailbtns {
 	display: inherit;
 	display: unset;
 }
@@ -1945,6 +1941,9 @@ html.y #tree.nowrap .ntree a+a:hover {
 	margin: -1em 0 .5em 0;
 	padding: 1em 0 1em 0;
 	border-radius: .3em;
+}
+#doc.wrap {
+	white-space: pre-wrap;
 }
 html.y #doc {
 	box-shadow: 0 0 .3em var(--bg-u5);
