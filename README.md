@@ -56,7 +56,7 @@ made in Norway 🇳🇴
         * [creating a playlist](#creating-a-playlist) - with a standalone mediaplayer or copyparty
         * [audio equalizer](#audio-equalizer) - and [dynamic range compressor](https://en.wikipedia.org/wiki/Dynamic_range_compression)
         * [fix unreliable playback on android](#fix-unreliable-playback-on-android) - due to phone / app settings
-    * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/?doc=lipsum.txt&tail))
+    * [textfile viewer](#textfile-viewer) - with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))
     * [markdown viewer](#markdown-viewer) - and there are *two* editors
         * [markdown vars](#markdown-vars) - dynamic docs with serverside variable expansion
     * [other tricks](#other-tricks)
@@ -1131,13 +1131,14 @@ due to phone / app settings,  android phones may randomly stop playing music whe
 
 ## textfile viewer
 
-with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/?doc=lipsum.txt&tail))  , and terminal colors work too
+with realtime streaming of logfiles and such ([demo](https://a.ocv.me/pub/demo/logtail/))  , and terminal colors work too
 
 click `-txt-` next to a textfile to open the viewer, which has the following toolbar buttons:
 
 * `✏️ edit` opens the textfile editor
 * `📡 follow` starts monitoring the file for changes, streaming new lines in realtime
   * similar to `tail -f`
+  * [link directly](https://a.ocv.me/pub/demo/logtail/?doc=lipsum.txt&tail) to a file with tailing enabled by adding `&tail` to the textviewer URL
 
 
 ## markdown viewer

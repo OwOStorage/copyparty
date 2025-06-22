@@ -1,4 +1,36 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0527-1939  `v1.17.2`  pushing chrome to the limits (and then some)
+
+## 🧪 new features
+
+* not this time
+
+## 🩹 bugfixes
+
+* up2k: improve file-hashing speed on recent versions of google chrome e3e51fb8
+  * speed increased from 319 to 513 MiB/s by default (but older chrome versions did 748...)
+  * read the commit message for the full story, but basically chrome has gotten gradually slower over the past couple versions (starting from v133) and this makes it slightly less bad again
+  * hashing speed can be further improved from `0.5` to `1.1` GiB/s by enabling the `[wasm]` option in the `[⚙️] settings` tab
+    * this option can be made default-enabled with `--nosubtle 137` but beware that this increases the chances of running into browser-bugs (foreshadowing...)
+* up2k: fix errorhandler for browser-bugs (oom and such) 49c71247
+  * because [chrome-bug 383568268](https://issues.chromium.org/issues/383568268) is about to make a [surprise return?!](https://issues.chromium.org/issues/383568268#comment14)
+* #168 fix uploading into shares if path-based proxying is used 9cb93ae1
+* #165 unconditionally heed `--rp-loc` 84f5f417
+  * the config-option for [path-based proxying](https://github.com/9001/copyparty/#reverse-proxy) was ignored if the reverse-proxy was untrusted; this was confusing and not strictly necessary
+
+## 🔧 other changes
+
+* #166 the nixos module was improved once more (thx @msfjarvis!) 48470f6b 60fb1207
+* added usage instructions to [minimal-up2k.js](https://github.com/9001/copyparty/tree/hovudstraum/contrib/plugins#example-browser-js), the up2k-ui [simplifier](https://user-images.githubusercontent.com/241032/118311195-dd6ca380-b4ef-11eb-86f3-75a3ff2e1332.png) 1d308eeb
+* docker: improve feedback if config is bad or missing 28b63e58
+
+## 🌠 fun facts
+
+* this release was tested using an [unreliable rdp connection](https://a.ocv.me/pub/g/nerd-stuff/PXL_20250526_021207825.jpg) through two ssh-jumphosts to a qemu win10 vm back home from the bergen-oslo night train wifi
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0518-2234  `v1.17.1`  as seen on archlinux
 
 ## 🧪 new features
