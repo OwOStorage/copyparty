@@ -22,6 +22,8 @@ set -e
 #   modifies the keyfinder python lib to load the .so in ~/pe
 
 
+export FORCE_COLOR=1
+
 linux=1
 
 win=
@@ -186,12 +188,15 @@ install_keyfinder() {
 		echo "so not found at $sop"
 		exit 1
 	}
-	
+
+	x=${-//[^x]/}; set -x; cat /etc/alpine-release
 	# rm -rf /Users/ed/Library/Python/3.9/lib/python/site-packages/*keyfinder*
 	CFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include -I/usr/include/ffmpeg" \
+	CXXFLAGS="-I$h/pe/keyfinder/include -I/opt/local/include -I/usr/include/ffmpeg" \
 	LDFLAGS="-L$h/pe/keyfinder/lib -L$h/pe/keyfinder/lib64 -L/opt/local/lib" \
-	PKG_CONFIG_PATH=/c/msys64/mingw64/lib/pkgconfig \
+	PKG_CONFIG_PATH="/c/msys64/mingw64/lib/pkgconfig:$h/pe/keyfinder/lib/pkgconfig" \
 	$pybin -m pip install --user keyfinder
+	[ "$x" ] || set +x
 
 	pypath="$($pybin -c 'import keyfinder; print(keyfinder.__file__)')"
 	for pyso in "${pypath%/*}"/*.so; do
