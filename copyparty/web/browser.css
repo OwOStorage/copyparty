@@ -4,6 +4,8 @@
 	--grid-sz: 10em;
 	--grid-ln: 3;
 	--nav-sz: 16em;
+	--sbw: 0.5em;
+	--sbh: 0.5em;
 
 	--fg: #ccc;
 	--fg-max: #fff;
@@ -1558,8 +1560,8 @@ html {
 	z-index: 1;
 	position: fixed;
 	background: var(--tree-bg);
-	left: -.98em;
-	width: calc(var(--nav-sz) - 0.5em);
+	left: -.96em;
+	width: calc(.3em + var(--nav-sz) - var(--sbw));
 	border-bottom: 1px solid var(--bg-u5);
 	overflow: hidden;
 }
@@ -3066,7 +3068,8 @@ html.b .ntree a {
 	padding: .6em .2em;
 }
 html.b #treepar {
-	margin-left: .62em;
+	margin-left: .63em;
+	width: calc(.1em + var(--nav-sz) - var(--sbw));
 	border-bottom: .2em solid var(--f-h-b1);
 }
 html.b #wrap {

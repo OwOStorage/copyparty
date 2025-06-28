@@ -2258,14 +2258,17 @@ SPINNER = m[0];
 
 
 var SBW, SBH;  // scrollbar size
-(function () {
+function read_sbw() {
 	var el = mknod('div');
-	el.style.cssText = 'overflow:scroll;width:100px;height:100px';
+	el.style.cssText = 'overflow:scroll;width:100px;height:100px;position:absolute;top:0;left:0';
 	document.body.appendChild(el);
 	SBW = el.offsetWidth - el.clientWidth;
 	SBH = el.offsetHeight - el.clientHeight;
 	document.body.removeChild(el);
-})();
+	setcvar('--sbw', SBW + 'px');
+	setcvar('--sbh', SBH + 'px');
+}
+onresize100.add(read_sbw, true);
 
 
 var have_webp = sread('have_webp');
