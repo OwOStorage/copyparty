@@ -67,6 +67,7 @@ for n in $(seq 1 200); do sleep 0.2
   v=$(awk '/^127/{print;n=1;exit}END{exit n-1}' $t) && break
 done
 [ -z "$v" ] && echo SNAAAAAKE && exit 1
+rm $t
 
 for n in $(seq 1 200); do sleep 0.2
   wget -O- http://${v/ /:}/?tar=gz:1 >tf && break
@@ -79,7 +80,7 @@ kill $pid; wait $pid
 ########################################################################
 
 # output from -e2d
-rm -rf .hist
+rm -rf .hist /cfg/copyparty
 
 # goodbye
 exec rm innvikler.sh
