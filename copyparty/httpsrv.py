@@ -313,6 +313,8 @@ class HttpSrv(object):
 
         Daemon(self.broker.say, "sig-hsrv-up1", ("cb_httpsrv_up",))
 
+        saddr = ("", 0)  # fwd-decl for `except TypeError as ex:`
+
         while not self.stopping:
             if self.args.log_conn:
                 self.log(self.name, "|%sC-ncli" % ("-" * 1,), c="90")
@@ -394,6 +396,19 @@ class HttpSrv(object):
                 self.log(self.name, "accept({}): {}".format(fno, ex), c=6)
                 time.sleep(0.02)
                 continue
+            except TypeError as ex:
+                # on macOS, accept() may return a None saddr if blocked by LittleSnitch;
+                # unicode(saddr[0]) ==> TypeError: 'NoneType' object is not subscriptable
+                if tcp and not saddr:
+                    t = "accept(%s): failed to accept connection from client due to firewall or network issue"
+                    self.log(self.name, t % (fno,), c=3)
+                    try:
+                        sck.close()  # type: ignore
+                    except:
+                        pass
+                    time.sleep(0.02)
+                    continue
+                raise
 
             if self.args.log_conn:
                 t = "|{}C-acc2 \033[0;36m{} \033[3{}m{}".format(
