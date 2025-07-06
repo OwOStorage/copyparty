@@ -1093,12 +1093,15 @@ def add_cert(ap, cert_path):
 
 
 def add_auth(ap):
+    idp_db = os.path.join(E.cfg, "idp.db")
     ses_db = os.path.join(E.cfg, "sessions.db")
     ap2 = ap.add_argument_group('IdP / identity provider / user authentication options')
     ap2.add_argument("--idp-h-usr", metavar="HN", type=u, default="", help="bypass the copyparty authentication checks if the request-header \033[33mHN\033[0m contains a username to associate the request with (for use with authentik/oauth/...)\n\033[1;31mWARNING:\033[0m if you enable this, make sure clients are unable to specify this header themselves; must be washed away and replaced by a reverse-proxy")
     ap2.add_argument("--idp-h-grp", metavar="HN", type=u, default="", help="assume the request-header \033[33mHN\033[0m contains the groupname of the requesting user; can be referenced in config files for group-based access control")
     ap2.add_argument("--idp-h-key", metavar="HN", type=u, default="", help="optional but recommended safeguard; your reverse-proxy will insert a secret header named \033[33mHN\033[0m into all requests, and the other IdP headers will be ignored if this header is not present")
     ap2.add_argument("--idp-gsep", metavar="RE", type=u, default="|:;+,", help="if there are multiple groups in \033[33m--idp-h-grp\033[0m, they are separated by one of the characters in \033[33mRE\033[0m")
+    ap2.add_argument("--idp-db", metavar="PATH", type=u, default=idp_db, help="where to store the known IdP users/groups (if you run multiple copyparty instances, make sure they use different DBs)")
+    ap2.add_argument("--idp-store", metavar="N", type=int, default=1, help="how to use \033[33m--idp-db\033[0m; [\033[32m0\033[0m] = entirely disable, [\033[32m1\033[0m] = write-only (effectively disabled), [\033[32m2\033[0m] = remember users, [\033[32m3\033[0m] = remember users and groups.\nNOTE: Will remember and restore the IdP-volumes of all users for all eternity if set to 2 or 3, even when user is deleted from your IdP")
     ap2.add_argument("--no-bauth", action="store_true", help="disable basic-authentication support; do not accept passwords from the 'Authenticate' header at all. NOTE: This breaks support for the android app")
     ap2.add_argument("--bauth-last", action="store_true", help="keeps basic-authentication enabled, but only as a last-resort; if a cookie is also provided then the cookie wins")
     ap2.add_argument("--ses-db", metavar="PATH", type=u, default=ses_db, help="where to store the sessions database (if you run multiple copyparty instances, make sure they use different DBs)")

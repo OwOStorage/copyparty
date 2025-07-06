@@ -21,6 +21,7 @@ from .util import (
     DEF_MTE,
     DEF_MTH,
     EXTS,
+    HAVE_SQLITE3,
     IMPLICATIONS,
     MIMES,
     SQLITE_VER,
@@ -32,6 +33,7 @@ from .util import (
     afsenc,
     get_df,
     humansize,
+    min_ex,
     odfusion,
     read_utf8,
     relchk,
@@ -43,6 +45,9 @@ from .util import (
     vjoin,
     vsplit,
 )
+
+if HAVE_SQLITE3:
+    import sqlite3
 
 if True:  # pylint: disable=using-constant-test
     from collections.abc import Iterable
@@ -935,6 +940,10 @@ class AuthSrv(object):
                 return False
 
             self.idp_accs[uname] = gnames
+            try:
+                self._update_idp_db(uname, gname)
+            except:
+                self.log("failed to update the --idp-db:\n%s" % (min_ex(),), 3)
 
             t = "reinitializing due to new user from IdP: [%r:%r]"
             self.log(t % (uname, gnames), 3)
@@ -946,6 +955,22 @@ class AuthSrv(object):
 
         broker.ask("reload", False, True).get()
         return True
+
+    def _update_idp_db(self, uname, gname):
+        if not self.args.idp_store:
+            return
+
+        assert sqlite3  # type: ignore  # !rm
+
+        db = sqlite3.connect(self.args.idp_db)
+        cur = db.cursor()
+
+        cur.execute("delete from us where un = ?", (uname,))
+        cur.execute("insert into us values (?,?)", (uname, gname))
+
+        db.commit()
+        cur.close()
+        db.close()
 
     def _map_volume_idp(
         self,
@@ -1095,6 +1120,7 @@ class AuthSrv(object):
          * any non-zero value from IdP group header
          * otherwise take --grps / [groups]
         """
+        self.load_idp_db(bool(self.idp_accs))
         ret = {un: gns[:] for un, gns in self.idp_accs.items()}
         ret.update({zs: [""] for zs in acct if zs not in ret})
         for gn, uns in grps.items():
@@ -1655,7 +1681,7 @@ class AuthSrv(object):
         shr = enshare[1:-1]
         shrs = enshare[1:]
         if enshare:
-            import sqlite3
+            assert sqlite3  # type: ignore  # !rm
 
             zsd = {"d2d": True, "tcolor": self.args.tcolor}
             shv = VFS(self.log_func, "", shr, shr, AXS(), zsd)
@@ -2621,6 +2647,40 @@ class AuthSrv(object):
             zs = str(vol.flags.get("tcolor") or self.args.tcolor)
             vol.flags["tcolor"] = zs.lstrip("#")
 
+    def load_idp_db(self, quiet=False) -> None:
+        # mutex me
+        level = self.args.idp_store
+        if level < 2 or not self.args.idp_h_usr:
+            return
+
+        assert sqlite3  # type: ignore  # !rm
+
+        db = sqlite3.connect(self.args.idp_db)
+        cur = db.cursor()
+
+        gsep = self.args.idp_gsep
+        n = []
+        for uname, gname in cur.execute("select un, gs from us"):
+            if level < 3:
+                if uname in self.idp_accs:
+                    continue
+                gname = ""
+            gnames = [x.strip() for x in gsep.split(gname)]
+            gnames.sort()
+
+            # self.idp_usr_gh[uname] = gname
+            self.idp_accs[uname] = gnames
+            n.append(uname)
+
+        cur.close()
+        db.close()
+
+        if n and not quiet:
+            t = ", ".join(n[:9])
+            if len(n) > 9:
+                t += "..."
+            self.log("found %d IdP users in db (%s)" % (len(n), t))
+
     def load_sessions(self, quiet=False) -> None:
         # mutex me
         if self.args.no_ses:
@@ -2628,7 +2688,7 @@ class AuthSrv(object):
             self.sesa = {}
             return
 
-        import sqlite3
+        assert sqlite3  # type: ignore  # !rm
 
         ases = {}
         blen = (self.args.ses_len // 4) * 4  # 3 bytes in 4 chars
@@ -2675,7 +2735,7 @@ class AuthSrv(object):
         if self.args.no_ses:
             return
 
-        import sqlite3
+        assert sqlite3  # type: ignore  # !rm
 
         db = sqlite3.connect(self.args.ses_db)
         cur = db.cursor()

@@ -88,6 +88,7 @@ if PY2:
     range = xrange  # type: ignore
 
 
+VER_IDP_DB = 1
 VER_SESSION_DB = 1
 VER_SHARES_DB = 2
 
@@ -258,11 +259,15 @@ class SvcHub(object):
                 self.log("root", "effective %s is %s" % (zs, getattr(args, zs)))
 
         if args.ah_cli or args.ah_gen:
+            args.idp_store = 0
             args.no_ses = True
             args.shr = ""
 
+        if args.idp_store and args.idp_h_usr:
+            self.setup_db("idp")
+
         if not self.args.no_ses:
-            self.setup_session_db()
+            self.setup_db("ses")
 
         args.shr1 = ""
         if args.shr:
@@ -421,26 +426,58 @@ class SvcHub(object):
             except:
                 pass
 
-    def setup_session_db(self) -> None:
+    def _db_onfail_ses(self) -> None:
+        self.args.no_ses = True
+
+    def _db_onfail_idp(self) -> None:
+        self.args.idp_store = 0
+
+    def setup_db(self, which: str) -> None:
+        """
+        the "non-mission-critical" databases; if something looks broken then just nuke it
+        """
+        if which == "ses":
+            native_ver = VER_SESSION_DB
+            db_path = self.args.ses_db
+            desc = "sessions-db"
+            pathopt = "ses-db"
+            sanchk_q = "select count(*) from us"
+            createfun = self._create_session_db
+            failfun = self._db_onfail_ses
+        elif which == "idp":
+            native_ver = VER_IDP_DB
+            db_path = self.args.idp_db
+            desc = "idp-db"
+            pathopt = "idp-db"
+            sanchk_q = "select count(*) from us"
+            createfun = self._create_idp_db
+            failfun = self._db_onfail_idp
+        else:
+            raise Exception("unknown cachetype")
+
+        if not db_path.endswith(".db"):
+            zs = "config option --%s (the %s) was configured to [%s] which is invalid; must be a filepath ending with .db"
+            self.log("root", zs % (pathopt, desc, db_path), 1)
+            raise Exception(BAD_CFG)
+
         if not HAVE_SQLITE3:
-            self.args.no_ses = True
-            t = "WARNING: sqlite3 not available; disabling sessions, will use plaintext passwords in cookies"
-            self.log("root", t, 3)
+            failfun()
+            if which == "ses":
+                zs = "disabling sessions, will use plaintext passwords in cookies"
+            elif which == "idp":
+                zs = "disabling idp-db, will be unable to remember IdP-volumes after a restart"
+            self.log("root", "WARNING: sqlite3 not available; %s" % (zs,), 3)
             return
 
         assert sqlite3  # type: ignore  # !rm
 
-        # policy:
-        # the sessions-db is whatever, if something looks broken then just nuke it
-
-        db_path = self.args.ses_db
         db_lock = db_path + ".lock"
         try:
             create = not os.path.getsize(db_path)
         except:
             create = True
         zs = "creating new" if create else "opening"
-        self.log("root", "%s sessions-db %s" % (zs, db_path))
+        self.log("root", "%s %s %s" % (zs, desc, db_path))
 
         for tries in range(2):
             sver = 0
@@ -450,17 +487,19 @@ class SvcHub(object):
                 try:
                     zs = "select v from kv where k='sver'"
                     sver = cur.execute(zs).fetchall()[0][0]
-                    if sver > VER_SESSION_DB:
-                        zs = "this version of copyparty only understands session-db v%d and older; the db is v%d"
-                        raise Exception(zs % (VER_SESSION_DB, sver))
+                    if sver > native_ver:
+                        zs = "this version of copyparty only understands %s v%d and older; the db is v%d"
+                        raise Exception(zs % (desc, native_ver, sver))
 
-                    cur.execute("select count(*) from us").fetchone()
+                    cur.execute(sanchk_q).fetchone()
                 except:
                     if sver:
                         raise
-                    sver = 1
-                    self._create_session_db(cur)
-                err = self._verify_session_db(cur, sver, db_path)
+                    sver = createfun(cur)
+
+                err = self._verify_db(
+                    cur, which, pathopt, db_path, desc, sver, native_ver
+                )
                 if err:
                     tries = 99
                     self.args.no_ses = True
@@ -468,10 +507,10 @@ class SvcHub(object):
                 break
 
             except Exception as ex:
-                if tries or sver > VER_SESSION_DB:
+                if tries or sver > native_ver:
                     raise
-                t = "sessions-db is unusable; deleting and recreating: %r"
-                self.log("root", t % (ex,), 3)
+                t = "%s is unusable; deleting and recreating: %r"
+                self.log("root", t % (desc, ex), 3)
                 try:
                     cur.close()  # type: ignore
                 except:
@@ -486,7 +525,7 @@ class SvcHub(object):
                     pass
                 os.unlink(db_path)
 
-    def _create_session_db(self, cur: "sqlite3.Cursor") -> None:
+    def _create_session_db(self, cur: "sqlite3.Cursor") -> int:
         sch = [
             r"create table kv (k text, v int)",
             r"create table us (un text, si text, t0 int)",
@@ -499,8 +538,31 @@ class SvcHub(object):
         for cmd in sch:
             cur.execute(cmd)
         self.log("root", "created new sessions-db")
+        return 1
 
-    def _verify_session_db(self, cur: "sqlite3.Cursor", sver: int, db_path: str) -> str:
+    def _create_idp_db(self, cur: "sqlite3.Cursor") -> int:
+        sch = [
+            r"create table kv (k text, v int)",
+            r"create table us (un text, gs text)",
+            # username, groups
+            r"create index us_un on us(un)",
+            r"insert into kv values ('sver', 1)",
+        ]
+        for cmd in sch:
+            cur.execute(cmd)
+        self.log("root", "created new idp-db")
+        return 1
+
+    def _verify_db(
+        self,
+        cur: "sqlite3.Cursor",
+        which: str,
+        pathopt: str,
+        db_path: str,
+        desc: str,
+        sver: int,
+        native_ver: int,
+    ) -> str:
         # ensure writable (maybe owned by other user)
         db = cur.connection
 
@@ -512,9 +574,16 @@ class SvcHub(object):
         except:
             owner = 0
 
+        if which == "ses":
+            cons = "Will now disable sessions and instead use plaintext passwords in cookies."
+        elif which == "idp":
+            cons = "Each IdP-volume will not become available until its associated user sends their first request."
+        else:
+            raise Exception()
+
         if not lock_file(db_path + ".lock"):
-            t = "the sessions-db [%s] is already in use by another copyparty instance (pid:%d). This is not supported; please provide another database with --ses-db or give this copyparty-instance its entirely separate config-folder by setting another path in the XDG_CONFIG_HOME env-var. You can also disable this safeguard by setting env-var PRTY_NO_DB_LOCK=1. Will now disable sessions and instead use plaintext passwords in cookies."
-            return t % (db_path, owner)
+            t = "the %s [%s] is already in use by another copyparty instance (pid:%d). This is not supported; please provide another database with --%s or give this copyparty-instance its entirely separate config-folder by setting another path in the XDG_CONFIG_HOME env-var. You can also disable this safeguard by setting env-var PRTY_NO_DB_LOCK=1. %s"
+            return t % (desc, db_path, owner, pathopt, cons)
 
         vars = (("pid", os.getpid()), ("ts", int(time.time() * 1000)))
         if owner:
@@ -526,9 +595,9 @@ class SvcHub(object):
             for k, v in vars:
                 cur.execute("insert into kv values(?, ?)", (k, v))
 
-        if sver < VER_SESSION_DB:
+        if sver < native_ver:
             cur.execute("delete from kv where k='sver'")
-            cur.execute("insert into kv values('sver',?)", (VER_SESSION_DB,))
+            cur.execute("insert into kv values('sver',?)", (native_ver,))
 
         db.commit()
         cur.close()
