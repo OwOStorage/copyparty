@@ -96,6 +96,12 @@ try:
         if os.environ.get("PRTY_NO_PIL_AVIF"):
             raise Exception()
 
+        from PIL import features as piltures
+
+        if piltures.check("avif"):
+            HAVE_AVIF = True
+            raise Exception()
+
         import pillow_avif  # noqa: F401  # pylint: disable=unused-import
 
         HAVE_AVIF = True

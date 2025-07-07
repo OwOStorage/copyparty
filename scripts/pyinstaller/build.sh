@@ -95,6 +95,7 @@ excl=(
     _pyrepl
     distutils
     setuptools
+    PIL._avif
     PIL.ImageQt
     PIL.ImageShow
     PIL.ImageTk
