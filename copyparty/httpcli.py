@@ -5100,15 +5100,24 @@ class HttpCli(object):
         return ""  # unhandled / fallthrough
 
     def scanvol(self) -> bool:
-        if not self.can_admin:
-            raise Pebkac(403, "'scanvol' not allowed for user " + self.uname)
-
         if self.args.no_rescan:
             raise Pebkac(403, "the rescan feature is disabled in server config")
 
-        vn, _ = self.asrv.vfs.get(self.vpath, self.uname, True, True)
+        vpaths = self.uparam["scan"].split(",/")
+        if vpaths == [""]:
+            vpaths = [self.vpath]
 
-        args = [self.asrv.vfs.all_vols, [vn.vpath], False, True]
+        vols = []
+        for vpath in vpaths:
+            vn, _ = self.asrv.vfs.get(vpath, self.uname, True, True)
+            vols.append(vn.vpath)
+            if self.uname not in vn.axs.uadmin:
+                self.log("rejected scanning [%s] => [%s];" % (vpath, vn.vpath), 3)
+                raise Pebkac(403, "'scanvol' not allowed for user " + self.uname)
+
+        self.log("trying to rescan %d volumes: %r" % (len(vols), vols))
+
+        args = [self.asrv.vfs.all_vols, vols, False, True]
 
         x = self.conn.hsrv.broker.ask("up2k.rescan", *args)
         err = x.get()

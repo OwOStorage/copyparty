@@ -1501,7 +1501,6 @@ the same arguments can be set as volflags, in addition to `d2d`, `d2ds`, `d2t`, 
 note:
 * upload-times can be displayed in the file listing by enabling the `.up_at` metadata key, either globally with `-e2d -mte +.up_at` or per-volume with volflags `e2d,mte=+.up_at` (will have a ~17% performance impact on directory listings)
 * `e2tsr` is probably always overkill, since `e2ds`/`e2dsa` would pick up any file modifications and `e2ts` would then reindex those, unless there is a new copyparty version with new parsers and the release note says otherwise
-* the rescan button in the admin panel has no effect unless the volume has `-e2ds` or higher
 
 config file example (these options are recommended btw):
 

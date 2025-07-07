@@ -261,6 +261,7 @@ upload modifiers:
 |--|--|--|
 | GET | `?reload=cfg` | reload config files and rescan volumes |
 | GET | `?scan` | initiate a rescan of the volume which provides URL |
+| GET | `?scan=/a,/b` | initiate a rescan of volumes `/a` and `/b` |
 | GET | `?stack` | show a stacktrace of all threads |
 
 ## general
