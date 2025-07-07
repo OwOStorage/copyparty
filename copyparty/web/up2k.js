@@ -2431,8 +2431,8 @@ function up2k_init(subtle) {
             try { orz(e); } catch (ex) { vis_exh(ex + '', 'up2k.js', '', '', ex); }
         };
 
-        xhr.timeout = 34000;
         xhr.open('HEAD', t.purl + uricom_enc(t.name), true);
+        xhr.timeout = 34000;
         xhr.send();
     }
 
@@ -2911,7 +2911,8 @@ function up2k_init(subtle) {
 
                 st.bytes.inflight += db;
                 xhr.bsent = nb;
-                xhr.timeout = 64000 + Date.now() - xhr.t0;
+                if (!IE)
+                    xhr.timeout = 64000 + Date.now() - xhr.t0;
                 pvis.prog(t, pcar, nb);
             };
             xhr.onload = function (xev) {
@@ -2959,7 +2960,7 @@ function up2k_init(subtle) {
 
             xhr.bsent = 0;
             xhr.t0 = Date.now();
-            xhr.timeout = 42000;
+            xhr.timeout = 1000 * (IE ? 1234 : 42);
             xhr.responseType = 'text';
             xhr.send(t.fobj.slice(car, cdr));
         }

@@ -32,7 +32,7 @@ var wah = '',
     CHROME = !!window.chrome,  // safari=false
     VCHROME = CHROME ? 1 : 0,
     UA = '' + navigator.userAgent,
-    IE = /Trident\//.test(UA),
+    IE = !!document.documentMode,
     FIREFOX = ('netscape' in window) && / rv:/.test(UA),
     IPHONE = TOUCH && /iPhone|iPad|iPod/i.test(UA),
     LINUX = /Linux/.test(UA),
