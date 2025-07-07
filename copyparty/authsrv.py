@@ -2062,6 +2062,8 @@ class AuthSrv(object):
             elif self.args.re_maxage:
                 vol.flags["scan"] = self.args.re_maxage
 
+        self.args.have_unlistc = False
+
         all_mte = {}
         errors = False
         for vol in vfs.all_nodes.values():
@@ -2122,6 +2124,9 @@ class AuthSrv(object):
 
             if vol.flags.get("og"):
                 self.args.uqe = True
+
+            if "unlistcr" in vol.flags or "unlistcw" in vol.flags:
+                self.args.have_unlistc = True
 
             zs = str(vol.flags.get("tcolor", "")).lstrip("#")
             if len(zs) == 3:  # fc5 => ffcc55

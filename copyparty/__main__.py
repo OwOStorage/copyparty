@@ -1535,6 +1535,7 @@ def add_ui(ap, retry):
     ap2.add_argument("--lg-sba", metavar="TXT", type=u, default="", help="the value of the iframe 'allow' attribute for prologue/epilogue docs (volflag=lg_sba); see https://developer.mozilla.org/en-US/docs/Web/HTTP/Headers/Permissions-Policy#iframes")
     ap2.add_argument("--no-sb-md", action="store_true", help="don't sandbox README/PREADME.md documents (volflags: no_sb_md | sb_md)")
     ap2.add_argument("--no-sb-lg", action="store_true", help="don't sandbox prologue/epilogue docs (volflags: no_sb_lg | sb_lg); enables non-js support")
+    ap2.add_argument("--have-unlistc", action="store_true", help=argparse.SUPPRESS)
 
 
 def add_debug(ap):

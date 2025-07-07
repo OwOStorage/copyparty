@@ -4949,6 +4949,11 @@ class HttpCli(object):
             fn = html_escape(fn) if fn else self.conn.hsrv.iiam
             dls.append((perc, hsent, spd, eta, idle, usr, erd, rds, fn))
 
+        if self.args.have_unlistc:
+            allvols = self.asrv.vfs.all_vols
+            rvol = [x for x in rvol if "unlistcr" not in allvols[x[1:-1]].flags]
+            wvol = [x for x in wvol if "unlistcw" not in allvols[x[1:-1]].flags]
+
         fmt = self.uparam.get("ls", "")
         if not fmt and (self.ua.startswith("curl/") or self.ua.startswith("fetch")):
             fmt = "v"

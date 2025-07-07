@@ -280,6 +280,8 @@ flagcats = {
         "nodirsz": "don't show total folder size",
         "robots": "allows indexing by search engines (default)",
         "norobots": "kindly asks search engines to leave",
+        "unlistcr": "don't list read-access in controlpanel",
+        "unlistcw": "don't list write-access in controlpanel",
         "no_sb_md": "disable js sandbox for markdown files",
         "no_sb_lg": "disable js sandbox for prologue/epilogue",
         "sb_md": "enable js sandbox for markdown files (default)",
