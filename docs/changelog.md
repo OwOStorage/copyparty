@@ -1,4 +1,39 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0622-0020  `v1.18.0`  Logtail
+
+## 🧪 new features
+
+* textfile-viewer can now livestream logfiles (and other growing files) 17fa4906 77df17d1 a1c7a095 6ecf4fdc
+  * see [readme](https://github.com/9001/copyparty/#textfile-viewer) and the [live demo](https://a.ocv.me/pub/demo/logtail/)
+* IdP-volumes: extend syntax for excluding certain users/groups 2e53f797
+  * the commit-message explains it well enough
+* new option `--see-dots` to show dotfiles in the web-ui by default c599e2aa
+* #171 automatic mimetype detection for files without extensions (thx @Morganamilo!) ec05f8cc 9dd5dec0
+  * default-disabled since it has a performance impact on webdav
+    * there are plans to fix this by using the db instead
+* #170 improve custom filetype icons
+  * be less strict; if a thumbnail is set for `.gz` files, use it for `.tar.gz` too c75b0c25
+  * improve config docs fa5845ff
+
+## 🩹 bugfixes
+
+* cosmetic: get rid of some noise along the bottom of some cards in the gridview 8cae7a71
+* cosmetic: satisfy a new syntax warning in cpython-3.14 5ac38648
+
+## 🔧 other changes
+
+* properly document how to [build from source](https://github.com/9001/copyparty/blob/hovudstraum/docs/devnotes.md#build-from-scratch) / build from scratch f61511d8
+* update deps
+  * copyparty.exe: python 3.13 1eff87c3
+  * webdeps: dompurify 7eca90cc
+
+## 🌠 fun facts
+
+* this release was cooked up in a [swedish forest cabin](https://a.ocv.me/pub/g/nerd-stuff/forestparty.jpg)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0527-1939  `v1.17.2`  pushing chrome to the limits (and then some)
 
 ## 🧪 new features
