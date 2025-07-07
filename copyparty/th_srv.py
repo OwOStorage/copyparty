@@ -96,9 +96,7 @@ try:
         if os.environ.get("PRTY_NO_PIL_AVIF"):
             raise Exception()
 
-        from PIL import features as piltures
-
-        if piltures.check("avif"):
+        if ".avif" in Image.registered_extensions():
             HAVE_AVIF = True
             raise Exception()
 
