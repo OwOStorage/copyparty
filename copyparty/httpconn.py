@@ -224,3 +224,6 @@ class HttpConn(object):
             if self.u2idx:
                 self.hsrv.put_u2idx(str(self.addr), self.u2idx)
                 self.u2idx = None
+
+            if self.rproxy:
+                self.set_rproxy()
