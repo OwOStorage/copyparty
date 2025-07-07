@@ -4,6 +4,7 @@ import os
 import stat
 import subprocess as sp
 import sys
+from urllib.parse import unquote_to_bytes as unquote
 
 
 """
@@ -28,14 +29,17 @@ which does the following respectively,
 """
 
 
+MOUNT_BASE = b"/run/media/egon/"
+
+
 def main():
     try:
         label = sys.argv[1].split(":usb-eject:")[1].split(":")[0]
-        mp = "/run/media/egon/" + label
+        mp = MOUNT_BASE + unquote(label)
         # print("ejecting [%s]... " % (mp,), end="")
-        mp = os.path.abspath(os.path.realpath(mp.encode("utf-8")))
+        mp = os.path.abspath(os.path.realpath(mp))
         st = os.lstat(mp)
-        if not stat.S_ISDIR(st.st_mode):
+        if not stat.S_ISDIR(st.st_mode) or not mp.startswith(MOUNT_BASE):
             raise Exception("not a regular directory")
 
         # if you're running copyparty as root (thx for the faith)
