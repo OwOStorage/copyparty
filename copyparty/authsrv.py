@@ -956,7 +956,7 @@ class AuthSrv(object):
         broker.ask("reload", False, True).get()
         return True
 
-    def _update_idp_db(self, uname, gname):
+    def _update_idp_db(self, uname: str, gname: str) -> None:
         if not self.args.idp_store:
             return
 
@@ -2657,10 +2657,16 @@ class AuthSrv(object):
 
         db = sqlite3.connect(self.args.idp_db)
         cur = db.cursor()
+        from_cache = cur.execute("select un, gs from us").fetchall()
+        cur.close()
+        db.close()
+
+        self.idp_accs.clear()
+        self.idp_usr_gh.clear()
 
         gsep = self.args.idp_gsep
         n = []
-        for uname, gname in cur.execute("select un, gs from us"):
+        for uname, gname in from_cache:
             if level < 3:
                 if uname in self.idp_accs:
                     continue
@@ -2671,9 +2677,6 @@ class AuthSrv(object):
             # self.idp_usr_gh[uname] = gname
             self.idp_accs[uname] = gnames
             n.append(uname)
-
-        cur.close()
-        db.close()
 
         if n and not quiet:
             t = ", ".join(n[:9])

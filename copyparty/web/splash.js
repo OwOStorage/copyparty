@@ -39,6 +39,7 @@ var Ls = {
 		"ad1": "no304 stopper all bruk av cache. Hvis ikke k304 var nok, prøv denne. Vil mangedoble dataforbruk!",
 		"ae1": "utgående:",
 		"af1": "vis nylig opplastede filer",
+		"ag1": "vis kjente IdP-brukere",
 	},
 	"eng": {
 		"d2": "shows the state of all active threads",
@@ -90,6 +91,7 @@ var Ls = {
 		"ad1": "启用 no304 将禁用所有缓存；如果 k304 不够，可以尝试此选项。这将消耗大量的网络流量！", //m
 		"ae1": "正在下载：", //m
 		"af1": "显示最近上传的文件", //m
+		"ag1": "查看已知 IdP 用户", //m
 	}
 };
 

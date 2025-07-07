@@ -135,6 +135,10 @@
 
 		<h1 id="cc">other stuff:</h1>
 		<ul>
+			{%- if this.uname in this.args.idp_adm_set %}
+			<li><a id="ag" href="{{ r }}/?idp">view idp cache</a></li>
+			{% endif %}
+
 			{%- if this.uname != '*' and this.args.shr %}
 			<li><a id="y" href="{{ r }}/?shares">edit shares</a></li>
 			{% endif %}

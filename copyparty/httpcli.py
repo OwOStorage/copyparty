@@ -1299,6 +1299,9 @@ class HttpCli(object):
             if "ru" in self.uparam:
                 return self.tx_rups()
 
+            if "idp" in self.uparam:
+                return self.tx_idp()
+
         if "h" in self.uparam:
             return self.tx_mounts()
 
@@ -5537,6 +5540,32 @@ class HttpCli(object):
         self.reply(html.encode("utf-8"), status=200)
         return True
 
+    def tx_idp(self) -> bool:
+        if self.uname.lower() not in self.args.idp_adm_set:
+            raise Pebkac(403, "'idp' not allowed for user " + self.uname)
+
+        cmd = self.uparam["idp"]
+        if cmd.startswith("rm="):
+            import sqlite3
+
+            db = sqlite3.connect(self.args.idp_db)
+            db.execute("delete from us where un=?", (cmd[3:],))
+            db.commit()
+            db.close()
+
+            self.conn.hsrv.broker.ask("reload", False, False).get()
+
+            self.redirect("", "?idp")
+            return True
+
+        rows = [
+            [k, "[%s]" % ("], [".join(v))]
+            for k, v in sorted(self.asrv.idp_accs.items())
+        ]
+        html = self.j2s("idp", this=self, rows=rows, now=int(time.time()))
+        self.reply(html.encode("utf-8"), status=200)
+        return True
+
     def tx_shares(self) -> bool:
         if self.uname == "*":
             self.loud_reply("you're not logged in")
@@ -5611,7 +5640,7 @@ class HttpCli(object):
             self.conn.hsrv.broker.ask("reload", False, False).get()
             self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
-        self.redirect(self.args.SRS + "?shares")
+        self.redirect("", "?shares")
         return True
 
     def handle_share(self, req: dict[str, str]) -> bool:

@@ -949,6 +949,12 @@ class SvcHub(object):
                 vs = os.path.expandvars(os.path.expanduser(vs))
                 setattr(al, k, vs)
 
+        for k in "idp_adm".split(" "):
+            vs = getattr(al, k)
+            vsa = [x.strip() for x in vs.split(",")]
+            vsa = [x.lower() for x in vsa if x]
+            setattr(al, k + "_set", set(vsa))
+
         zs = "dav_ua1 sus_urls nonsus_urls ua_nodoc ua_nozip"
         for k in zs.split(" "):
             vs = getattr(al, k)
