@@ -776,6 +776,8 @@ window.baguetteBox = (function () {
         if (is_vid) {
             image.volume = clamp(fcfg_get('vol', dvol / 100), 0, 1);
             image.setAttribute('controls', 'controls');
+            image.setAttribute('playsinline', '1');
+            // ios ignores poster
             image.onended = vidEnd;
             image.onplay = function () { show_buttons(1); };
             image.onpause = function () { show_buttons(); };
