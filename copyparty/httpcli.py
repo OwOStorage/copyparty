@@ -1374,12 +1374,13 @@ class HttpCli(object):
         title = self.uparam.get("title") or self.vpath.split("/")[-1]
         etitle = html_escape(title, True, True)
 
-        baseurl = "%s://%s%s" % (
+        baseurl = "%s://%s/" % (
             "https" if self.is_https else "http",
             self.host,
-            self.args.SRS,
         )
-        feed = "%s%s" % (baseurl, self.req[1:])
+        feed = baseurl + self.req[1:]
+        if self.is_vproxied:
+            baseurl += self.args.RS
         efeed = html_escape(feed, True, True)
         edirlink = efeed.split("?")[0] + q_pw
 
@@ -1392,7 +1393,7 @@ class HttpCli(object):
 \t\t<title>%s</title>
 \t\t<description></description>
 \t\t<link>%s</link>
-\t\t<generator>copyparty-1</generator>
+\t\t<generator>copyparty-2</generator>
 """
             % (efeed, etitle, edirlink)
         ]
