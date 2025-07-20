@@ -35,7 +35,7 @@ var Ls = {
 				"file-manager",
 				["G", "toggle list / grid view"],
 				["T", "toggle thumbnails / icons"],
-				["🡅 A/D", "thumbnail size"],
+				["⇧ A/D", "thumbnail size"],
 				["ctrl-K", "delete selected"],
 				["ctrl-X", "cut selection to clipboard"],
 				["ctrl-C", "copy selection to clipboard"],
@@ -45,9 +45,9 @@ var Ls = {
 
 				"file-list-sel",
 				["space", "toggle file selection"],
-				["🡑/🡓", "move selection cursor"],
-				["ctrl 🡑/🡓", "move cursor and viewport"],
-				["🡅 🡑/🡓", "select prev/next file"],
+				["↑/↓", "move selection cursor"],
+				["ctrl ↑/↓", "move cursor and viewport"],
+				["⇧ ↑/↓", "select prev/next file"],
 				["ctrl-A", "select all files / folders"],
 			], [
 				"navigation",
@@ -70,7 +70,7 @@ var Ls = {
 				["Home/End", "first/last pic"],
 				["F", "fullscreen"],
 				["R", "rotate clockwise"],
-				["🡅 R", "rotate ccw"],
+				["⇧ R", "rotate ccw"],
 				["S", "select pic"],
 				["Y", "download pic"],
 			], [
@@ -658,7 +658,7 @@ var Ls = {
 				"filbehandler",
 				["G", "listevisning eller ikoner"],
 				["T", "miniatyrbilder på/av"],
-				["🡅 A/D", "ikonstørrelse"],
+				["⇧ A/D", "ikonstørrelse"],
 				["ctrl-K", "slett valgte"],
 				["ctrl-X", "klipp ut valgte"],
 				["ctrl-C", "kopiér til utklippstavle"],
@@ -668,9 +668,9 @@ var Ls = {
 
 				"filmarkering",
 				["space", "marker fil"],
-				["🡑/🡓", "flytt markør"],
-				["ctrl 🡑/🡓", "flytt markør og scroll"],
-				["🡅 🡑/🡓", "velg forr./neste fil"],
+				["↑/↓", "flytt markør"],
+				["ctrl ↑/↓", "flytt markør og scroll"],
+				["⇧ ↑/↓", "velg forr./neste fil"],
 				["ctrl-A", "velg alle filer / mapper"],
 			], [
 				"navigering",
@@ -693,7 +693,7 @@ var Ls = {
 				["Home/End", "første/siste bilde"],
 				["F", "fullskjermvisning"],
 				["R", "rotere mot høyre"],
-				["🡅 R", "rotere mot venstre"],
+				["⇧ R", "rotere mot venstre"],
 				["S", "marker bilde"],
 				["Y", "last ned bilde"],
 			], [
@@ -1283,7 +1283,7 @@ var Ls = {
 				"file-manager",
 				["G", "切换列表 / 网格视图"],
 				["T", "切换缩略图 / 图标"],
-				["🡅 A/D", "缩略图大小"],
+				["⇧ A/D", "缩略图大小"],
 				["ctrl-K", "删除选中项"],
 				["ctrl-X", "剪切选中项"],
 				["ctrl-C", "复制选中项"], //m
@@ -1293,9 +1293,9 @@ var Ls = {
 
 				"file-list-sel",
 				["space", "切换文件选择"],
-				["🡑/🡓", "移动选择光标"],
-				["ctrl 🡑/🡓", "移动光标和视图"],
-				["🡅 🡑/🡓", "选择上一个/下一个文件"],
+				["↑/↓", "移动选择光标"],
+				["ctrl ↑/↓", "移动光标和视图"],
+				["⇧ ↑/↓", "选择上一个/下一个文件"],
 				["ctrl-A", "选择所有文件 / 文件夹"]
 			], [
 				"navigation",
@@ -1318,7 +1318,7 @@ var Ls = {
 				["Home/End", "第一张/最后一张图片"],
 				["F", "全屏"],
 				["R", "顺时针旋转"],
-				["🡅 R", "逆时针旋转"],
+				["⇧ R", "逆时针旋转"],
 				["S", "选择图片"], //m
 				["Y", "下载图片"]
 			], [
@@ -6885,8 +6885,10 @@ function hkhelp() {
 			try {
 				if (c[a].length != 2)
 					html.push('<tr><th colspan="2">' + esc(c[a]) + '</th></tr>');
-				else
-					html.push('<tr><td>{0}</td><td>{1}</td></tr>'.format(c[a][0], c[a][1]));
+				else {
+					var t1 = c[a][0].replace('⇧', '<b>⇧</b>');
+					html.push('<tr><td>{0}</td><td>{1}</td></tr>'.format(t1, c[a][1]));
+				}
 			}
 			catch (ex) {
 				html.push(">>> " + c[a]);

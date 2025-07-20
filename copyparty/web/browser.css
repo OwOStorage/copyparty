@@ -2035,6 +2035,9 @@ a.btn,
 	font-family: 'scp', monospace, monospace;
 	font-family: var(--font-mono), 'scp', monospace, monospace;
 }
+#hkhelp b {
+	text-shadow: 1px 0 0 var(--fg), -1px 0 0 var(--fg), 0 -1px 0 var(--fg);
+}
 html.noscroll,
 html.noscroll .sbar {
 	scrollbar-width: none;
