@@ -3683,7 +3683,7 @@ var mpui = (function () {
 					var oi = mp.order.indexOf(mp.au.tid) + 1,
 						evp = get_evpath();
 
-					if (mpl.pb_mode == 'loop' || mp.au.evp != evp)
+					if (mpl.pb_mode == 'loop' || mp.au.evp != evp || ebi('unsearch'))
 						oi = 0;
 
 					if (oi >= mp.order.length) {
