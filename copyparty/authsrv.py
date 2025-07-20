@@ -922,6 +922,9 @@ class AuthSrv(object):
 
         yield prev, True
 
+    def vf0(self):
+        return {"d2d": True, "tcolor": self.args.tcolor}
+
     def idp_checkin(
         self, broker: Optional["BrokerCli"], uname: str, gname: str
     ) -> bool:
@@ -1628,13 +1631,12 @@ class AuthSrv(object):
                 t = "Read-access has been disabled due to failsafe: No volumes were defined by the config-file. This failsafe is to prevent unintended access if this is due to accidental loss of config. You can override this safeguard and allow read/write to the working-directory by adding the following arguments:  -v .::rw"
                 self.log(t, 1)
                 axs = AXS()
-            vfs = VFS(self.log_func, absreal("."), "", "", axs, {})
+            vfs = VFS(self.log_func, absreal("."), "", "", axs, self.vf0())
             if not axs.uread:
                 self.badcfg1 = True
         elif "" not in mount:
             # there's volumes but no root; make root inaccessible
-            zsd = {"d2d": True, "tcolor": self.args.tcolor}
-            vfs = VFS(self.log_func, "", "", "", AXS(), zsd)
+            vfs = VFS(self.log_func, "", "", "", AXS(), self.vf0())
 
         maxdepth = 0
         for dst in sorted(mount.keys(), key=lambda x: (x.count("/"), len(x))):
@@ -1683,8 +1685,7 @@ class AuthSrv(object):
         if enshare:
             assert sqlite3  # type: ignore  # !rm
 
-            zsd = {"d2d": True, "tcolor": self.args.tcolor}
-            shv = VFS(self.log_func, "", shr, shr, AXS(), zsd)
+            shv = VFS(self.log_func, "", shr, shr, AXS(), self.vf0())
 
             db_path = self.args.shr_db
             db = sqlite3.connect(db_path)
@@ -2567,7 +2568,7 @@ class AuthSrv(object):
                     continue  # also fine
                 for zs in svn.nodes.keys():
                     # hide subvolume
-                    vn.nodes[zs] = VFS(self.log_func, "", "", "", AXS(), {})
+                    vn.nodes[zs] = VFS(self.log_func, "", "", "", AXS(), self.vf0())
 
             cur2.close()
             cur.close()
