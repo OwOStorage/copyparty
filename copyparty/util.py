@@ -2400,11 +2400,11 @@ def pathmod(
 
         # try to map abspath to vpath
         np = np.replace("/", os.sep)
-        for vn_ap, vn in vfs.all_aps:
+        for vn_ap, vns in vfs.all_aps:
             if not np.startswith(vn_ap):
                 continue
             zs = np[len(vn_ap) :].replace(os.sep, "/")
-            nvp = vjoin(vn.vpath, zs)
+            nvp = vjoin(vns[0].vpath, zs)
             break
 
     if nvp == "\n":

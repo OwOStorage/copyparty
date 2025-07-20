@@ -372,6 +372,7 @@ class VFS(object):
         self.shr_src: Optional[tuple[VFS, str]] = None  # source vfs+rem of a share
         self.shr_files: set[str] = set()  # filenames to include from shr_src
         self.shr_owner: str = ""  # uname
+        self.shr_all_aps: list[tuple[str, list[VFS]]] = []
         self.aread: dict[str, list[str]] = {}
         self.awrite: dict[str, list[str]] = {}
         self.amove: dict[str, list[str]] = {}
@@ -391,7 +392,7 @@ class VFS(object):
             self.dbpath = self.histpath
             self.all_vols = {vpath: self}  # flattened recursive
             self.all_nodes = {vpath: self}  # also jumpvols/shares
-            self.all_aps = [(rp, self)]
+            self.all_aps = [(rp, [self])]
             self.all_vps = [(vp, self)]
         else:
             self.histpath = self.dbpath = ""
@@ -415,7 +416,7 @@ class VFS(object):
         self,
         vols: dict[str, "VFS"],
         nodes: dict[str, "VFS"],
-        aps: list[tuple[str, "VFS"]],
+        aps: list[tuple[str, list["VFS"]]],
         vps: list[tuple[str, "VFS"]],
     ) -> None:
         nodes[self.vpath] = self
@@ -424,7 +425,11 @@ class VFS(object):
             rp = self.realpath
             rp += "" if rp.endswith(os.sep) else os.sep
             vp = self.vpath + ("/" if self.vpath else "")
-            aps.append((rp, self))
+            hit = next((x[1] for x in aps if x[0] == rp), None)
+            if hit:
+                hit.append(self)
+            else:
+                aps.append((rp, [self]))
             vps.append((vp, self))
 
         for v in self.nodes.values():
@@ -848,9 +853,11 @@ class VFS(object):
                 return None
 
         if "xvol" in self.flags:
-            for vap, vn in self.root.all_aps:
+            all_aps = self.shr_all_aps or self.root.all_aps
+
+            for vap, vns in all_aps:
                 if aps.startswith(vap):
-                    return vn
+                    return self if self in vns else vns[0]
 
             if self.log:
                 self.log("vfs", "xvol: %r" % (ap,), 3)
@@ -2553,6 +2560,28 @@ class AuthSrv(object):
                 shn.shr_owner = s_un
                 shn.shr_src = (s_vfs, s_rem)
                 shn.realpath = s_vfs.canonical(s_rem)
+
+                # root.all_aps doesn't include any shares, so make a copy where the
+                # share appears in all abspaths it can provide (for example for chk_ap)
+                ap = shn.realpath
+                if not ap.endswith(os.sep):
+                    ap += os.sep
+                shn.shr_all_aps = [(x, y[:]) for x, y in vfs.all_aps]
+                exact = False
+                for ap2, vns in shn.shr_all_aps:
+                    if ap == ap2:
+                        exact = True
+                    if ap2.startswith(ap):
+                        try:
+                            vp2 = vjoin(s_rem, ap2[len(ap) :])
+                            vn2, _ = s_vfs.get(vp2, "*", False, False)
+                            if vn2 == s_vfs or vn2.dbv == s_vfs:
+                                vns.append(shn)
+                        except:
+                            pass
+                if not exact:
+                    shn.shr_all_aps.append((ap, [shn]))
+                shn.shr_all_aps.sort(key=lambda x: len(x[0]), reverse=True)
 
                 if self.args.shr_v:
                     t = "mapped %s share [%s] by [%s] => [%s] => [%s]"

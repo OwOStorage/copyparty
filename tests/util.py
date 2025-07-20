@@ -260,6 +260,9 @@ class VHub(object):
         self.is_dut = True
         self.up2k = Up2k(self)
 
+    def reload(self, a, b):
+        pass
+
 
 class VBrokerThr(BrokerThr):
     def __init__(self, hub):

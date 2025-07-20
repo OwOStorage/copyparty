@@ -284,7 +284,7 @@ class ThumbSrv(object):
             vn = next((x for x in allvols if x.realpath == ptop), None)
             if not vn:
                 self.log("ptop %r not in %s" % (ptop, allvols), 3)
-                vn = self.asrv.vfs.all_aps[0][1]
+                vn = self.asrv.vfs.all_aps[0][1][0]
 
             self.q.put((abspath, tpath, fmt, vn))
             self.log("conv %r :%s \033[0m%r" % (tpath, fmt, abspath), 6)
