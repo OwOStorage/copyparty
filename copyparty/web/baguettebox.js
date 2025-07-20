@@ -592,9 +592,7 @@ window.baguetteBox = (function () {
             preloadPrev(currentIndex);
         });
 
-        clmod(ebi('bbox-btns'), 'off');
-        clmod(btnPrev, 'off');
-        clmod(btnNext, 'off');
+        show_buttons(0);
 
         updateOffset();
         overlay.style.display = 'block';
