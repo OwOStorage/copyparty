@@ -45,6 +45,7 @@ from .util import (
     APPLESAN_RE,
     BITNESS,
     DAV_ALLPROPS,
+    E_SCK_WR,
     FN_EMB,
     HAVE_SQLITE3,
     HTTPCODE,
@@ -4365,7 +4366,7 @@ class HttpCli(object):
                             self.log("file deleted; disconnecting")
                             break
         except IOError as ex:
-            if ex.errno not in (errno.EPIPE, errno.ESHUTDOWN, errno.EBADFD):
+            if ex.errno not in E_SCK_WR:
                 raise
         finally:
             if f:

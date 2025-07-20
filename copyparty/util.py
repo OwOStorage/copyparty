@@ -105,6 +105,7 @@ def _ens(want: str) -> tuple[int, ...]:
 # WSAENOTSOCK - no longer a socket
 # EUNATCH - can't assign requested address (wifi down)
 E_SCK = _ens("ENOTCONN EUNATCH EBADF WSAENOTSOCK WSAECONNRESET")
+E_SCK_WR = _ens("EPIPE ESHUTDOWN EBADFD")
 E_ADDR_NOT_AVAIL = _ens("EADDRNOTAVAIL WSAEADDRNOTAVAIL")
 E_ADDR_IN_USE = _ens("EADDRINUSE WSAEADDRINUSE")
 E_ACCESS = _ens("EACCES WSAEACCES")

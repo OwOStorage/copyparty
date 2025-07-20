@@ -282,7 +282,7 @@ class TcpSrv(object):
         except:
             pass  # will create another ipv4 socket instead
 
-        if not ANYWIN and self.args.freebind:
+        if getattr(self.args, "freebind", False):
             srv.setsockopt(socket.SOL_IP, socket.IP_FREEBIND, 1)
 
         try:
