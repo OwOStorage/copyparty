@@ -2364,8 +2364,10 @@ TLDR: yes
 | send message    | yep | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | set sort order  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | zip selection   |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| file search     |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | file rename     |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | file cut/paste  |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
+| unpost uploads  |  -  |  -   | yep  | yep  |  yep  | yep  | yep | yep  |
 | navpane         |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | image viewer    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |
 | video player    |  -  | yep  | yep  | yep  |  yep  | yep  | yep | yep  |

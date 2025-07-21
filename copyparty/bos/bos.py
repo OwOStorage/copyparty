@@ -38,7 +38,12 @@ def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> bool:
             os.mkdir(bname)  # to throw
         return False
     for zb in todo[::-1]:
-        os.mkdir(zb, mode)
+        try:
+            os.mkdir(zb, mode)
+        except:
+            if os.path.isdir(zb):
+                continue
+            raise
     return True
 
 

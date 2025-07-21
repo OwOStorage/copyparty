@@ -1,4 +1,41 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0707-1419  `v1.18.2`  idp-vol persistence
+
+## 🧪 new features
+
+* IdP-volumes can optionally be persisted across restarts d162502c
+  * there is a UI to manage the cached users/groups 4f264a0a
+    * only available to users listed in the new option `--idp-adm`
+* api for manually rescanning several volumes at once 42c199e7
+  * `/some/path/?scan` does that one volume like before
+  * `/any/path/?scan=/vol1,/another/vol2` rescans `/vol1` and `/another/vol2`
+* volflag to hide volume from listing in controlpanel fd7c71d6
+
+## 🩹 bugfixes
+
+* macos: fix confusing crash when blocked by [Little Snitch](https://www.obdev.at/products/littlesnitch/) bf11b2a4
+* unpost could break in some hairy reverseproxy setups 1b2d3985
+* copyparty32.exe: fix segfault on win7 c9fafb20
+* ui: fix navpane overlapping the scrollbar (still a bit jank but eh) 7ef6fd13
+* usb-eject: support all volume names ed908b98
+* docker: ensure clean slate deb6711b
+* fix up2k on ie11 d2714434
+
+## 🔧 other changes
+
+* update buildscript for keyfinder to support llvm 65c4e035
+* #175 add `python-magic` into the `iv` and `dj` docker flavors (thx @Morganamilo) 77274e9d
+* properly killed the experimental docker flavors to avoid confusion 8306e3d9
+* copyparty.exe: updated pillow 299cff3f f6be3905
+  * avif support was removed to save 2 MiB
+
+## 🌠 fun facts
+
+* this release was slightly delayed due to a [norwegian traffic jam](https://a.ocv.me/pub/g/2025/07/PXL_20250706_143558381.jpg)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0622-0020  `v1.18.0`  Logtail
 
 ## 🧪 new features
