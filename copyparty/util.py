@@ -1585,6 +1585,7 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
+    chmod = kwargs.pop("chmod", -1)
 
     if fname == os.devnull:
         return fun(fname, *args, **kwargs), fname
@@ -1628,6 +1629,11 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
                 fp2 = os.path.join(fdir, fp2)
                 with open(fsenc(fp2), "wb") as f2:
                     f2.write(orig_name.encode("utf-8"))
+                    if chmod >= 0:
+                        os.fchmod(f2.fileno(), chmod)
+
+            if chmod >= 0:
+                os.fchmod(f.fileno(), chmod)
 
             return f, fname
 

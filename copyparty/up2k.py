@@ -915,7 +915,8 @@ class Up2k(object):
             # only need to protect register_vpath but all in one go feels right
             for vol in vols:
                 try:
-                    bos.makedirs(vol.realpath)  # gonna happen at snap anyways
+                    # mkdir gonna happen at snap anyways;
+                    bos.makedirs(vol.realpath, vol.flags["chmod_d"])
                     dir_is_empty(self.log_func, not self.args.no_scandir, vol.realpath)
                 except Exception as ex:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
@@ -1141,6 +1142,20 @@ class Up2k(object):
                 del fl[k1]
             else:
                 fl[k1] = ",".join(x for x in fl[k1])
+
+        if fl["chmod_d"] == int(self.args.chmod_d, 8):
+            fl.pop("chmod_d")
+        try:
+            if fl["chmod_f"] == int(self.args.chmod_f or "-1", 8):
+                fl.pop("chmod_f")
+        except:
+            pass
+        for k in ("chmod_f", "chmod_d"):
+            try:
+                fl[k] = "%o" % (fl[k])
+            except:
+                pass
+
         a = [
             (ft if v is True else ff if v is False else fv).format(k, str(v))
             for k, v in fl.items()
@@ -3290,7 +3305,7 @@ class Up2k(object):
                         reg,
                         "up2k._get_volsize",
                     )
-                    bos.makedirs(ap2)
+                    bos.makedirs(ap2, vfs.flags["chmod_d"])
                     vfs.lim.nup(cj["addr"])
                     vfs.lim.bup(cj["addr"], cj["size"])
 
@@ -3397,11 +3412,11 @@ class Up2k(object):
                 self.log(t % (mts - mtc, mts, mtc, fp))
                 ow = False
 
+        ptop = job["ptop"]
+        vf = self.flags.get(ptop) or {}
         if ow:
             self.log("replacing existing file at %r" % (fp,))
             cur = None
-            ptop = job["ptop"]
-            vf = self.flags.get(ptop) or {}
             st = bos.stat(fp)
             try:
                 vrel = vjoin(job["prel"], fname)
@@ -3421,8 +3436,13 @@ class Up2k(object):
         else:
             dip = self.hub.iphash.s(ip)
 
-        suffix = "-%.6f-%s" % (ts, dip)
-        f, ret = ren_open(fname, "wb", fdir=fdir, suffix=suffix)
+        f, ret = ren_open(
+            fname,
+            "wb",
+            fdir=fdir,
+            suffix="-%.6f-%s" % (ts, dip),
+            chmod=vf.get("chmod_f", -1),
+        )
         f.close()
         return ret
 
@@ -4277,7 +4297,7 @@ class Up2k(object):
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
-        bos.makedirs(os.path.dirname(dabs))
+        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
 
         c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(
             svn_dbv.realpath, srem_dbv
@@ -4453,7 +4473,7 @@ class Up2k(object):
                 vp = vjoin(dvp, rem)
                 try:
                     dvn, drem = self.vfs.get(vp, uname, False, True)
-                    bos.mkdir(dvn.canonical(drem))
+                    bos.mkdir(dvn.canonical(drem), dvn.flags["chmod_d"])
                 except:
                     pass
 
@@ -4523,7 +4543,7 @@ class Up2k(object):
 
         is_xvol = svn.realpath != dvn.realpath
 
-        bos.makedirs(os.path.dirname(dabs))
+        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
 
         if is_dirlink:
             dlabs = absreal(sabs)
@@ -5030,8 +5050,13 @@ class Up2k(object):
         else:
             dip = self.hub.iphash.s(job["addr"])
 
-        suffix = "-%.6f-%s" % (job["t0"], dip)
-        f, job["tnam"] = ren_open(tnam, "wb", fdir=pdir, suffix=suffix)
+        f, job["tnam"] = ren_open(
+            tnam,
+            "wb",
+            fdir=pdir,
+            suffix="-%.6f-%s" % (job["t0"], dip),
+            chmod=vf.get("chmod_f", -1),
+        )
         try:
             abspath = djoin(pdir, job["tnam"])
             sprs = job["sprs"]

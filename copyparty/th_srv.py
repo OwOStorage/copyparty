@@ -269,7 +269,8 @@ class ThumbSrv(object):
                 self.log("joined waiting room for %r" % (tpath,))
             except:
                 thdir = os.path.dirname(tpath)
-                bos.makedirs(os.path.join(thdir, "w"))
+                chmod = 0o700 if self.args.free_umask else 0o755
+                bos.makedirs(os.path.join(thdir, "w"), chmod)
 
                 inf_path = os.path.join(thdir, "dir.txt")
                 if not bos.path.exists(inf_path):

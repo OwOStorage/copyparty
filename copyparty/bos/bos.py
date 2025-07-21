@@ -25,14 +25,21 @@ def listdir(p: str = ".") -> list[str]:
 
 
 def makedirs(name: str, mode: int = 0o755, exist_ok: bool = True) -> bool:
+    # os.makedirs does 777 for all but leaf; this does mode on all
+    todo = []
     bname = fsenc(name)
-    try:
-        os.makedirs(bname, mode)
-        return True
-    except:
-        if not exist_ok or not os.path.isdir(bname):
-            raise
+    while bname:
+        if os.path.isdir(bname):
+            break
+        todo.append(bname)
+        bname = os.path.dirname(bname)
+    if not todo:
+        if not exist_ok:
+            os.mkdir(bname)  # to throw
         return False
+    for zb in todo[::-1]:
+        os.mkdir(zb, mode)
+    return True
 
 
 def mkdir(p: str, mode: int = 0o755) -> None:

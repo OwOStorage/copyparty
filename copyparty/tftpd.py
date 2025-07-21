@@ -387,14 +387,18 @@ class Tftpd(object):
         if not a:
             a = (self.args.iobuf,)
 
-        return open(ap, mode, *a, **ka)
+        ret = open(ap, mode, *a, **ka)
+        if wr and "chmod_f" in vfs.flags:
+            os.fchmod(ret.fileno(), vfs.flags["chmod_f"])
+
+        return ret
 
     def _mkdir(self, vpath: str, *a) -> None:
         vfs, _, ap = self._v2a("mkdir", vpath, [False, True])
         if "*" not in vfs.axs.uwrite:
             yeet("blocked mkdir; folder not world-writable: /%s" % (vpath,))
 
-        return bos.mkdir(ap)
+        return bos.mkdir(ap, vfs.flags["chmod_d"])
 
     def _unlink(self, vpath: str) -> None:
         # return bos.unlink(self._v2a("stat", vpath, *a)[1])

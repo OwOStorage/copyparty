@@ -120,6 +120,8 @@ class Lim(object):
 
         self.reg: Optional[dict[str, dict[str, Any]]] = None  # up2k registry
 
+        self.chmod_d = 0o755
+
         self.nups: dict[str, list[float]] = {}  # num tracker
         self.bups: dict[str, list[tuple[float, int]]] = {}  # byte tracker list
         self.bupc: dict[str, int] = {}  # byte tracker cache
@@ -280,7 +282,7 @@ class Lim(object):
         if not dirs:
             # no branches yet; make one
             sub = os.path.join(path, "0")
-            bos.mkdir(sub)
+            bos.mkdir(sub, self.chmod_d)
         else:
             # try newest branch only
             sub = os.path.join(path, str(dirs[-1]))
@@ -295,7 +297,7 @@ class Lim(object):
 
         # make a branch
         sub = os.path.join(path, str(dirs[-1] + 1))
-        bos.mkdir(sub)
+        bos.mkdir(sub, self.chmod_d)
         ret = self.dive(sub, lvs - 1)
         if ret is None:
             raise Pebkac(500, "rotation bug")
@@ -2074,6 +2076,7 @@ class AuthSrv(object):
 
         all_mte = {}
         errors = False
+        free_umask = False
         for vol in vfs.all_nodes.values():
             if (self.args.e2ds and vol.axs.uwrite) or self.args.e2dsa:
                 vol.flags["e2ds"] = True
@@ -2129,6 +2132,27 @@ class AuthSrv(object):
                 except:
                     t = 'volume "/%s" has invalid %stry [%s]'
                     raise Exception(t % (vol.vpath, k, vol.flags.get(k + "try")))
+
+            for k in ("chmod_d", "chmod_f"):
+                is_d = k == "chmod_d"
+                zs = vol.flags.get(k, "")
+                if not zs and is_d:
+                    zs = "755"
+                if not zs:
+                    vol.flags.pop(k, None)
+                    continue
+                if not re.match("^[0-7]{3}$", zs):
+                    t = "config-option '%s' must be a three-digit octal value such as [755] or [644] but the value was [%s]"
+                    t = t % (k, zs)
+                    self.log(t, 1)
+                    raise Exception(t)
+                zi = int(zs, 8)
+                vol.flags[k] = zi
+                if (is_d and zi != 0o755) or not is_d:
+                    free_umask = True
+
+            if vol.lim:
+                vol.lim.chmod_d = vol.flags["chmod_d"]
 
             if vol.flags.get("og"):
                 self.args.uqe = True
@@ -2358,6 +2382,10 @@ class AuthSrv(object):
 
         if errors:
             sys.exit(1)
+
+        setattr(self.args, "free_umask", free_umask)
+        if free_umask:
+            os.umask(0)
 
         vfs.bubble_flags()
 

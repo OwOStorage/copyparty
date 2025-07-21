@@ -320,7 +320,7 @@ class SMB(object):
 
         self.hub.up2k.handle_mv(uname, "1.7.6.2", vp1, vp2)
         try:
-            bos.makedirs(ap2)
+            bos.makedirs(ap2, vfs2.flags["chmod_d"])
         except:
             pass
 
@@ -334,7 +334,7 @@ class SMB(object):
             t = "blocked mkdir (no-write-acc %s): /%s @%s"
             yeet(t % (vfs.axs.uwrite, vpath, uname))
 
-        return bos.mkdir(ap)
+        return bos.mkdir(ap, vfs.flags["chmod_d"])
 
     def _stat(self, vpath: str, *a: Any, **ka: Any) -> os.stat_result:
         try:

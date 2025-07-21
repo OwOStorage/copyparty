@@ -864,6 +864,43 @@ def get_sects():
             ),
         ],
         [
+            "chmod",
+            "file/folder permissions",
+            dedent(
+                """
+            global-option \033[33m--chmod-f\033[0m and volflag \033[33mchmod_f\033[0m specifies the unix-permission to use when creating a new file
+
+            similarly, \033[33m--chmod-d\033[0m and \033[33mchmod_d\033[0m sets the directory/folder perm
+
+            the value is a three-digit octal number such as 755, 750, 644, etc.
+
+            first digit = "User"; permission for the unix-user
+            second digit = "Group"; permission for the unix-group
+            third digit = "Other"; permission for all other users/groups
+
+            for files:
+            0 = --- = no access
+            1 = --x = can execute the file as a program
+            2 = -w- = can write
+            3 = -wx = can write and execute
+            4 = r-- = can read
+            5 = r-x = can read and execute
+            6 = rw- = can read and write
+            7 = rwx = can read, write, execute
+
+            for directories/folders:
+            0 = --- = no access
+            1 = --x = can read files in folder but not list contents
+            2 = -w- = n/a
+            3 = -wx = can create files but not list
+            4 = r-- = can list, but not read/write
+            5 = r-x = can list and read files
+            6 = rw- = n/a
+            7 = rwx = can read, write, list
+            """
+            ),
+        ],
+        [
             "pwhash",
             "password hashing",
             dedent(
@@ -1013,6 +1050,8 @@ def add_upload(ap):
     ap2.add_argument("--reg-cap", metavar="N", type=int, default=38400, help="max number of uploads to keep in memory when running without \033[33m-e2d\033[0m; roughly 1 MiB RAM per 600")
     ap2.add_argument("--no-fpool", action="store_true", help="disable file-handle pooling -- instead, repeatedly close and reopen files during upload (bad idea to enable this on windows and/or cow filesystems)")
     ap2.add_argument("--use-fpool", action="store_true", help="force file-handle pooling, even when it might be dangerous (multiprocessing, filesystems lacking sparse-files support, ...)")
+    ap2.add_argument("--chmod-f", metavar="UGO", type=u, default="", help="unix file permissions to use when creating files; default is probably 644 (OS-decided), see --help-chmod. Examples: [\033[32m644\033[0m] = owner-RW + all-R, [\033[32m755\033[0m] = owner-RWX + all-RX, [\033[32m777\033[0m] = full-yolo (volflag=chmod_f)")
+    ap2.add_argument("--chmod-d", metavar="UGO", type=u, default="755", help="unix file permissions to use when creating directories; see --help-chmod. Examples: [\033[32m755\033[0m] = owner-RW + all-R, [\033[32m777\033[0m] = full-yolo (volflag=chmod_d)")
     ap2.add_argument("--dedup", action="store_true", help="enable symlink-based upload deduplication (volflag=dedup)")
     ap2.add_argument("--safe-dedup", metavar="N", type=int, default=50, help="how careful to be when deduplicating files; [\033[32m1\033[0m] = just verify the filesize, [\033[32m50\033[0m] = verify file contents have not been altered (volflag=safededup)")
     ap2.add_argument("--hardlink", action="store_true", help="enable hardlink-based dedup; will fallback on symlinks when that is impossible (across filesystems) (volflag=hardlink)")

@@ -27,6 +27,7 @@ if True:  # pylint: disable=using-constant-test
 
 from .__init__ import ANYWIN, EXE, MACOS, PY2, TYPE_CHECKING, E, EnvParams, unicode
 from .authsrv import BAD_CFG, AuthSrv
+from .bos import bos
 from .cert import ensure_cert
 from .mtag import HAVE_FFMPEG, HAVE_FFPROBE, HAVE_MUTAGEN
 from .pwhash import HAVE_ARGON2
@@ -1118,7 +1119,7 @@ class SvcHub(object):
 
         fn = sel_fn
         try:
-            os.makedirs(os.path.dirname(fn))
+            bos.makedirs(os.path.dirname(fn))
         except:
             pass
 
@@ -1134,6 +1135,9 @@ class SvcHub(object):
             import codecs
 
             lh = codecs.open(fn, "w", encoding="utf-8", errors="replace")
+
+        if getattr(self.args, "free_umask", False):
+            os.fchmod(lh.fileno(), 0o644)
 
         argv = [pybin] + self.argv
         if hasattr(shlex, "quote"):

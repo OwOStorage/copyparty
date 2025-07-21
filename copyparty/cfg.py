@@ -78,6 +78,8 @@ def vf_vmap() -> dict[str, str]:
     }
     for k in (
         "bup_ck",
+        "chmod_d",
+        "chmod_f",
         "dbd",
         "forget_ip",
         "hsortn",
@@ -169,6 +171,8 @@ flagcats = {
         "safededup": "verify on-disk data before using it for dedup",
         "noclone": "take dupe data from clients, even if available on HDD",
         "nodupe": "rejects existing files (instead of linking/cloning them)",
+        "chmod_d=755": "unix-permission for new dirs/folders",
+        "chmod_f=644": "unix-permission for new files",
         "sparse": "force use of sparse files, mainly for s3-backed storage",
         "nosparse": "deny use of sparse files, mainly for slow storage",
         "daw": "enable full WebDAV write support (dangerous);\nPUT-operations will now \033[1;31mOVERWRITE\033[0;35m existing files",

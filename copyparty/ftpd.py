@@ -229,7 +229,7 @@ class FtpFs(AbstractedFS):
         r = "r" in mode
         w = "w" in mode or "a" in mode or "+" in mode
 
-        ap = self.rv2a(filename, r, w)[0]
+        ap, vfs, _ = self.rv2a(filename, r, w)
         self.validpath(ap)
         if w:
             try:
@@ -261,7 +261,11 @@ class FtpFs(AbstractedFS):
 
             wunlink(self.log, ap, VF_CAREFUL)
 
-        return open(fsenc(ap), mode, self.args.iobuf)
+        ret = open(fsenc(ap), mode, self.args.iobuf)
+        if w and "chmod_f" in vfs.flags:
+            os.fchmod(ret.fileno(), vfs.flags["chmod_f"])
+
+        return ret
 
     def chdir(self, path: str) -> None:
         nwd = join(self.cwd, path)
@@ -292,8 +296,9 @@ class FtpFs(AbstractedFS):
         ) = avfs.can_access("", self.h.uname)
 
     def mkdir(self, path: str) -> None:
-        ap = self.rv2a(path, w=True)[0]
-        bos.makedirs(ap)  # filezilla expects this
+        ap, vfs, _ = self.rv2a(path, w=True)
+        chmod = vfs.flags["chmod_d"]
+        bos.makedirs(ap, chmod)  # filezilla expects this
 
     def listdir(self, path: str) -> list[str]:
         vpath = join(self.cwd, path)
