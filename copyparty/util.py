@@ -1974,7 +1974,7 @@ def rand_name(fdir: str, fn: str, rnd: int) -> str:
     return fn
 
 
-def gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
+def _gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
     if alg == 1:
         zs = "%s %s %s %s" % (salt, fspath, fsize, inode)
     else:
@@ -1982,6 +1982,13 @@ def gen_filekey(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str
 
     zb = zs.encode("utf-8", "replace")
     return ub64enc(hashlib.sha512(zb).digest()).decode("ascii")
+
+
+def _gen_filekey_w(alg: int, salt: str, fspath: str, fsize: int, inode: int) -> str:
+    return _gen_filekey(alg, salt, fspath.replace("/", "\\"), fsize, inode)
+
+
+gen_filekey = _gen_filekey_w if ANYWIN else _gen_filekey
 
 
 def gen_filekey_dbg(
