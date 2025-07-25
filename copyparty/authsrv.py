@@ -2670,6 +2670,7 @@ class AuthSrv(object):
                 "def_hcols": list(vf.get("mth") or []),
                 "unlist0": vf.get("unlist") or "",
                 "see_dots": self.args.see_dots,
+                "dqdel": self.args.qdel,
                 "dgrid": "grid" in vf,
                 "dgsel": "gsel" in vf,
                 "dnsort": "nsort" in vf,

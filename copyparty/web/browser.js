@@ -226,6 +226,7 @@ var Ls = {
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
+		"ct_qdel": 'when deleting files, only ask for confirmation once">qdel',
 		"ct_dir1st": 'sort folders before files">📁 first',
 		"ct_nsort": 'natural sort (for filenames with leading digits)">nsort',
 		"ct_readme": 'show README.md in folder listings">📜 readme',
@@ -850,6 +851,7 @@ var Ls = {
 		"ct_csel": 'bruk tastene CTRL og SHIFT for markering av filer i ikonvisning">merk',
 		"ct_ihop": 'bla ned til sist viste bilde når bildeviseren lukkes">g⮯',
 		"ct_dots": 'vis skjulte filer (gitt at serveren tillater det)">.synlig',
+		"ct_qdel": 'sletteknappen spør bare én gang om bekreftelse">hurtig🗑️',
 		"ct_dir1st": 'sorter slik at mapper kommer foran filer">📁 først',
 		"ct_nsort": 'naturlig sortering (forstår tall i filnavn)">nsort',
 		"ct_readme": 'vis README.md nedenfor filene">📜 readme',
@@ -1474,6 +1476,7 @@ var Ls = {
 		"ct_csel": '在网格视图中使用 CTRL 和 SHIFT 进行文件选择">CTRL',
 		"ct_ihop": '当图像查看器关闭时，滚动到最后查看的文件">滚动',
 		"ct_dots": '显示隐藏文件（如果服务器允许）">隐藏文件',
+		"ct_qdel": '删除文件时，只需确认一次">快删', //m
 		"ct_dir1st": '在文件之前排序文件夹">📁 排序',
 		"ct_nsort": '正确排序以数字开头的文件名">数字排序', //m
 		"ct_readme": '在文件夹列表中显示 README.md">📜 readme',
@@ -2090,6 +2093,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="csel" class="tgl btn" href="#" tt="' + L.ct_csel + '</a>\n' +
 	'		<a id="ihop" class="tgl btn" href="#" tt="' + L.ct_ihop + '</a>\n' +
 	'		<a id="dotfiles" class="tgl btn" href="#" tt="' + L.ct_dots + '</a>\n' +
+	'		<a id="qdel" class="tgl btn" href="#" tt="' + L.ct_qdel + '</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
 	'		<a id="nsort" class="tgl btn" href="#" tt="' + L.ct_nsort + '</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
@@ -5453,7 +5457,16 @@ var fileman = (function () {
 			deleter();
 		}
 
+		var asks = r.qdel ? 1 : 2;
+		if (dqdel === 0)
+			asks -= 1;
+
+		if (!asks)
+			return deleter();
+
 		modal.confirm('<h6 style="color:#900">' + L.danger + '</h6>\n<b>' + L.fd_warn1.format(vps.length) + '</b><ul>' + uricom_adec(vps, true).join('') + '</ul>', function () {
+			if (asks === 1)
+				return deleter();
 			modal.confirm(L.fd_warn2, deleter, null);
 		}, null);
 	};
@@ -5813,6 +5826,8 @@ var fileman = (function () {
 		r.bus.postMessage(msg);
 		r.bus.onmessage();
 	};
+
+	bcfg_bind(r, 'qdel', 'qdel', dqdel == 1);
 
 	bren.onclick = r.rename;
 	bdel.onclick = r.delete;
