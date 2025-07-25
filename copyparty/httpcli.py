@@ -5573,7 +5573,7 @@ class HttpCli(object):
             db.commit()
             db.close()
 
-            self.conn.hsrv.broker.ask("reload", False, False).get()
+            self.conn.hsrv.broker.ask("reload", False, True).get()
 
             self.redirect("", "?idp")
             return True
@@ -5657,7 +5657,7 @@ class HttpCli(object):
 
         cur.connection.commit()
         if reload:
-            self.conn.hsrv.broker.ask("reload", False, False).get()
+            self.conn.hsrv.broker.ask("reload", False, True).get()
             self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
         self.redirect("", "?shares")
@@ -5749,7 +5749,7 @@ class HttpCli(object):
             cur.execute(q, (skey, fn))
 
         cur.connection.commit()
-        self.conn.hsrv.broker.ask("reload", False, False).get()
+        self.conn.hsrv.broker.ask("reload", False, True).get()
         self.conn.hsrv.broker.ask("up2k.wake_rescanner").get()
 
         fn = quotep(fns[0]) if len(fns) == 1 else ""
