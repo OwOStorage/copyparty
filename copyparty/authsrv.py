@@ -386,20 +386,20 @@ class VFS(object):
         self.adot: dict[str, list[str]] = {}
         self.js_ls = {}
         self.js_htm = ""
+        self.all_vols: dict[str, VFS] = {}  # flattened recursive
+        self.all_nodes: dict[str, VFS] = {}  # also jumpvols/shares
 
         if realpath:
             rp = realpath + ("" if realpath.endswith(os.sep) else os.sep)
             vp = vpath + ("/" if vpath else "")
             self.histpath = os.path.join(realpath, ".hist")  # db / thumbcache
             self.dbpath = self.histpath
-            self.all_vols = {vpath: self}  # flattened recursive
-            self.all_nodes = {vpath: self}  # also jumpvols/shares
+            self.all_vols[vpath] = self
+            self.all_nodes[vpath] = self
             self.all_aps = [(rp, [self])]
             self.all_vps = [(vp, self)]
         else:
             self.histpath = self.dbpath = ""
-            self.all_vols = {}
-            self.all_nodes = {}
             self.all_aps = []
             self.all_vps = []
 
@@ -867,6 +867,53 @@ class VFS(object):
             return None
 
         return self
+
+    def check_landmarks(self) -> bool:
+        if self.dbv:
+            return True
+
+        vps = self.flags.get("landmark") or []
+        if not vps:
+            return True
+
+        failed = ""
+        for vp in vps:
+            if "^=" in vp:
+                vp, zs = vp.split("^=", 1)
+                expect = zs.encode("utf-8")
+            else:
+                expect = b""
+
+            if self.log:
+                t = "checking [/%s] landmark [%s]"
+                self.log("vfs", t % (self.vpath, vp), 6)
+
+            ap = "?"
+            try:
+                ap = self.canonical(vp)
+                with open(ap, "rb") as f:
+                    buf = f.read(4096)
+                    if not buf.startswith(expect):
+                        t = "file [%s] does not start with the expected bytes %s"
+                        failed = t % (ap, expect)
+                        break
+            except Exception as ex:
+                t = "%r while trying to read [%s] => [%s]"
+                failed = t % (ex, vp, ap)
+                break
+
+        if not failed:
+            return True
+
+        if self.log:
+            t = "WARNING: landmark verification failed; %s; will now disable up2k database for volume [/%s]"
+            self.log("vfs", t % (failed, self.vpath), 3)
+
+        for rm in "e2d e2t e2v".split():
+            self.flags = {k: v for k, v in self.flags.items() if not k.startswith(rm)}
+        self.flags["d2d"] = True
+        self.flags["d2t"] = True
+        return False
 
 
 if WINDOWS:
@@ -1501,7 +1548,7 @@ class AuthSrv(object):
             flags[name] = True
             return
 
-        zs = "ext_th mtp on403 on404 xbu xau xiu xbc xac xbr xar xbd xad xm xban"
+        zs = "ext_th landmark mtp on403 on404 xbu xau xiu xbc xac xbr xar xbd xad xm xban"
         if name not in zs.split():
             if value is True:
                 t = "└─add volflag [{}] = {}  ({})"
@@ -2236,6 +2283,8 @@ class AuthSrv(object):
             except:
                 t = "WARNING: volume [/%s]: invalid value specified for ext-th: %s"
                 self.log(t % (vol.vpath, etv), 3)
+
+            vol.check_landmarks()
 
             # d2d drops all database features for a volume
             for grp, rm in [["d2d", "e2d"], ["d2t", "e2t"], ["d2d", "e2v"]]:

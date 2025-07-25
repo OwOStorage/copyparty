@@ -1605,7 +1605,7 @@ config file example:
     w: *    # anyone can upload here
     rw: ed  # only user "ed" can read-write
   flags:
-    e2ds:      # filesystem indexing is required for many of these:
+    e2ds       # filesystem indexing is required for many of these:
     sz: 1k-3m  # accept upload only if filesize in this range
     df: 4g     # free disk space cannot go lower than this
     vmaxb: 1g  # volume can never exceed 1 GiB
@@ -1662,6 +1662,8 @@ this can instead be kept in a single place using the `--hist` argument, or the `
 
 by default, the per-volume `up2k.db` sqlite3-database for `-e2d` and `-e2t` is stored next to the thumbnails according to the `--hist` option, but the global-option `--dbpath` and/or volflag `dbpath` can be used to put the database somewhere else
 
+if your storage backend is unreliable (NFS or bad HDDs), you can specify one or more "landmarks" to look for before doing anything database-related. A landmark is a file which is always expected to exist inside the volume. This avoids spurious filesystem rescans in the event of an outage. One line per landmark (see example below)
+
 note:
 * putting the hist-folders on an SSD is strongly recommended for performance
 * markdown edits are always stored in a local `.hist` subdirectory
@@ -1679,6 +1681,8 @@ config file example:
   flags:
     hist: -  # restore the default (/mnt/nas/pics/.hist/)
     hist: /mnt/nas/cache/pics/  # can be absolute path
+    landmark: me.jpg  # /mnt/nas/pics/me.jpg must be readable to enable db
+    landmark: info/a.txt^=ok  # and this textfile must start with "ok"
 ```
 
 
