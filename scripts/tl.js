@@ -121,7 +121,7 @@ var tl_browser = {
 				"file-manager",
 				["G", "toggle list / grid view"],
 				["T", "toggle thumbnails / icons"],
-				["🡅 A/D", "thumbnail size"],
+				["⇧ A/D", "thumbnail size"],
 				["ctrl-K", "delete selected"],
 				["ctrl-X", "cut selection to clipboard"],
 				["ctrl-C", "copy selection to clipboard"],
@@ -131,9 +131,9 @@ var tl_browser = {
 
 				"file-list-sel",
 				["space", "toggle file selection"],
-				["🡑/🡓", "move selection cursor"],
-				["ctrl 🡑/🡓", "move cursor and viewport"],
-				["🡅 🡑/🡓", "select prev/next file"],
+				["↑/↓", "move selection cursor"],
+				["ctrl ↑/↓", "move cursor and viewport"],
+				["⇧ ↑/↓", "select prev/next file"],
 				["ctrl-A", "select all files / folders"],
 			], [
 				"navigation",
@@ -156,7 +156,7 @@ var tl_browser = {
 				["Home/End", "first/last pic"],
 				["F", "fullscreen"],
 				["R", "rotate clockwise"],
-				["🡅 R", "rotate ccw"],
+				["⇧ R", "rotate ccw"],
 				["S", "select pic"],
 				["Y", "download pic"],
 			], [
@@ -312,6 +312,7 @@ var tl_browser = {
 		"ct_csel": 'use CTRL and SHIFT for file selection in grid-view">sel',
 		"ct_ihop": 'when the image viewer is closed, scroll down to the last viewed file">g⮯',
 		"ct_dots": 'show hidden files (if server permits)">dotfiles',
+		"ct_qdel": 'when deleting files, only ask for confirmation once">qdel',
 		"ct_dir1st": 'sort folders before files">📁 first',
 		"ct_nsort": 'natural sort (for filenames with leading digits)">nsort',
 		"ct_readme": 'show README.md in folder listings">📜 readme',

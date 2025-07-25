@@ -1,4 +1,25 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0721-2307  `v1.18.3`  drop the umask
+
+## 🧪 new features
+
+* #181 the default chmod (unix-permissions) of new files and folders can now be changed 9921c43e
+  * `--chmod-d` or volflag `chmod_d` sets directory permissions; default is 755
+  * `--chmod-f` or volflag `chmod_f` sets file permissions; default is usually 644 (OS-defined)
+  * see `--help-chmod` which explains the numbers
+
+## 🩹 bugfixes
+
+* #179 couldn't combine `--shr` (shares) and `--xvol` (symlink-guard) 0f0f8d90
+* #180 gallery buttons could still be clicked when faded-out 8c32b0e7
+* rss-feeds were slightly busted when combined with rp-loc (location-based proxying) 56d3bcf5
+* music-playback within search-results no longer jumps into the next folder at end-of-list 9bc4c5d2
+* video-playback on iOS now behaves like on all other platforms 78605d9a
+  * (it would force-switch into fullscreen because that's their default)
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0707-1419  `v1.18.2`  idp-vol persistence
 
 ## 🧪 new features
