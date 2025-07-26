@@ -161,7 +161,7 @@ symbol legend,
 | upload                  | █ | █ | █ | █ | █ | █ | █ | █ | █ | █ | ╱ | █ | █ |
 | parallel uploads        | █ |   |   | █ | █ |   | • |   | █ | █ | █ |   | █ |
 | resumable uploads       | █ |   | █ |   |   |   |   |   | █ | █ | █ | ╱ |   |
-| upload segmenting       | █ |   |   |   |   |   |   | █ | █ | █ | █ | ╱ | █ |
+| upload segmenting       | █ |   |   | █ |   |   |   | █ | █ | █ | █ | ╱ | █ |
 | upload acceleration     | █ |   |   |   |   |   |   |   | █ |   | █ |   |   |
 | upload verification     | █ |   |   | █ | █ |   |   |   | █ |   |   |   |   |
 | upload deduplication    | █ |   |   |   | █ |   |   |   | █ |   |   |   |   |
@@ -488,7 +488,7 @@ symbol legend,
 * ⚠️ [isolated on-disk file hierarchy] in per-user folders
   * not that bad, can probably be remedied with bindmounts or maybe symlinks
 * ⚠️ uploads not resumable / accelerated / integrity-checked
-  * ⚠️ on cloudflare: max upload size 100 MiB
+  * 🔵 uploads are segmented; no filesize limit, even on cloudflare
 * ⚠️ uploading small files is slow; `4` files per sec (copyparty does `670`/sec, 160x faster)
 * ⚠️ no write-only / upload-only folders
 * ⚠️ http/webdav only; no ftp, zeroconf
