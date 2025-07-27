@@ -7464,7 +7464,7 @@ var search_ui = (function () {
 				nodes = ['<tr><td>-</td><td><div>' + links + '</div>', sz];
 
 			for (var b = 0; b < tagord.length; b++) {
-				var k = tagord[b],
+				var k = esc(tagord[b]),
 					v = r.tags[k] || "";
 
 				if (k == ".dur") {
@@ -7473,7 +7473,7 @@ var search_ui = (function () {
 					continue;
 				}
 
-				nodes.push(v);
+				nodes.push(esc('' + v));
 			}
 
 			nodes = nodes.concat([ext, unix2iso(ts)]);
@@ -8362,7 +8362,7 @@ var treectl = (function () {
 					top + tn.href + '" id="' + id + '">' + hname + '</a>', tn.sz];
 
 			for (var b = 0; b < res.taglist.length; b++) {
-				var k = res.taglist[b],
+				var k = esc(res.taglist[b]),
 					v = (tn.tags || {})[k] || "",
 					sv = null;
 
@@ -8371,7 +8371,7 @@ var treectl = (function () {
 				else if (k == ".up_at")
 					sv = v ? unix2iso(v) : "";
 				else {
-					ln.push(v);
+					ln.push(esc('' + v));
 					continue;
 				}
 				ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
