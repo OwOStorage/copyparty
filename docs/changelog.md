@@ -1,4 +1,22 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0725-1841  `v1.18.4`  Landmarks
+
+## 🧪 new features
+
+* #182 [Landmarks](https://github.com/9001/copyparty#database-location) edba7fff
+  * detects that a storage backend is glitching out and disengage the up2k-database as a precaution
+* #183 quickdelete 21a96bcf 
+  * new togglebutton `qdel` in the UI which reduces the number of deletion confirmations by one
+  * global-option `--qdel=0` which can bring it all the way to zero (good luck)
+
+## 🩹 bugfixes
+
+* fix unpost in recently created shares 2d322dd4
+* fix filekeys on windows df6d4df4
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0721-2307  `v1.18.3`  drop the umask
 
 ## 🧪 new features
