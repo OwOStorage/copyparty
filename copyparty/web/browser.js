@@ -6046,6 +6046,7 @@ var showfile = (function () {
 			m = /[?&](k=[^&#]+)/.exec(url);
 
 		url = url.split('?')[0] + (m ? '?' + m[1] : '');
+		assert_vp(url);
 		if (r.taildoc)
 			return r.tail(url, no_push);
 
@@ -7540,6 +7541,7 @@ function ev_load_m3u(e) {
 	return false;
 }
 function load_m3u(url) {
+	assert_vp(url);
 	var xhr = new XHR();
 	xhr.open('GET', url, true);
 	xhr.onload = render_m3u;
