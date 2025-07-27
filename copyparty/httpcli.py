@@ -4873,24 +4873,21 @@ class HttpCli(object):
     def tx_svcs(self) -> bool:
         aname = re.sub("[^0-9a-zA-Z]+", "", self.args.vname) or "a"
         ep = self.host
-        host = ep.split(":")[0]
-        hport = ep[ep.find(":") :] if ":" in ep else ""
-        
-        import ipaddress
-        try:
-            ipaddress.ip_address(host)
-            user_used_ip = True
-        except ValueError:
-            user_used_ip = False
-        
-        if user_used_ip or self.args.rclone_mdns or not self.args.zm:
-            rip = (
-                host
-                if self.args.rclone_mdns or not self.args.zm
-                else self.conn.hsrv.nm.map(self.ip) or host
-            )
+        sep = "]:" if "]" in ep else ":"
+        if sep in ep:
+            host, hport = ep.rsplit(":", 1)
+            hport = ":" + hport
+        else:
+            host = ep
+            hport = ""
+
+        if host.endswith(".local") and self.args.zm and not self.args.rclone_mdns:
+            rip = self.conn.hsrv.nm.map(self.ip) or host
+            if ":" in rip and "[" not in rip:
+                rip = "[%s]" % (rip,)
         else:
             rip = host
+
         # safer than html_escape/quotep since this avoids both XSS and shell-stuff
         pw = re.sub(r"[<>&$?`\"']", "_", self.pw or "hunter2")
         vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
