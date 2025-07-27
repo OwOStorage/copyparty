@@ -2995,12 +2995,20 @@ class HttpCli(object):
             # reset both plaintext and tls
             # (only affects active tls cookies when tls)
             for k in ("cppwd", "cppws") if self.is_https else ("cppwd",):
-                ck = gencookie(k, pwd, self.args.R, False)
+                ck = gencookie(k, pwd, self.args.R, self.args.cookie_lax, False)
                 self.out_headerlist.append(("Set-Cookie", ck))
             self.out_headers.pop("Set-Cookie", None)  # drop keepalive
         else:
             k = "cppws" if self.is_https else "cppwd"
-            ck = gencookie(k, pwd, self.args.R, self.is_https, dur, "; HttpOnly")
+            ck = gencookie(
+                k,
+                pwd,
+                self.args.R,
+                self.args.cookie_lax,
+                self.is_https,
+                dur,
+                "; HttpOnly",
+            )
             self.out_headers["Set-Cookie"] = ck
 
         return dur > 0, msg
@@ -5041,7 +5049,7 @@ class HttpCli(object):
     def setck(self) -> bool:
         k, v = self.uparam["setck"].split("=", 1)
         t = 0 if v in ("", "x") else 86400 * 299
-        ck = gencookie(k, v, self.args.R, False, t)
+        ck = gencookie(k, v, self.args.R, self.args.cookie_lax, False, t)
         self.out_headerlist.append(("Set-Cookie", ck))
         if "cc" in self.ouparam:
             self.redirect("", "?h#cc")
@@ -5053,7 +5061,7 @@ class HttpCli(object):
         for k in ALL_COOKIES:
             if k not in self.cookies:
                 continue
-            cookie = gencookie(k, "x", self.args.R, False)
+            cookie = gencookie(k, "x", self.args.R, self.args.cookie_lax, False)
             self.out_headerlist.append(("Set-Cookie", cookie))
 
         self.redirect("", "?h#cc")

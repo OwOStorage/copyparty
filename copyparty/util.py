@@ -2037,15 +2037,25 @@ def formatdate(ts: Optional[float] = None) -> str:
     return RFC2822 % (WKDAYS[wd], d, MONTHS[mo - 1], y, h, mi, s)
 
 
-def gencookie(k: str, v: str, r: str, tls: bool, dur: int = 0, txt: str = "") -> str:
+def gencookie(
+    k: str, v: str, r: str, lax: bool, tls: bool, dur: int = 0, txt: str = ""
+) -> str:
     v = v.replace("%", "%25").replace(";", "%3B")
     if dur:
         exp = formatdate(time.time() + dur)
     else:
         exp = "Fri, 15 Aug 1997 01:00:00 GMT"
 
-    t = "%s=%s; Path=/%s; Expires=%s%s%s; SameSite=Lax"
-    return t % (k, v, r, exp, "; Secure" if tls else "", txt)
+    t = "%s=%s; Path=/%s; Expires=%s%s%s; SameSite=%s"
+    return t % (
+        k,
+        v,
+        r,
+        exp,
+        "; Secure" if tls else "",
+        txt,
+        "Lax" if lax else "Strict",
+    )
 
 
 def humansize(sz: float, terse: bool = False) -> str:
