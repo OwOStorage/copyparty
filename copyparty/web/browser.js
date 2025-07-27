@@ -8269,6 +8269,7 @@ var treectl = (function () {
 	};
 
 	r.gentab = function (top, res) {
+		showfile.untail();
 		var nodes = res.dirs.concat(res.files),
 			html = mk_files_header(res.taglist),
 			sel = msel.hist[top],
