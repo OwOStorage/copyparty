@@ -2912,6 +2912,7 @@ class HttpCli(object):
 
         ok, msg = self.asrv.chpw(self.conn.hsrv.broker, self.uname, pwd)
         if ok:
+            self.cbonk(self.conn.hsrv.gpwc, pwd, "pw", "too many password changes")
             ok, msg = self.get_pwd_cookie(pwd)
             if ok:
                 msg = "new password OK"
