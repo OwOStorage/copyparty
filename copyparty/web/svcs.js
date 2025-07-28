@@ -49,7 +49,7 @@ function setos(os) {
 setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : 'idk');
 
 
-function setpw() {
+function setpw(e) {
     ev(e);
     modal.prompt('password:', '', function (v) {
         if (!v)

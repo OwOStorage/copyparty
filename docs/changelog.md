@@ -1,4 +1,40 @@
 ▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
+# 2025-0727-2305  `v1.18.5`  SECURITY: fix XSS in media tags
+
+## ⚠️ ATTN: this release fixes an XSS vulnerability
+
+[GHSA-9q4r-x2hj-jmvr](https://github.com/9001/copyparty/security/advisories/GHSA-9q4r-x2hj-jmvr), exploitable in two different ways, could let an attacker execute arbitrary javascript on other users:
+* either: tricking someone into clicking a malicious URL to load and execute javascript
+* or: uploading a malicious audio file to the server, affecting any successive visitors
+
+so, with new and curious eyes on the project, we are starting off with a bang. Huge thanks to @altperfect for finding and reporting this earlier today.
+
+## recent important news
+
+* [v1.18.5 (2025-07-28)](https://github.com/9001/copyparty/releases/tag/v1.18.5) fixed XSS in display of media tags
+* [v1.15.0 (2024-09-08)](https://github.com/9001/copyparty/releases/tag/v1.15.0) changed upload deduplication to be default-disabled
+* [v1.14.3 (2024-08-30)](https://github.com/9001/copyparty/releases/tag/v1.14.3) fixed a bug that was introduced in v1.13.8 (2024-08-13); this bug could lead to **data loss** -- see the v1.14.3 release-notes for details
+
+## 🧪 new features
+
+* #214 option to stop playback after one song, and/or at end of folder 6bb27e60
+
+## 🩹 bugfixes
+
+* GHSA-9q4r-x2hj-jmvr 895880ae 
+* block external m3u files 2228f81f
+* #202 the connect-page could show IP-address when it should have used hostnames/domains b0dec83a
+* scrolling locked after tailing a file and closing it creatively d197e754
+
+## 🔧 other changes
+
+* #189 the `SameSite` cookie parameter now defaults to `Strict`, increasing CSRF protection ca6d0b8d
+  * new option `--cookie-lax` reverts to previous value `Lax`
+* docker: add FTPS support b4199847
+
+
+
+▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀▀  
 # 2025-0725-1841  `v1.18.4`  Landmarks
 
 ## 🧪 new features
