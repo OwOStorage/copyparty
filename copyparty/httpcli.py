@@ -3026,6 +3026,9 @@ class HttpCli(object):
         self.gctx = vpath
         vpath = undot(vpath)
         vfs, rem = self.asrv.vfs.get(vpath, self.uname, False, True)
+        if "nosub" in vfs.flags:
+            raise Pebkac(403, "mkdir is forbidden below this folder")
+
         rem = sanitize_vpath(rem, "/")
         fn = vfs.canonical(rem)
 
