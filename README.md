@@ -1439,12 +1439,17 @@ if you enable deduplication with `--dedup` then it'll create a symlink instead o
 **warning:** when enabling dedup, you should also:
 * enable indexing with `-e2dsa` or volflag `e2dsa` (see [file indexing](#file-indexing) section below); strongly recommended
 * ...and/or `--hardlink-only` to use hardlink-based deduplication instead of symlinks; see explanation below
+* ...and/or `--reflink` to use CoW/reflink-based dedup (much safer than hardlink, but OS/FS-dependent)
 
 it will not be safe to rename/delete files if you only enable dedup and none of the above; if you enable indexing then it is not *necessary* to also do hardlinks (but you may still want to)
 
 by default, deduplication is done based on symlinks (symbolic links); these are tiny files which are pointers to the nearest full copy of the file
 
-you can choose to use hardlinks instead of softlinks, globally with `--hardlink-only` or volflag `hardlinkonly`;
+you can choose to use hardlinks instead of softlinks, globally with `--hardlink-only` or volflag `hardlinkonly`, and you can choose to use reflinks with `--reflink` or volflag `reflink`
+
+advantages of using reflinks (CoW, copy-on-write):
+* entirely safe (when your filesystem supports it correctly); either file can be edited or deleted without affecting other copies
+* only linux 5.3 or newer, only python 3.14 or newer, only some filesystems (btrfs probably ok, maybe xfs too, but zfs had bugs)
 
 advantages of using hardlinks:
 * hardlinks are more compatible with other software; they behave entirely like regular files
