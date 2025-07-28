@@ -873,31 +873,31 @@ def get_sects():
 
             similarly, \033[33m--chmod-d\033[0m and \033[33mchmod_d\033[0m sets the directory/folder perm
 
-            the value is a three-digit octal number such as 755, 750, 644, etc.
+            the value is a three-digit octal number such as \033[32m755\033[0m, \033[32m750\033[0m, \033[32m644\033[0m, etc.
 
             first digit = "User"; permission for the unix-user
             second digit = "Group"; permission for the unix-group
             third digit = "Other"; permission for all other users/groups
 
             for files:
-            0 = --- = no access
-            1 = --x = can execute the file as a program
-            2 = -w- = can write
-            3 = -wx = can write and execute
-            4 = r-- = can read
-            5 = r-x = can read and execute
-            6 = rw- = can read and write
-            7 = rwx = can read, write, execute
+            \033[32m0\033[0m = \033[35m---\033[0m = no access
+            \033[32m1\033[0m = \033[35m--x\033[0m = can execute the file as a program
+            \033[32m2\033[0m = \033[35m-w-\033[0m = can write
+            \033[32m3\033[0m = \033[35m-wx\033[0m = can write and execute
+            \033[32m4\033[0m = \033[35mr--\033[0m = can read
+            \033[32m5\033[0m = \033[35mr-x\033[0m = can read and execute
+            \033[32m6\033[0m = \033[35mrw-\033[0m = can read and write
+            \033[32m7\033[0m = \033[35mrwx\033[0m = can read, write, execute
 
             for directories/folders:
-            0 = --- = no access
-            1 = --x = can read files in folder but not list contents
-            2 = -w- = n/a
-            3 = -wx = can create files but not list
-            4 = r-- = can list, but not read/write
-            5 = r-x = can list and read files
-            6 = rw- = n/a
-            7 = rwx = can read, write, list
+            \033[32m0\033[0m = \033[35m---\033[0m = no access
+            \033[32m1\033[0m = \033[35m--x\033[0m = can read files in folder but not list contents
+            \033[32m2\033[0m = \033[35m-w-\033[0m = n/a
+            \033[32m3\033[0m = \033[35m-wx\033[0m = can create files but not list
+            \033[32m4\033[0m = \033[35mr--\033[0m = can list, but not read/write
+            \033[32m5\033[0m = \033[35mr-x\033[0m = can list and read files
+            \033[32m6\033[0m = \033[35mrw-\033[0m = n/a
+            \033[32m7\033[0m = \033[35mrwx\033[0m = can read, write, list
             """
             ),
         ],
