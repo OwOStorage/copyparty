@@ -2248,7 +2248,7 @@ NOTE: there used to be an aur package; this evaporated when copyparty was adopte
 
 ## fedora package
 
-does not exist yet;  using the [copr-pypi](https://copr.fedorainfracloud.org/coprs/g/copr/PyPI/) builds is **NOT recommended** because updates can be delayed by [several months](https://github.com/fedora-copr/copr/issues/3056)
+does not exist yet;  there are rumours that it is being packaged! keep an eye on this space...
 
 
 ## nix package
