@@ -547,14 +547,15 @@ def get_sects():
             when running behind a reverse-proxy, it's recommended to
             use unix-sockets for improved performance and security;
 
-            \033[32m-i unix:770:www:\033[33m/tmp/a.sock\033[0m listens on \033[33m/tmp/a.sock\033[0m with
-            permissions \033[33m0770\033[0m; only accessible to members of the \033[33mwww\033[0m
-            group. This is the best approach. Alternatively,
+            \033[32m-i unix:770:www:\033[33m/dev/shm/party.sock\033[0m listens on
+            \033[33m/dev/shm/party.sock\033[0m with permissions \033[33m0770\033[0m;
+            only accessible to members of the \033[33mwww\033[0m group.
+            This is the best approach. Alternatively,
 
-            \033[32m-i unix:777:\033[33m/tmp/a.sock\033[0m sets perms \033[33m0777\033[0m so anyone can
-            access it; bad unless it's inside a restricted folder
+            \033[32m-i unix:777:\033[33m/dev/shm/party.sock\033[0m sets perms \033[33m0777\033[0m so anyone
+            can access it; bad unless it's inside a restricted folder
 
-            \033[32m-i unix:\033[33m/tmp/a.sock\033[0m keeps umask-defined permissions
+            \033[32m-i unix:\033[33m/dev/shm/party.sock\033[0m keeps umask-defined permission
             (usually \033[33m0600\033[0m) and the same user/group as copyparty
 
             \033[33m-p\033[0m (tcp ports) is ignored for unix sockets

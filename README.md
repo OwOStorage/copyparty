@@ -2027,7 +2027,7 @@ some reverse proxies (such as [Caddy](https://caddyserver.com/)) can automatical
 * **warning:** nginx-QUIC (HTTP/3) is still experimental and can make uploads much slower, so HTTP/1.1 is recommended for now
 * depending on server/client, HTTP/1.1 can also be 5x faster than HTTP/2
 
-for improved security (and a 10% performance boost) consider listening on a unix-socket with `-i unix:770:www:/tmp/party.sock` (permission `770` means only members of group `www` can access it)
+for improved security (and a 10% performance boost) consider listening on a unix-socket with `-i unix:770:www:/dev/shm/party.sock` (permission `770` means only members of group `www` can access it)
 
 example webserver / reverse-proxy configs:
 
