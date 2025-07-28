@@ -49,21 +49,21 @@ function setos(os) {
 setos(WINDOWS ? 'win' : LINUX ? 'lin' : MACOS ? 'mac' : 'idk');
 
 
-pwbutton = ebi('setpw')
-if (pwbutton != null)
-    pwbutton.onclick = function (e) {
-        ev(e);
-        modal.prompt('password:', '', function (v) {
-            if (!v)
-                return;
+function setpw() {
+    ev(e);
+    modal.prompt('password:', '', function (v) {
+        if (!v)
+            return;
 
-            var pw0 = ebi('pw0').innerHTML,
-                oa = QSA('b');
-        
-            for (var a = 0; a < oa.length; a++)
-                if (oa[a].innerHTML == pw0)
-                    oa[a].textContent = v;
+        var pw0 = ebi('pw0').innerHTML,
+            oa = QSA('b');
+    
+        for (var a = 0; a < oa.length; a++)
+            if (oa[a].innerHTML == pw0)
+                oa[a].textContent = v;
 
-            add_dls();
-        });
-    }
+        add_dls();
+    });
+}
+if (ebi('setpw'))
+    ebi('setpw').onclick = setpw;
