@@ -1575,6 +1575,18 @@ class HttpCli(object):
             self.log("inaccessible: %r" % ("/" + self.vpath,))
             raise Pebkac(401, "authenticate")
 
+        if "quota-available-bytes" in props and not self.args.nid:
+            bfree, btot, _ = get_df(vn.realpath, False)
+            if btot:
+                df = {
+                    "quota-available-bytes": str(bfree),
+                    "quota-used-bytes": str(btot - bfree),
+                }
+            else:
+                df = {}
+        else:
+            df = {}
+
         fgen = itertools.chain([topdir], fgen)
         vtop = vjoin(self.args.R, vjoin(vn.vpath, rem))
 
@@ -1617,6 +1629,9 @@ class HttpCli(object):
                     ap = os.path.join(tap, x["vp"])
                 pvs["getcontenttype"] = html_escape(guess_mime(rp, ap))
                 pvs["getcontentlength"] = str(st.st_size)
+            elif df:
+                pvs.update(df)
+                df = {}
 
             for k, v in pvs.items():
                 if k not in props:
