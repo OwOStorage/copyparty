@@ -6157,13 +6157,13 @@ class HttpCli(object):
             self.log("#wow #whoa")
 
         if not self.args.nid:
-            free, total, _ = get_df(abspath, False)
-            if total is not None:
+            free, total, zs = get_df(abspath, False)
+            if total:
                 h1 = humansize(free or 0)
                 h2 = humansize(total)
                 srv_info.append("{} free of {}".format(h1, h2))
-            elif free is not None:
-                srv_info.append(humansize(free, True) + " free")
+            elif zs:
+                self.log("diskfree(%r): %s" % (abspath, zs), 3)
 
         srv_infot = "</span> // <span>".join(srv_info)
 

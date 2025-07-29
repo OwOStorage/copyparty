@@ -2662,7 +2662,7 @@ def wunlink(log: "NamedLogger", abspath: str, flags: dict[str, Any]) -> bool:
     return _fs_mvrm(log, abspath, "", False, flags)
 
 
-def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str]:
+def get_df(abspath: str, prune: bool) -> tuple[int, int, str]:
     try:
         ap = fsenc(abspath)
         while prune and not os.path.isdir(ap) and BOS_SEP in ap:
@@ -2673,17 +2673,22 @@ def get_df(abspath: str, prune: bool) -> tuple[Optional[int], Optional[int], str
             assert ctypes  # type: ignore  # !rm
             abspath = fsdec(ap)
             bfree = ctypes.c_ulonglong(0)
+            btotal = ctypes.c_ulonglong(0)
+            bavail = ctypes.c_ulonglong(0)
             ctypes.windll.kernel32.GetDiskFreeSpaceExW(  # type: ignore
-                ctypes.c_wchar_p(abspath), None, None, ctypes.pointer(bfree)
+                ctypes.c_wchar_p(abspath),
+                ctypes.pointer(bavail),
+                ctypes.pointer(btotal),
+                ctypes.pointer(bfree),
             )
-            return (bfree.value, None, "")
+            return (bavail.value, btotal.value, "")
         else:
             sv = os.statvfs(ap)
             free = sv.f_frsize * sv.f_bfree
             total = sv.f_frsize * sv.f_blocks
             return (free, total, "")
     except Exception as ex:
-        return (None, None, repr(ex))
+        return (0, 0, repr(ex))
 
 
 if not ANYWIN and not MACOS:
