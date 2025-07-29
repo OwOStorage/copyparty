@@ -7946,6 +7946,17 @@ var treectl = (function () {
 			return toast.err(30, "bad <code>?tree</code> reply;\nexpected json, got this:\n\n" + esc(this.responseText + ''));
 		}
 		r.rendertree(res, this.ts, this.top, this.dst, this.rst);
+
+		if (r.lsc && r.lsc.unlist)
+			r.prunetree(r.lsc);
+	};
+
+	r.prunetree = function (res) {
+		var ptn = new RegExp(res.unlist);
+		var els = QSA('#treeul li>a+a');
+		for (var a = els.length - 1; a >= 0; a--)
+			if (ptn.exec(els[a].textContent) && !els[a].className)
+				els[a].closest('ul').removeChild(els[a].closest('li'));
 	};
 
 	r.rendertree = function (res, ts, top0, dst, rst) {
@@ -8233,6 +8244,8 @@ var treectl = (function () {
 			}
 
 			r.rendertree({ "a": dirs }, this.ts, ".", get_evpath() + (dk ? '?k=' + dk : ''));
+			if (res.unlist)
+				r.prunetree(res);
 		}
 
 		r.gentab(this.top, res);
@@ -8314,7 +8327,7 @@ var treectl = (function () {
 		if (res.unlist) {
 			var ptn = new RegExp(res.unlist);
 			for (var a = nodes.length - 1; a >= 0; a--)
-				if (ptn.exec(nodes[a].href.split('?')[0]))
+				if (ptn.exec(uricom_dec(nodes[a].href.split('?')[0])))
 					nodes.splice(a, 1);
 		}
 		nodes = sortfiles(nodes);
