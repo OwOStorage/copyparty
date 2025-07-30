@@ -51,6 +51,7 @@ from .util import (
     HAVE_PSUTIL,
     HAVE_SQLITE3,
     HAVE_ZMQ,
+    RE_ANSI,
     URL_BUG,
     UTC,
     VERSIONS,
@@ -60,7 +61,6 @@ from .util import (
     HMaccas,
     ODict,
     alltrace,
-    ansi_re,
     build_netmap,
     expat_ver,
     gzip,
@@ -1409,9 +1409,9 @@ class SvcHub(object):
             if self.no_ansi:
                 fmt = "%s %-21s %s\n"
                 if "\033" in msg:
-                    msg = ansi_re.sub("", msg)
+                    msg = RE_ANSI.sub("", msg)
                 if "\033" in src:
-                    src = ansi_re.sub("", src)
+                    src = RE_ANSI.sub("", src)
             elif c:
                 if isinstance(c, int):
                     msg = "\033[3%sm%s\033[0m" % (c, msg)

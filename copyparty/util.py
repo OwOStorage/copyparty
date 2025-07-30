@@ -243,7 +243,17 @@ except:
     BITNESS = struct.calcsize("P") * 8
 
 
-ansi_re = re.compile("\033\\[[^mK]*[mK]")
+RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
+RE_CTYPE = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
+RE_CDISP = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
+RE_CDISP_FIELD = re.compile(
+    r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
+)
+RE_CDISP_FILE = re.compile(
+    r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
+)
+RE_MEMTOTAL = re.compile("^MemTotal:.* kB")
+RE_MEMAVAIL = re.compile("^MemAvailable:.* kB")
 
 
 BOS_SEP = ("%s" % (os.sep,)).encode("ascii")
@@ -488,11 +498,11 @@ def read_ram() -> tuple[float, float]:
         with open("/proc/meminfo", "rb", 0x10000) as f:
             zsl = f.read(0x10000).decode("ascii", "replace").split("\n")
 
-        p = re.compile("^MemTotal:.* kB")
+        p = RE_MEMTOTAL
         zs = next((x for x in zsl if p.match(x)))
         a = int((int(zs.split()[1]) / 0x100000) * 100) / 100
 
-        p = re.compile("^MemAvailable:.* kB")
+        p = RE_MEMAVAIL
         zs = next((x for x in zsl if p.match(x)))
         b = int((int(zs.split()[1]) / 0x100000) * 100) / 100
     except:
@@ -1698,14 +1708,10 @@ class MultipartParser(object):
         self.args = args
         self.headers = http_headers
 
-        self.re_ctype = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
-        self.re_cdisp_field = re.compile(
-            r'^content-disposition:(?: *|.*; *)name="([^"]+)"', re.IGNORECASE
-        )
-        self.re_cdisp_file = re.compile(
-            r'^content-disposition:(?: *|.*; *)filename="(.*)"', re.IGNORECASE
-        )
+        self.re_ctype = RE_CTYPE
+        self.re_cdisp = RE_CDISP
+        self.re_cdisp_field = RE_CDISP_FIELD
+        self.re_cdisp_file = RE_CDISP_FILE
 
         self.boundary = b""
         self.gen: Optional[

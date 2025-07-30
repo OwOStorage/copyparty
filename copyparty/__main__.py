@@ -53,13 +53,13 @@ from .util import (
     PYFTPD_VER,
     RAM_AVAIL,
     RAM_TOTAL,
+    RE_ANSI,
     SQLITE_VER,
     UNPLICATIONS,
     URL_BUG,
     URL_PRJ,
     Daemon,
     align_tab,
-    ansi_re,
     b64enc,
     dedent,
     has_resource,
@@ -167,7 +167,7 @@ def lprint(*a: Any, **ka: Any) -> None:
     txt: str = " ".join(unicode(x) for x in a) + eol
     printed.append(txt)
     if not VT100:
-        txt = ansi_re.sub("", txt)
+        txt = RE_ANSI.sub("", txt)
 
     print(txt, end="", **ka)
 
