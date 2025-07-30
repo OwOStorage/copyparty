@@ -1,9 +1,11 @@
+var SRS = SR.trimEnd('/') + '/';
+
 var t = QSA('a[k]');
 for (var a = 0; a < t.length; a++)
     t[a].onclick = rm;
 
 function rm() {
-    var u = SR + shr + uricom_enc(this.getAttribute('k')) + '?eshare=rm',
+    var u = SRS + '?eshare=rm&skey=' + uricom_enc(this.getAttribute('k')),
         xhr = new XHR();
 
     xhr.open('POST', u, true);
@@ -13,7 +15,7 @@ function rm() {
 
 function bump() {
     var k = this.closest('tr').getElementsByTagName('a')[2].getAttribute('k'),
-        u = SR + shr + uricom_enc(k) + '?eshare=' + this.value,
+        u = SRS + '?skey=' + uricom_enc(k) + '&eshare=' + this.value,
         xhr = new XHR();
 
     xhr.open('POST', u, true);

@@ -5659,14 +5659,14 @@ class HttpCli(object):
                 raise Pebkac(500, "sqlite3 not found on server; sharing is disabled")
             raise Pebkac(500, "server busy, cannot create share; please retry in a bit")
 
+        skey = self.uparam.get("skey") or self.vpath.split("/")[-1]
+
         if self.args.shr_v:
-            self.log("handle_eshare: " + self.req)
+            self.log("handle_eshare: " + skey)
 
         cur = idx.get_shr()
         if not cur:
             raise Pebkac(400, "huh, sharing must be disabled in the server config...")
-
-        skey = self.vpath.split("/")[-1]
 
         rows = cur.execute("select un, t1 from sh where k = ?", (skey,)).fetchall()
         un = rows[0][0] if rows and rows[0] else ""
