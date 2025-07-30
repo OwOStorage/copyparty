@@ -2393,7 +2393,7 @@ var Ls = {
 		"fu_xe2": "404: Datei nicht gefunden??",
 
 		"fz_tar": "Unkomprimierte GNU TAR-Datei (Linux / Mac)",
-		"fz_pax": "Unkomprimierte pax-format TAR-Datei (slower)",
+		"fz_pax": "Unkomprimierte pax-format TAR-Datei (etwas langsamer)", //m
 		"fz_targz": "GNU-TAR mit gzip Level 3 Kompression$N$Nüblicherweise recht langsam,$Nbenutze stattdessen ein unkomprimiertes TAR",
 		"fz_tarxz": "GNU-TAR mit xz level 1 Kompression$N$Nüblicherweise recht langsam,$Nbenutze stattdessen ein unkomprimiertes TAR",
 		"fz_zip8": "ZIP mit UTF8-Dateinamen (könnte kaputt gehen auf Windows 7 oder älter)",
