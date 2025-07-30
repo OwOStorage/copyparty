@@ -33,7 +33,7 @@ except:
 
 from .__init__ import ANYWIN, PY2, RES, TYPE_CHECKING, EnvParams, unicode
 from .__version__ import S_VERSION
-from .authsrv import VFS  # typechk
+from .authsrv import LEELOO_DALLAS, VFS  # typechk
 from .bos import bos
 from .star import StreamTar
 from .stolen.qrcodegen import QrCode, qr2svg
@@ -622,6 +622,9 @@ class HttpCli(object):
                 ) or self.args.idp_h_key in self.headers
 
                 if trusted_key and trusted_xff:
+                    if idp_usr.lower() == LEELOO_DALLAS:
+                        self.loud_reply("send her back", status=403)
+                        return False
                     self.asrv.idp_checkin(self.conn.hsrv.broker, idp_usr, idp_grp)
                 else:
                     if not trusted_key:

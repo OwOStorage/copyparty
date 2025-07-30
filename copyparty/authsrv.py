@@ -70,6 +70,25 @@ if PY2:
 
 
 LEELOO_DALLAS = "leeloo_dallas"
+##
+## you might be curious what Leeloo Dallas is doing here, so let me explain:
+##
+## certain daemonic tasks, namely:
+##  * deletion of expired files, running on a timer
+##  * deletion of sidecar files, initiated by plugins
+## need to skip the usual permission-checks to do their thing,
+## so we let Leeloo handle these
+##
+## and also, the smb-server has really shitty support for user-accounts
+## so one popular way to avoid issues is by running copyparty without users;
+## this makes all smb-clients identify as LD to gain unrestricted access
+##
+## Leeloo, being a fictional character from The Fifth Element,
+## obviously does not exist and will never be able to access any copyparty
+## instances from the outside (the username is rejected at every entrypoint)
+##
+## thanks for coming to my ted talk
+
 
 SEE_LOG = "see log for details"
 SEESLOG = " (see serverlog for details)"
