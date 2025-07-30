@@ -79,6 +79,7 @@ from .util import (
     hidedir,
     html_bescape,
     html_escape,
+    html_sh_esc,
     humansize,
     ipnorm,
     json_hesc,
@@ -4912,11 +4913,8 @@ class HttpCli(object):
         else:
             rip = host
 
-        # safer than html_escape/quotep since this avoids both XSS and shell-stuff
-        pw = re.sub(r"[<>&$?`\"']", "_", self.pw or "hunter2")
-        vp = re.sub(r"[<>&$?`\"']", "_", self.uparam["hc"] or "").lstrip("/")
-        pw = pw.replace(" ", "%20")
-        vp = vp.replace(" ", "%20")
+        vp = (self.uparam["hc"] or "").lstrip("/")
+        pw = self.pw or "hunter2"
         if pw in self.asrv.sesa:
             pw = "hunter2"
 
@@ -4925,14 +4923,14 @@ class HttpCli(object):
             args=self.args,
             accs=bool(self.asrv.acct),
             s="s" if self.is_https else "",
-            rip=rip,
-            ep=ep,
-            vp=vp,
-            rvp=vjoin(self.args.R, vp),
-            host=host,
-            hport=hport,
+            rip=html_sh_esc(rip),
+            ep=html_sh_esc(ep),
+            vp=html_sh_esc(vp),
+            rvp=html_sh_esc(vjoin(self.args.R, vp)),
+            host=html_sh_esc(host),
+            hport=html_sh_esc(hport),
             aname=aname,
-            pw=pw,
+            pw=html_sh_esc(pw),
         )
         self.reply(html.encode("utf-8"))
         return True

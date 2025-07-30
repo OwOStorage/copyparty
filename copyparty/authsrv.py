@@ -33,6 +33,7 @@ from .util import (
     afsenc,
     get_df,
     humansize,
+    json_hesc,
     min_ex,
     odfusion,
     read_utf8,
@@ -2785,7 +2786,7 @@ class AuthSrv(object):
                 "lifetime": vn.js_ls["lifetime"],
                 "u2sort": self.args.u2sort,
             }
-            vn.js_htm = json.dumps(js_htm)
+            vn.js_htm = json_hesc(json.dumps(js_htm))
 
         vols = list(vfs.all_nodes.values())
         if enshare:

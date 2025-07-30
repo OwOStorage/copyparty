@@ -244,6 +244,7 @@ except:
 
 
 RE_ANSI = re.compile("\033\\[[^mK]*[mK]")
+RE_HTML_SH = re.compile(r"[<>&$?`\"';]")
 RE_CTYPE = re.compile(r"^content-type: *([^; ]+)", re.IGNORECASE)
 RE_CDISP = re.compile(r"^content-disposition: *([^; ]+)", re.IGNORECASE)
 RE_CDISP_FIELD = re.compile(
@@ -2251,6 +2252,12 @@ def find_prefix(ips: list[str], cidrs: list[str]) -> list[str]:
         if hit:
             ret.append(hit)
     return ret
+
+
+def html_sh_esc(s: str) -> str:
+    s = re.sub(RE_HTML_SH, "_", s).replace(" ", "%20")
+    s = s.replace("\r", "_").replace("\n", "_")
+    return s
 
 
 def json_hesc(s: str) -> str:

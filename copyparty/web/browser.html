@@ -109,8 +109,8 @@
 {%- for f in files %}
 <tr><td>{{ f.lead }}</td><td><a href="{{ f.href }}">{{ f.name|e }}</a></td><td>{{ f.sz }}</td>
 {%- if f.tags is defined %}
-	{%- for k in taglist %}<td>{{ f.tags[k] }}</td>{%- endfor %}
-{%- endif %}<td>{{ f.ext }}</td><td>{{ f.dt }}</td></tr>
+	{%- for k in taglist %}<td>{{ f.tags[k]|e }}</td>{%- endfor %}
+{%- endif %}<td>{{ f.ext|e }}</td><td>{{ f.dt }}</td></tr>
 {%- endfor %}
 
 		</tbody>
