@@ -1114,15 +1114,18 @@ class HttpCli(object):
             else:
                 return True
 
+        host = self.host.lower()
+        if host.startswith("["):
+            if "]:" in host:
+                host = host.split("]:")[0] + "]"
+        else:
+            host = host.split(":")[0]
+
         oh = self.out_headers
         origin = origin.lower()
-        good_origins = self.args.acao + [
-            "%s://%s"
-            % (
-                "https" if self.is_https else "http",
-                self.host.lower().split(":")[0],
-            )
-        ]
+        proto = "https" if self.is_https else "http"
+        good_origins = self.args.acao + ["%s://%s" % (proto, host)]
+
         if "pw" in ih or re.sub(r"(:[0-9]{1,5})?/?$", "", origin) in good_origins:
             good_origin = True
             bad_hdrs = ("",)
