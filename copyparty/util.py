@@ -155,7 +155,9 @@ except:
     HAVE_PSUTIL = False
 
 try:
-    if os.environ.get("PRTY_NO_MAGIC"):
+    if os.environ.get("PRTY_NO_MAGIC") or (
+        ANYWIN and not os.environ.get("PRTY_FORCE_MAGIC")
+    ):
         raise Exception()
 
     import magic

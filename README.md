@@ -2226,6 +2226,7 @@ force-enable features with known issues on your OS/env  by setting any of the fo
 | env-var                  | what it does |
 | ------------------------ | ------------ |
 | `PRTY_FORCE_MP`          | force-enable multiprocessing (real multithreading) on MacOS and other broken platforms |
+| `PRTY_FORCE_MAGIC`       | use [magic](https://pypi.org/project/python-magic/) on Windows (you will segfault) |
 
 
 # packages
