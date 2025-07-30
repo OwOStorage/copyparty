@@ -2253,6 +2253,10 @@ def find_prefix(ips: list[str], cidrs: list[str]) -> list[str]:
     return ret
 
 
+def json_hesc(s: str) -> str:
+    return s.replace("<", "\\u003c").replace(">", "\\u003e").replace("&", "\\u0026")
+
+
 def html_escape(s: str, quot: bool = False, crlf: bool = False) -> str:
     """html.escape but also newlines"""
     s = s.replace("&", "&amp;").replace("<", "&lt;").replace(">", "&gt;")

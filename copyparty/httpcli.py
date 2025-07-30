@@ -81,6 +81,7 @@ from .util import (
     html_escape,
     humansize,
     ipnorm,
+    json_hesc,
     justcopy,
     load_resource,
     loadpy,
@@ -5595,7 +5596,7 @@ class HttpCli(object):
             self.reply(jtxt.encode("utf-8", "replace"), mime="application/json")
             return True
 
-        html = self.j2s("rups", this=self, v=jtxt)
+        html = self.j2s("rups", this=self, v=json_hesc(jtxt))
         self.reply(html.encode("utf-8"), status=200)
         return True
 
