@@ -916,7 +916,7 @@ class Up2k(object):
             for vol in vols:
                 try:
                     # mkdir gonna happen at snap anyways;
-                    bos.makedirs(vol.realpath, vol.flags["chmod_d"])
+                    bos.makedirs(vol.realpath, vf=vol.flags)
                     dir_is_empty(self.log_func, not self.args.no_scandir, vol.realpath)
                 except Exception as ex:
                     self.volstate[vol.vpath] = "OFFLINE (cannot access folder)"
@@ -3309,7 +3309,7 @@ class Up2k(object):
                         reg,
                         "up2k._get_volsize",
                     )
-                    bos.makedirs(ap2, vfs.flags["chmod_d"])
+                    bos.makedirs(ap2, vf=vfs.flags)
                     vfs.lim.nup(cj["addr"])
                     vfs.lim.bup(cj["addr"], cj["size"])
 
@@ -3445,7 +3445,7 @@ class Up2k(object):
             "wb",
             fdir=fdir,
             suffix="-%.6f-%s" % (ts, dip),
-            chmod=vf.get("chmod_f", -1),
+            vf=vf,
         )
         f.close()
         return ret
@@ -4304,7 +4304,7 @@ class Up2k(object):
                 self.log(t, 1)
                 raise Pebkac(405, t)
 
-        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
+        bos.makedirs(os.path.dirname(dabs), vf=dvn.flags)
 
         c1, w, ftime_, fsize_, ip, at = self._find_from_vpath(
             svn_dbv.realpath, srem_dbv
@@ -4480,7 +4480,10 @@ class Up2k(object):
                 vp = vjoin(dvp, rem)
                 try:
                     dvn, drem = self.vfs.get(vp, uname, False, True)
-                    bos.mkdir(dvn.canonical(drem), dvn.flags["chmod_d"])
+                    dap = dvn.canonical(drem)
+                    bos.mkdir(dap, dvn.flags["chmod_d"])
+                    if "chown" in dvn.flags:
+                        bos.chown(dap, dvn.flags["uid"], dvn.flags["gid"])
                 except:
                     pass
 
@@ -4550,7 +4553,7 @@ class Up2k(object):
 
         is_xvol = svn.realpath != dvn.realpath
 
-        bos.makedirs(os.path.dirname(dabs), dvn.flags["chmod_d"])
+        bos.makedirs(os.path.dirname(dabs), vf=dvn.flags)
 
         if is_dirlink:
             dlabs = absreal(sabs)
@@ -5062,7 +5065,7 @@ class Up2k(object):
             "wb",
             fdir=pdir,
             suffix="-%.6f-%s" % (job["t0"], dip),
-            chmod=vf.get("chmod_f", -1),
+            vf=vf,
         )
         try:
             abspath = djoin(pdir, job["tnam"])

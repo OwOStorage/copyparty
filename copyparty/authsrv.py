@@ -140,6 +140,8 @@ class Lim(object):
         self.reg: Optional[dict[str, dict[str, Any]]] = None  # up2k registry
 
         self.chmod_d = 0o755
+        self.uid = self.gid = -1
+        self.chown = False
 
         self.nups: dict[str, list[float]] = {}  # num tracker
         self.bups: dict[str, list[tuple[float, int]]] = {}  # byte tracker list
@@ -302,6 +304,8 @@ class Lim(object):
             # no branches yet; make one
             sub = os.path.join(path, "0")
             bos.mkdir(sub, self.chmod_d)
+            if self.chown:
+                os.chown(sub, self.uid, self.gid)
         else:
             # try newest branch only
             sub = os.path.join(path, str(dirs[-1]))
@@ -317,6 +321,8 @@ class Lim(object):
         # make a branch
         sub = os.path.join(path, str(dirs[-1] + 1))
         bos.mkdir(sub, self.chmod_d)
+        if self.chown:
+            os.chown(sub, self.uid, self.gid)
         ret = self.dive(sub, lvs - 1)
         if ret is None:
             raise Pebkac(500, "rotation bug")
@@ -2181,7 +2187,7 @@ class AuthSrv(object):
                 if vf not in vol.flags:
                     vol.flags[vf] = getattr(self.args, ga)
 
-            zs = "forget_ip nrand tail_who u2abort u2ow ups_who zip_who"
+            zs = "forget_ip gid nrand tail_who u2abort u2ow uid ups_who zip_who"
             for k in zs.split():
                 if k in vol.flags:
                     vol.flags[k] = int(vol.flags[k])
@@ -2218,8 +2224,17 @@ class AuthSrv(object):
                 if (is_d and zi != 0o755) or not is_d:
                     free_umask = True
 
+            vol.flags.pop("chown", None)
+            if vol.flags["uid"] != -1 or vol.flags["gid"] != -1:
+                vol.flags["chown"] = True
+            vol.flags.pop("fperms", None)
+            if "chown" in vol.flags or vol.flags.get("chmod_f"):
+                vol.flags["fperms"] = True
             if vol.lim:
                 vol.lim.chmod_d = vol.flags["chmod_d"]
+                vol.lim.chown = "chown" in vol.flags
+                vol.lim.uid = vol.flags["uid"]
+                vol.lim.gid = vol.flags["gid"]
 
             if vol.flags.get("og"):
                 self.args.uqe = True

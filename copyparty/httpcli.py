@@ -103,6 +103,7 @@ from .util import (
     sanitize_vpath,
     sendfile_kern,
     sendfile_py,
+    set_fperms,
     stat_resource,
     ub64dec,
     ub64enc,
@@ -2086,7 +2087,7 @@ class HttpCli(object):
             fdir, fn = os.path.split(fdir)
             rem, _ = vsplit(rem)
 
-        bos.makedirs(fdir, vfs.flags["chmod_d"])
+        bos.makedirs(fdir, vf=vfs.flags)
 
         open_ka: dict[str, Any] = {"fun": open}
         open_a = ["wb", self.args.iobuf]
@@ -2144,9 +2145,7 @@ class HttpCli(object):
         if nameless:
             fn = vfs.flags["put_name2"].format(now=time.time(), cip=self.dip())
 
-        params = {"suffix": suffix, "fdir": fdir}
-        if "chmod_f" in vfs.flags:
-            params["chmod"] = vfs.flags["chmod_f"]
+        params = {"suffix": suffix, "fdir": fdir, "vf": vfs.flags}
         if self.args.nw:
             params = {}
             fn = os.devnull
@@ -2195,7 +2194,7 @@ class HttpCli(object):
                     if self.args.nw:
                         fn = os.devnull
                     else:
-                        bos.makedirs(fdir, vfs.flags["chmod_d"])
+                        bos.makedirs(fdir, vf=vfs.flags)
                         path = os.path.join(fdir, fn)
                         if not nameless:
                             self.vpath = vjoin(self.vpath, fn)
@@ -2327,7 +2326,7 @@ class HttpCli(object):
                     if self.args.hook_v:
                         log_reloc(self.log, hr["reloc"], x, path, vp, fn, vfs, rem)
                     fdir, self.vpath, fn, (vfs, rem) = x
-                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                    bos.makedirs(fdir, vf=vfs.flags)
                     path2 = os.path.join(fdir, fn)
                     atomic_move(self.log, path, path2, vfs.flags)
                     path = path2
@@ -2613,7 +2612,7 @@ class HttpCli(object):
             dst = vfs.canonical(rem)
             try:
                 if not bos.path.isdir(dst):
-                    bos.makedirs(dst, vfs.flags["chmod_d"])
+                    bos.makedirs(dst, vf=vfs.flags)
             except OSError as ex:
                 self.log("makedirs failed %r" % (dst,))
                 if not bos.path.isdir(dst):
@@ -3060,7 +3059,7 @@ class HttpCli(object):
                 raise Pebkac(405, 'folder "/%s" already exists' % (vpath,))
 
             try:
-                bos.makedirs(fn, vfs.flags["chmod_d"])
+                bos.makedirs(fn, vf=vfs.flags)
             except OSError as ex:
                 if ex.errno == errno.EACCES:
                     raise Pebkac(500, "the server OS denied write-access")
@@ -3102,8 +3101,8 @@ class HttpCli(object):
 
             with open(fsenc(fn), "wb") as f:
                 f.write(b"`GRUNNUR`\n")
-                if "chmod_f" in vfs.flags:
-                    os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                if "fperms" in vfs.flags:
+                    set_fperms(f, vfs.flags)
 
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath, "?edit")
@@ -3177,7 +3176,7 @@ class HttpCli(object):
             )
             upload_vpath = "{}/{}".format(vfs.vpath, rem).strip("/")
             if not nullwrite:
-                bos.makedirs(fdir_base, vfs.flags["chmod_d"])
+                bos.makedirs(fdir_base, vf=vfs.flags)
 
         rnd, lifetime, xbu, xau = self.upload_flags(vfs)
         zs = self.uparam.get("want") or self.headers.get("accept") or ""
@@ -3210,7 +3209,7 @@ class HttpCli(object):
                     if rnd:
                         fname = rand_name(fdir, fname, rnd)
 
-                    open_args = {"fdir": fdir, "suffix": suffix}
+                    open_args = {"fdir": fdir, "suffix": suffix, "vf": vfs.flags}
 
                     if "replace" in self.uparam:
                         if not self.can_delete:
@@ -3272,11 +3271,8 @@ class HttpCli(object):
                             else:
                                 open_args["fdir"] = fdir
 
-                if "chmod_f" in vfs.flags:
-                    open_args["chmod"] = vfs.flags["chmod_f"]
-
                 if p_file and not nullwrite:
-                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                    bos.makedirs(fdir, vf=vfs.flags)
 
                     # reserve destination filename
                     f, fname = ren_open(fname, "wb", fdir=fdir, suffix=suffix)
@@ -3380,7 +3376,7 @@ class HttpCli(object):
                                 if nullwrite:
                                     fdir = ap2 = ""
                                 else:
-                                    bos.makedirs(fdir, vfs.flags["chmod_d"])
+                                    bos.makedirs(fdir, vf=vfs.flags)
                                     atomic_move(self.log, abspath, ap2, vfs.flags)
                                 abspath = ap2
                         sz = bos.path.getsize(abspath)
@@ -3501,8 +3497,8 @@ class HttpCli(object):
                     ft = "{}:{}".format(self.ip, self.addr[1])
                     ft = "{}\n{}\n{}\n".format(ft, msg.rstrip(), errmsg)
                     f.write(ft.encode("utf-8"))
-                    if "chmod_f" in vfs.flags:
-                        os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                    if "fperms" in vfs.flags:
+                        set_fperms(f, vfs.flags)
             except Exception as ex:
                 suf = "\nfailed to write the upload report: {}".format(ex)
 
@@ -3553,7 +3549,7 @@ class HttpCli(object):
         lim = vfs.get_dbv(rem)[0].lim
         if lim:
             fp, rp = lim.all(self.ip, rp, clen, vfs.realpath, fp, self.conn.hsrv.broker)
-            bos.makedirs(fp, vfs.flags["chmod_d"])
+            bos.makedirs(fp, vf=vfs.flags)
 
         fp = os.path.join(fp, fn)
         rem = "{}/{}".format(rp, fn).strip("/")
@@ -3621,15 +3617,17 @@ class HttpCli(object):
                 zs = ub64enc(zb).decode("ascii")[:24].lower()
                 dp = "%s/md/%s/%s/%s" % (dbv.histpath, zs[:2], zs[2:4], zs)
                 self.log("moving old version to %s/%s" % (dp, mfile2))
-                if bos.makedirs(dp, vfs.flags["chmod_d"]):
+                if bos.makedirs(dp, vf=vfs.flags):
                     with open(os.path.join(dp, "dir.txt"), "wb") as f:
                         f.write(afsenc(vrd))
-                        if "chmod_f" in vfs.flags:
-                            os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+                        if "fperms" in vfs.flags:
+                            set_fperms(f, vfs.flags)
             elif hist_cfg == "s":
                 dp = os.path.join(mdir, ".hist")
                 try:
                     bos.mkdir(dp, vfs.flags["chmod_d"])
+                    if "chown" in vfs.flags:
+                        bos.chown(dp, vfs.flags["uid"], vfs.flags["gid"])
                     hidedir(dp)
                 except:
                     pass
@@ -3668,8 +3666,8 @@ class HttpCli(object):
             wunlink(self.log, fp, vfs.flags)
 
         with open(fsenc(fp), "wb", self.args.iobuf) as f:
-            if "chmod_f" in vfs.flags:
-                os.fchmod(f.fileno(), vfs.flags["chmod_f"])
+            if "fperms" in vfs.flags:
+                set_fperms(f, vfs.flags)
             sz, sha512, _ = hashcopy(p_data, f, None, 0, self.args.s_wr_slp)
 
         if lim:

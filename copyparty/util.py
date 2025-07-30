@@ -1587,7 +1587,8 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
     fun = kwargs.pop("fun", open)
     fdir = kwargs.pop("fdir", None)
     suffix = kwargs.pop("suffix", None)
-    chmod = kwargs.pop("chmod", -1)
+    vf = kwargs.pop("vf", None)
+    fperms = vf and "fperms" in vf
 
     if fname == os.devnull:
         return fun(fname, *args, **kwargs), fname
@@ -1631,11 +1632,11 @@ def ren_open(fname: str, *args: Any, **kwargs: Any) -> tuple[typing.IO[Any], str
                 fp2 = os.path.join(fdir, fp2)
                 with open(fsenc(fp2), "wb") as f2:
                     f2.write(orig_name.encode("utf-8"))
-                    if chmod >= 0:
-                        os.fchmod(f2.fileno(), chmod)
+                    if fperms:
+                        set_fperms(f2, vf)
 
-            if chmod >= 0:
-                os.fchmod(f.fileno(), chmod)
+            if fperms:
+                set_fperms(f, vf)
 
             return f, fname
 
@@ -2563,6 +2564,14 @@ def lsof(log: "NamedLogger", abspath: str) -> None:
         log("lsof %r = %s\n%s" % (abspath, rc, zs), 3)
     except:
         log("lsof failed; " + min_ex(), 3)
+
+
+def set_fperms(f: Union[typing.BinaryIO, typing.IO[Any]], vf: dict[str, Any]) -> None:
+    fno = f.fileno()
+    if "chmod_f" in vf:
+        os.fchmod(fno, vf["chmod_f"])
+    if "chown" in vf:
+        os.fchown(fno, vf["uid"], vf["gid"])
 
 
 def _fs_mvrm(
