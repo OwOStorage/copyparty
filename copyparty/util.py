@@ -4186,7 +4186,14 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
                 stream = codecs.getreader(enc)(stream)
             return stream
 
-    return open(os.path.join(E.mod, name), mode, encoding=enc)
+    ap = os.path.join(E.mod, name)
+
+    if PY2:
+        import codecs
+
+        return codecs.open(ap, "r", encoding=enc)  # type: ignore
+
+    return open(ap, mode, encoding=enc)
 
 
 class Pebkac(Exception):
