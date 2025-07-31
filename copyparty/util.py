@@ -4200,8 +4200,6 @@ def load_resource(E: EnvParams, name: str, mode="rb") -> IO[bytes]:
     ap = os.path.join(E.mod, name)
 
     if PY2:
-        import codecs
-
         return codecs.open(ap, "r", encoding=enc)  # type: ignore
 
     return open(ap, mode, encoding=enc)
