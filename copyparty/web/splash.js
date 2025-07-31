@@ -1,3 +1,4 @@
+// please add translations in alphabetic order, but keep "nor" and "eng" first
 var Ls = {
 	"nor": {
 		"a1": "oppdater",
