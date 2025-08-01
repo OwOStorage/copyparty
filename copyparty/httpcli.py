@@ -3109,6 +3109,20 @@ class HttpCli(object):
                 if "fperms" in vfs.flags:
                     set_fperms(f, vfs.flags)
 
+            dbv, vrem = vfs.get_dbv(rem)
+            self.conn.hsrv.broker.say(
+                "up2k.hash_file",
+                dbv.realpath,
+                dbv.vpath,
+                dbv.flags,
+                vrem,
+                sanitized,
+                self.ip,
+                bos.stat(fn).st_mtime,
+                self.uname,
+                True,
+            )
+
         vpath = "{}/{}".format(self.vpath, sanitized).lstrip("/")
         self.redirect(vpath, "?edit")
         return True
