@@ -230,6 +230,7 @@ var Ls = {
 		"ct_qdel": 'when deleting files, only ask for confirmation once">qdel',
 		"ct_dir1st": 'sort folders before files">📁 first',
 		"ct_nsort": 'natural sort (for filenames with leading digits)">nsort',
+		"ct_utc": 'show all datetimes in UTC">UTC',
 		"ct_readme": 'show README.md in folder listings">📜 readme',
 		"ct_idxh": 'show index.html instead of folder listing">htm',
 		"ct_sbars": 'show scrollbars">⟊',
@@ -857,6 +858,7 @@ var Ls = {
 		"ct_qdel": 'sletteknappen spør bare én gang om bekreftelse">hurtig🗑️',
 		"ct_dir1st": 'sorter slik at mapper kommer foran filer">📁 først',
 		"ct_nsort": 'naturlig sortering (forstår tall i filnavn)">nsort',
+		"ct_utc": 'bruk UTC for alle klokkeslett">UTC',
 		"ct_readme": 'vis README.md nedenfor filene">📜 readme',
 		"ct_idxh": 'vis index.html istedenfor fil-liste">htm',
 		"ct_sbars": 'vis rullgardiner / skrollefelt">⟊',
@@ -1483,6 +1485,7 @@ var Ls = {
 		"ct_qdel": '删除文件时，只需确认一次">快删', //m
 		"ct_dir1st": '在文件之前排序文件夹">📁 排序',
 		"ct_nsort": '正确排序以数字开头的文件名">数字排序', //m
+		"ct_utc": '所有时间请使用UTC">UTC', //m
 		"ct_readme": '在文件夹列表中显示 README.md">📜 readme',
 		"ct_idxh": '显示 index.html 代替文件夹列表">htm',
 		"ct_sbars": '显示滚动条">⟊',
@@ -2109,6 +2112,7 @@ var Ls = {
 		"ct_qdel": 'Nur einmal fragen, wenn mehrere Dateien gelöscht werden">qdel',
 		"ct_dir1st": 'Ordner vor Dateien sortieren">📁 zuerst',
 		"ct_nsort": 'Natürliche Sortierung (für Dateinamen mit führenden Ziffern)">nsort',
+		"ct_utc": 'Verwenden Sie UTC für alle Zeitangaben">UTC', //m
 		"ct_readme": 'README.md in Dateiliste anzeigen">📜 readme',
 		"ct_idxh": 'index.html anstelle von Dateiliste anzeigen">htm',
 		"ct_sbars": 'Scrollbars zeigen">⟊',
@@ -3362,6 +3366,7 @@ var Ls = {
 		"ct_qdel": 'спрашивать подтверждение только один раз перед удалением файлов">быстр. удал.',
 		"ct_dir1st": 'разместить папки над файлами">📁 сверху',
 		"ct_nsort": 'сортировка по числам$N(например, файл с &gt;code&lt;2&gt;/code&lt; в начале названия идёт перед &gt;code&lt;11&gt;/code&lt;)">нат. сорт.',
+		"ct_utc": 'используйте UTC для всех временных меток">UTC', //m
 		"ct_readme": 'показывать содержимое README.md в описании папки">📜 ридми',
 		"ct_idxh": 'показывать страницу index.html в текущей папке вместо интерфейса">htm',
 		"ct_sbars": 'показывать полосы прокрутки">⟊',
@@ -3987,6 +3992,7 @@ var Ls = {
 		"ct_qdel": 'al eliminar archivos, pedir confirmación solo una vez">elim. rápida',
 		"ct_dir1st": 'ordenar carpetas antes que archivos">📁 primero',
 		"ct_nsort": 'orden natural (para nombres de archivo con dígitos iniciales)">ord. natural',
+		"ct_utc": 'use UTC para todas las horas">UTC', //m
 		"ct_readme": 'mostrar README.md en los listados de carpetas">📜 léeme',
 		"ct_idxh": 'mostrar index.html en lugar del listado de carpetas">htm',
 		"ct_sbars": 'mostrar barra lateral">⟊',
@@ -4613,6 +4619,7 @@ var Ls = {
 		"ct_qdel": 'при видаленні файлів, запитати підтвердження лише один раз">швидке видалення',
 		"ct_dir1st": 'сортувати папки перед файлами">спочатку 📁',
 		"ct_nsort": 'природне сортування (для імен файлів з початковими цифрами)">природне сортування',
+		"ct_utc": 'використовуйте UTC для всіх часових позначень">UTC', //m
 		"ct_readme": 'показати README.md у списках папок">📜 readme',
 		"ct_idxh": 'показати index.html замість списку папки">htm',
 		"ct_sbars": 'показати смуги прокрутки">⟊',
@@ -5232,6 +5239,7 @@ ebi('op_cfg').innerHTML = (
 	'		<a id="qdel" class="tgl btn" href="#" tt="' + L.ct_qdel + '</a>\n' +
 	'		<a id="dir1st" class="tgl btn" href="#" tt="' + L.ct_dir1st + '</a>\n' +
 	'		<a id="nsort" class="tgl btn" href="#" tt="' + L.ct_nsort + '</a>\n' +
+	'		<a id="utctid" class="tgl btn" href="#" tt="' + L.ct_utc + '</a>\n' +
 	'		<a id="ireadme" class="tgl btn" href="#" tt="' + L.ct_readme + '</a>\n' +
 	'		<a id="idxh" class="tgl btn" href="#" tt="' + L.ct_idxh + '</a>\n' +
 	'		<a id="sbars" class="tgl btn" href="#" tt="' + L.ct_sbars + '</a>\n' +
@@ -10607,7 +10615,7 @@ var search_ui = (function () {
 				nodes.push(esc('' + v));
 			}
 
-			nodes = nodes.concat([ext, unix2iso(ts)]);
+			nodes = nodes.concat([ext, unix2ui(ts)]);
 			html.push(nodes.join('</td><td>'));
 			html.push('</td></tr>');
 		}
@@ -10818,6 +10826,10 @@ var treectl = (function () {
 		var xhr = new XHR();
 		xhr.open('GET', SR + '/?setck=dots=' + (v ? 'y' : ''), true);
 		xhr.send();
+	});
+	bcfg_bind(r, 'utctid', 'utctid', dutc, function (v) {
+		window.unix2ui = v ? unix2iso : unix2iso_localtime;
+		resort();
 	});
 	bcfg_bind(r, 'nsort', 'nsort', dnsort, resort);
 	bcfg_bind(r, 'dir1st', 'dir1st', true, resort);
@@ -11514,14 +11526,14 @@ var treectl = (function () {
 				if (k == ".dur")
 					sv = v ? s2ms(v) : "";
 				else if (k == ".up_at")
-					sv = v ? unix2iso(v) : "";
+					sv = v ? unix2ui(v) : "";
 				else {
 					ln.push(esc('' + v));
 					continue;
 				}
 				ln[ln.length - 1] += '</td><td sortv="' + v + '">' + sv;
 			}
-			ln = ln.concat([tn.ext, unix2iso(tn.ts)]).join('</td><td>');
+			ln = ln.concat([tn.ext, unix2ui(tn.ts)]).join('</td><td>');
 			html.push(ln + '</td></tr>');
 		}
 		html.push('</tbody>');
@@ -13184,7 +13196,7 @@ var unpost = (function () {
 				var done = res[a].pd === undefined;
 				html.push(
 					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + (done ? L.un_del : L.un_abrt) + '</a></td>' +
-					'<td>' + unix2iso(res[a].at) + '</td>' +
+					'<td>' + unix2ui(res[a].at) + '</td>' +
 					'<td>' + ('' + res[a].sz).replace(/\B(?=(\d{3})+(?!\d))/g, " ") + '</td>' +
 					(done ? '<td>100%</td>' : '<td>' + res[a].pd + '%</td>') +
 					'<td>' + linksplit(res[a].vp).join('<span> / </span>') + '</td></tr>');
