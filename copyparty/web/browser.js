@@ -12526,29 +12526,19 @@ var unpost = (function () {
 				return ebi('op_unpost').innerHTML = '<p>' + L.badreply + ':</p>' + unpre(this.responseText);
 			}
 
-			if (ores.u.length == 1 && ores.u[0].timeout) {
+			if (ores.nou)
 				html.push('<p>' + L.un_nou + '</p>');
-				ores.u = [];
-			}
 
-			if (ores.c.length == 1 && ores.c[0].kinshi) {
+			if (ores.noc)
 				html.push('<p>' + L.un_noc + '</p>');
-				ores.c = [];
-			}
 
-			for (var a = 0; a < ores.u.length; a++)
-				ores.u[a].k = 'u';
-
-			for (var a = 0; a < ores.c.length; a++)
-				ores.c[a].k = 'c';
-
-			var res = ores.u.concat(ores.c);
+			var res = ores.f;
 
 			if (res.length) {
-				if (res.length == 2000)
+				if (ores.of)
 					html.push("<p>" + L.un_max);
 				else
-					html.push("<p>" + L.un_avail.format(ores.c.length, ores.u.length));
+					html.push("<p>" + L.un_avail.format(ores.nc, ores.nu));
 
 				html.push("<br />" + L.un_m2 + "</p>");
 				html.push("<table><thead><tr><td></td><td>time</td><td>size</td><td>done</td><td>file</td></tr></thead><tbody>");
@@ -12565,7 +12555,7 @@ var unpost = (function () {
 							'<a me="' + me + '" class="n' + a + '" n2="' + (a + mods[b]) +
 							'" href="#">' + L.un_next.format(Math.min(mods[b], res.length - a)) + '</a></td></tr>');
 
-				var done = res[a].k == 'c';
+				var done = res[a].pd === undefined;
 				html.push(
 					'<tr><td><a me="' + me + '" class="n' + a + '" href="#">' + (done ? L.un_del : L.un_abrt) + '</a></td>' +
 					'<td>' + unix2iso(res[a].at) + '</td>' +
