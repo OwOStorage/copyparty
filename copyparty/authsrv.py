@@ -3458,7 +3458,7 @@ def expand_config_file(
     ipath += " -> " + fp
     ret.append("#\033[36m opening cfg file{}\033[0m".format(ipath))
 
-    cfg_lines = read_utf8(log, fp, True).split("\n")
+    cfg_lines = read_utf8(log, fp, True).replace("\t", " ").split("\n")
     if True:  # diff-golf
         for oln in [x.rstrip() for x in cfg_lines]:
             ln = oln.split("  #")[0].strip()
